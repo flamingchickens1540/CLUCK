@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync } from 'fs'
 const google_client_secret = JSON.parse(readFileSync('secrets/client_secret.json'))
 
 // Refresh profile images every day // TODO: Switch to CRON job
-// setInterval(collect(signin_secret,token,google_client_secret),24*60*60*1000)
+setInterval(collect(signin_secret,token,google_client_secret),24*60*60*1000)
 
 // Init Express App
 const app = express()
