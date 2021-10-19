@@ -1,0 +1,7 @@
+secrets
+node_modules
+*/node_modules
+package-lock.json
+loggedin.json
+memberlog.json
+failed.json
