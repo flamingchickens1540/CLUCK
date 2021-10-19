@@ -57,6 +57,9 @@ app.get('/font/:font',(req,res)=>{
 app.get('/members',(req,res)=>{
     res.sendFile('members.json', {root:'./member-collector'})
 })
+app.get('/favicon.ico',(req,res)=>{
+    res.sendFile('cluckcluck!!!!!.png',{root:'./sites/img'})
+})
 
 
 app.listen(server_port, (err) => { console.log(`listening: ${server_port} | err: ${err !== undefined ? err : "none"}`) });
