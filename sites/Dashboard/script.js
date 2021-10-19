@@ -9,7 +9,7 @@ let seconds = document.getElementById("seconds")
 const totwo = (num) => { if (new String(num).length == 1) { return "0" + new String(num) } else { return num } }
 async function updateClock() {
     let now = new Date();
-    hourminute.innerHTML = `${(now.getHours()-1)%12+1}:${totwo(now.getMinutes())}`
+    hourminute.innerHTML = `${((now.getHours() - 1)%12+12)%12 + 1}:${totwo(now.getMinutes())}`
     seconds.innerHTML = `:${totwo(now.getSeconds())}`
     monthday.innerHTML = `${now.toLocaleString('default', { month: 'short' })}<br>${now.getDate()}`;
 }
@@ -20,8 +20,8 @@ let peeps = document.getElementById('peeps')
 // Regularly refresh members
 let members = {}
 let memberMap = {}
-const refreshMembers = ()=>new Promise(ress=>fetch('/members').then(res=>res.json().then(json=>{members=json; json.forEach(member=>{memberMap[member.name]=member}); ress()})));
-setInterval(refreshMembers,60*60*1000)
+const refreshMembers = () => new Promise(ress => fetch('/members').then(res => res.json().then(json => { members = json; json.forEach(member => { memberMap[member.name] = member }); ress() })));
+setInterval(refreshMembers, 60 * 60 * 1000)
 // function addperson(name, picturepath) {
 
 // }
@@ -37,7 +37,7 @@ async function rebuildList() {
 
     peeps.innerHTML = '';
     for (let name in loggedInMap) {
-        let validname = name.replace(/\ /g,'_')
+        let validname = name.replace(/\ /g, '_')
         let membercell = document.createElement(validname + "_cell");
         membercell.classList.add('membercell')
         let memberimage = document.createElement(validname + "_image");
@@ -52,7 +52,7 @@ async function rebuildList() {
 
         let memberObj = memberMap[name];
         let imagepath = "/img/boi.jpg";
-        if(memberObj && memberObj.img) {
+        if (memberObj && memberObj.img) {
             imagepath = memberObj.img;
         }
         // let imagepath = "/img/boi.jpg";
@@ -78,10 +78,12 @@ function getImageUrlFromObj(obj) {
 }
 function getTimeFromObj(obj) {
     let hours = new Date(obj.dt * 1000).getHours();
-    let ampm = hours<12 ? 'am':'pm' ;
-    return `${(hours-1)%12+1}${ampm}`
+    let ampm = hours < 12 ? 'am' : 'pm';
+    return `${(((hours - 1) % 12)+12)%12 + 1}${ampm}`
     // return `${(hours-1)%12+1}${ampm}`
 }
+
+
 function getWeatherCell(obj, isnow) {
     let weathercell = document.createElement('weathercell')
     weathercell.classList.add('weathercell')
@@ -92,7 +94,7 @@ function getWeatherCell(obj, isnow) {
 
     weathericon.style.backgroundImage = `url(${getImageUrlFromObj(obj)})`
     weathertime.innerHTML = getTimeFromObj(obj)
-    if(isnow) {weathertime.innerHTML = "NOW"}
+    if (isnow) { weathertime.innerHTML = "NOW" }
 
     weathercell.appendChild(weathericon);
     weathercell.appendChild(weathertime);
@@ -102,16 +104,16 @@ function getWeatherCell(obj, isnow) {
 async function updateWeather() {
     let weatherdata = await (await fetch(weatherApiUrl)).json()
     console.log(weatherdata)
-    
+
     // for(let weatherelement of document.getElementsByClassName('weathercell')) {
     //     // weatherelement.remove()
     //     weather.removeChild(weatherelement)
     // }
     weather.innerHTML = `<weathertitle class="paneltitle">Weather:</weathertitle>`
     weather.appendChild(getWeatherCell(weatherdata.current, true))
-    for(let i = 1; i<=4;i++) {
-    weather.appendChild(getWeatherCell(weatherdata.hourly[i]))
+    for (let i = 1; i <= 4; i++) {
+        weather.appendChild(getWeatherCell(weatherdata.hourly[i]))
     }
 }
 updateWeather()
-setInterval(updateWeather,5*60*1000)
+setInterval(updateWeather, 5 * 60 * 1000)
