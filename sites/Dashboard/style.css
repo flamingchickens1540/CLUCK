@@ -2,6 +2,7 @@
     font-family:"fishface";
     src:url("/font/fishface.ttf");
 }
+@import url(//db.onlinewebfonts.com/c/9b62dc86f936227b3f7b367bd0b6c05e?family=Tw+Cen+MT);
 
 :root {
     --lx: 3;
