@@ -27,12 +27,16 @@ export const collect = async (signin_secret, token, google_client_secret) => {
     const startNameRow = 3
     const endNameRow = 60
     const nameColumn = 0
+    const validPictColumn = 6;
     await sheet.loadCells({ startRowIndex: startNameRow, endRowIndex: endNameRow + 1, startColumnIndex: nameColumn, endColumnIndex: nameColumn + 1 })
+    await sheet.loadCells({ startRowIndex: startNameRow, endRowIndex: endNameRow + 1, startColumnIndex: validPictColumn, endColumnIndex: validPictColumn + 1 })
     for (let y = startNameRow; y <= endNameRow; y++) {
         let cell = sheet.getCell(y, nameColumn)
         let name = cell.value
         if (name != 'Name' && name != null && name != '' && name != ' ') {
-            names.push(name)
+            let pictcell = sheet.getCell(y, validPictColumn)
+            let pict = pictcell.value
+            names.push({ name, pict: !pict || !pict.includes || !pict.includes('N') })
         }
     }
     // Huzzah! Names aquired!
@@ -48,18 +52,22 @@ export const collect = async (signin_secret, token, google_client_secret) => {
 
     // Build members catalogue
     let members = []
-    names.forEach(name => {
+    names.forEach(nameobj => {
+        let name = nameobj.name
+        let pict = nameobj.pict;
         let foundMember = users.find(elem => { return elem.real_name.includes(name.trim()) || name.includes(elem.real_name.trim()) });
         if (!foundMember) {
             members.push({
                 name: name,
-                firstname: name.split(' ')[0]
+                firstname: name.split(' ')[0],
+                pict:pict
             })
         } else {
             members.push({
                 name: name,
                 firstname: name.split(' ')[0],
-                img: foundMember.profile.image_original
+                img: foundMember.profile.image_original,
+                pict:pict
             })
         }
     })
