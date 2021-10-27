@@ -51,7 +51,7 @@ async function rebuildList() {
         // console.log(memberMap[name])
 
         let memberObj = memberMap[name];
-        let imagepath = "/img/boi.jpg";
+        let imagepath = "https://media.wired.co.uk/photos/606d9c01f19707fe1aef2e63/4:3/w_2664,h_1998,c_limit/egg-insta.jpg";
         if (memberObj && memberObj.img) {
             imagepath = memberObj.img;
         }

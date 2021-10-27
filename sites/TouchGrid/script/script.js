@@ -106,7 +106,7 @@ async function run() {
         // Do other adding and styling things
         memberButton.appendChild(text)
         memberButton.style.setProperty('background-image', `url(${member.img})`)
-        if (!member.img) { memberButton.style.setProperty('background-image', `url(/img/boi.jpg)`) }
+        if (!member.img) { memberButton.style.setProperty('background-image', `url(https://media.wired.co.uk/photos/606d9c01f19707fe1aef2e63/4:3/w_2664,h_1998,c_limit/egg-insta.jpg)`) }
         // if (!member.img) { memberButton.style.setProperty('background-image', `url(/img/defpic.jpg)`) }
         memberButton.className = 'button-in'
 
