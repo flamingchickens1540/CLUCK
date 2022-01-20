@@ -60,7 +60,7 @@ if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
             addGridJS();
         }
     }
-    container.body.appendChild(pass)
-    container.body.appendChild(butt)
+    container.appendChild(pass)
+    container.appendChild(butt)
 }
 })();
