@@ -24,6 +24,7 @@ function setCookie(cname, cvalue, exdays) {
 
 function getCookie(name) {
     var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    if(!result) {return null};
     return result[1];
 }
 
