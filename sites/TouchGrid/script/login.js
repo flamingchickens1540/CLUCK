@@ -24,6 +24,7 @@ function setCookie(cname, cvalue, exdays) {
 
 function getCookie(name) {
     var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    console.log(result)
     if(!result) {return null};
     return result[1];
 }
@@ -37,7 +38,7 @@ function addGridJS() {
         document.body.appendChild(scp)
 }
 
-if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
+if(cyrb53((getCookie('funneeText'))?.value) == passHash) {
     console.log('password cookie is correct!')
    addGridJS();
 } else {
@@ -53,7 +54,8 @@ if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
 
     butt.onclick = function () {
         if(cyrb53(pass.value) == passHash) {
-            setCookie('funneeText',pass.value,200)
+            console.log('cookie set to' + pass.value)
+            setCookie('funneeText',pass.value,100)
             pass.remove();
             butt.remove()
             container.remove();
