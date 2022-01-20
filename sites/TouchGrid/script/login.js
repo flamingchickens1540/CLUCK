@@ -38,8 +38,10 @@ function addGridJS() {
 }
 
 if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
+    console.log('password cookie is correct!')
    addGridJS();
 } else {
+    console.log('password cookie is incorrect!')
     let pass = document.createElement('input');
     let butt = document.createElement('button')
     butt.innerHTML = "enter password"
