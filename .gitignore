@@ -5,3 +5,4 @@ package-lock.json
 loggedin.json
 memberlog.json
 failed.json
+*/.DS_Store
