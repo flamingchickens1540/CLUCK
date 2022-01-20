@@ -42,6 +42,11 @@ if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
    addGridJS();
 } else {
     console.log('password cookie is incorrect!')
+    let container = document.createElement('cont');
+    container.style.position = "absolute"
+    container.style.top = "0"
+    container.style.left = "0"
+    document.body.appendChild(container)
     let pass = document.createElement('input');
     let butt = document.createElement('button')
     butt.innerHTML = "enter password"
@@ -51,10 +56,11 @@ if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
             setCookie('funneeText',pass.value,200)
             pass.remove();
             butt.remove()
+            container.remove();
             addGridJS();
         }
     }
-    document.body.appendChild(pass)
-    document.body.appendChild(butt)
+    container.body.appendChild(pass)
+    container.body.appendChild(butt)
 }
 })();
