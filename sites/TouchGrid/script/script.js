@@ -171,5 +171,5 @@ run()
 
 setTimeout(async ()=>{
     await fetch('/members/refresh')
-    window.location.reload(1)
+    // window.location.reload(1)
 },60*60*1000)
