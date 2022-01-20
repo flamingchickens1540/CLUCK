@@ -15,6 +15,18 @@ const cyrb53 = function(str, seed = 0) {
     return 4294967296 * (2097151 & h2) + (h1>>>0);
 };
 
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    return result[1];
+}
+
 function addGridJS() {
     let api = document.createElement('script');
         let scp = document.createElement('script');
@@ -24,7 +36,7 @@ function addGridJS() {
         document.body.appendChild(scp)
 }
 
-if(cyrb53((await cookieStore.get('funneeText'))?.value) == passHash) {
+if(cyrb53((await getCookie('funneeText'))?.value) == passHash) {
    addGridJS();
 } else {
     let pass = document.createElement('input');
@@ -33,7 +45,7 @@ if(cyrb53((await cookieStore.get('funneeText'))?.value) == passHash) {
 
     butt.onclick = function () {
         if(cyrb53(pass.value) == passHash) {
-            cookieStore.set('funneeText',pass.value)
+            setCookie('funneeText',pass.value,200)
             pass.remove();
             butt.remove()
             addGridJS();
