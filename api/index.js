@@ -2,7 +2,7 @@
 function sleep(milis) { return new Promise(res => setTimeout(res, milis)) }
 
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { max_row, name_column, lab_hours_column, hours_sheet_id } from './consts.js'
+import { max_row, name_column, lab_hours_column, hours_sheet_id, min_row } from './consts.js'
 import cors from 'cors'
 import fs from 'fs'
 import { CronJob } from 'cron'
@@ -35,10 +35,9 @@ export const setupApi = async (app,token, google_client_secret) => {
         let hoursRounded = parseFloat(hours).toFixed(1);
         if (hoursRounded == 0) { return }
         await sheet.loadCells({ startRowIndex: 0, endRowIndex: max_row + 1, startColumnIndex: name_column, endColumnIndex: lab_hours_column + 1 })
-        for (let y = 0; y < max_row; y++) {
+        for (let y = min_row; y < max_row; y++) {
             const name_cell = sheet.getCell(y, name_column)
-
-            if (name.includes(name_cell.value) && name_cell.value != "" && name_cell.value != " ") {
+            if (name_cell.value && name_cell.value != "" && name_cell.value != " " && name.toLowerCase().includes(name_cell.value.toLowerCase())) {
                 const hours_cell = sheet.getCell(y, lab_hours_column)
                 let preformula = hours_cell.formula
                 if ('d' + preformula == 'dnull') {
