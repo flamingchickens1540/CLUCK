@@ -2,7 +2,7 @@
 function sleep(milis) { return new Promise(res => setTimeout(res, milis)) }
 
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { hours_spreadsheet_id, log_sheet_name } from './consts.js'
+import { hours_spreadsheet_id, log_sheet_name, loggedin_sheet_name } from './consts.js'
 import cors from 'cors'
 import fs from 'fs'
 import { CronJob } from 'cron'
@@ -31,8 +31,8 @@ export const setupApi = async (app,token, google_client_secret) => {
     const doc = await new GoogleSpreadsheet(hours_spreadsheet_id)
     await doc.useServiceAccountAuth(google_client_secret)
     await doc.loadInfo()
-    let sheet = doc.sheetsByTitle[log_sheet_name]
-
+    let timesheet = doc.sheetsByTitle[log_sheet_name]
+    let loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
     async function addLabHours(name, timeIn, timeOut) {
         if (typeof(timeOut)==='undefined') timeOut = Date.now();
         
@@ -42,9 +42,9 @@ export const setupApi = async (app,token, google_client_secret) => {
         if (hoursRounded == 0) { return }
 
         // Add to sheet
-        await sheet.loadCells()
-        await sheet.addRow([timeIn/1000, timeOut/1000, name, hoursRounded, 'lab'])
-        await sheet.saveUpdatedCells()
+        await timesheet.loadCells()
+        await timesheet.addRow([timeIn/1000, timeOut/1000, name, hoursRounded, 'lab'])
+        await timesheet.saveUpdatedCells()
     }
 
     async function addLabHoursSafe(name, timeIn) {
@@ -56,6 +56,17 @@ export const setupApi = async (app,token, google_client_secret) => {
             console.error(`failed hours add operation: ${name} : ${timeIn}, ${timeOut}`)
             console.error(e)
         }
+    }
+
+    async function updateLoggedIn() {
+        await loggedin_sheet.loadCells()
+        await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 })
+        let rows = Object.entries(loggedIn).map(entry => [entry[0], new Date(entry[1]).toLocaleTimeString()])
+        if (rows.length > 0) {
+            await loggedin_sheet.addRows(rows)
+        }
+        
+        await loggedin_sheet.saveUpdatedCells()
     }
 
     // INIT API ROUTES
@@ -108,7 +119,12 @@ export const setupApi = async (app,token, google_client_secret) => {
     }
 
     function logMember(name, loggingin) {
-        memberlog.push({ name, loggingin, time: Date.now() })
+        try {
+            updateLoggedIn()
+        } catch (e) {
+            console.error(e)
+        }
+        memberlog.push({ name, loggingin, time: Date.now(), row: 0 })
     }
 
     // Periodically save
