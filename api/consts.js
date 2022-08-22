@@ -1,11 +1,4 @@
 export const server_port = 4000
-export const hours_column = 4
-export const lab_hours_column = 3
-export const total_hours_column = 5
-export const global_hours_label_column = 4
-export const global_hours_value_column = 5
-export const name_column = 0;
-export const max_row = 59;
-export const min_row = 3;
-export const hours_sheet_id = '10AcplDpfbXlECQYaFuTFcIeN2U8raP9XysuN3e31js0' // REAL SHEET
-// export const hours_sheet_id = '1HrqjjiX9Hghol3ugSFyL8Hslag59cUP88hAgJHW-TUU' // TEST SHEET
+export const log_sheet_name = "Log"
+export const hours_spreadsheet_id = '10AcplDpfbXlECQYaFuTFcIeN2U8raP9XysuN3e31js0' // REAL SHEET
+// export const hours_spreadsheet_id = '1HrqjjiX9Hghol3ugSFyL8Hslag59cUP88hAgJHW-TUU' // TEST SHEET

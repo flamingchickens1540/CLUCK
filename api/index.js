@@ -2,7 +2,7 @@
 function sleep(milis) { return new Promise(res => setTimeout(res, milis)) }
 
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { max_row, name_column, lab_hours_column, hours_sheet_id, min_row } from './consts.js'
+import { hours_spreadsheet_id, log_sheet_name } from './consts.js'
 import cors from 'cors'
 import fs from 'fs'
 import { CronJob } from 'cron'
@@ -10,7 +10,7 @@ import { WebClient } from "@slack/web-api"
 
 export const setupApi = async (app,token, google_client_secret) => {
     app.use(cors())
-
+    
     let loggedIn = {}
     if (fs.existsSync('api/loggedin.json')) { loggedIn = JSON.parse(fs.readFileSync('api/loggedin.json')) }
 
@@ -20,55 +20,49 @@ export const setupApi = async (app,token, google_client_secret) => {
     // INIT SLACKBOT
     const client = new WebClient(token);
     let memberlist = (await client.users.list()).members;
-    function slackTo(fullname, text) {
+
+    function sendSlackMessage(fullname, text) {
         let user = memberlist.find(userobj => userobj.profile['real_name'].toLowerCase().includes(fullname.toLowerCase()))
         if (!user) { return; }
         return client.chat.postMessage({ channel: user.id, text: text })
     }
 
-    //// INIT SPREADSHEET
-    const doc = await new GoogleSpreadsheet(hours_sheet_id)
+    // INIT SPREADSHEET
+    const doc = await new GoogleSpreadsheet(hours_spreadsheet_id)
     await doc.useServiceAccountAuth(google_client_secret)
     await doc.loadInfo()
-    let sheet = doc.sheetsByIndex[0]
-    async function addLabHours(name, hours) {
-        let hoursRounded = parseFloat(hours).toFixed(1);
+    let sheet = doc.sheetsByTitle[log_sheet_name]
+
+    async function addLabHours(name, timeIn, timeOut) {
+        if (typeof(timeOut)==='undefined') timeOut = Date.now();
+        
+        // Calculate duration
+        let hours = (timeOut - timeIn) / 3600000
+        let hoursRounded = parseFloat(hours).toFixed(2);
         if (hoursRounded == 0) { return }
-        await sheet.loadCells({ startRowIndex: 0, endRowIndex: max_row + 1, startColumnIndex: name_column, endColumnIndex: lab_hours_column + 1 })
-        for (let y = min_row; y < max_row; y++) {
-            const name_cell = sheet.getCell(y, name_column)
-            if (name_cell.value && name_cell.value != "" && name_cell.value != " " && name.toLowerCase().includes(name_cell.value.toLowerCase())) {
-                const hours_cell = sheet.getCell(y, lab_hours_column)
-                let preformula = hours_cell.formula
-                if ('d' + preformula == 'dnull') {
-                    if (hours_cell.value) {
-                        preformula = `=${hours_cell.value}`
-                    } else {
-                        preformula = `=0`
-                    }
-                }
-                hours_cell.formula = `${preformula}+${hoursRounded}`
-                hours_cell.save()
-                return
-            }
 
-        }
+        // Add to sheet
+        await sheet.loadCells()
+        await sheet.addRow([timeIn/1000, timeOut/1000, name, hoursRounded, 'lab'])
+        await sheet.saveUpdatedCells()
     }
-    async function addLabHoursSafe(name, hours) {
+
+    async function addLabHoursSafe(name, timeIn) {
         try {
-            await addLabHours(name, hours)
+            await addLabHours(name, timeIn)
         } catch (e) {
-            failed.push({ name, hours })
-            console.log(`failed hours add opperation: ${name} : ${hours}`)
+            let timeOut = Date.now()
+            failed.push({ name, timeIn, timeOut})
+            console.error(`failed hours add operation: ${name} : ${timeIn}, ${timeOut}`)
+            console.error(e)
         }
     }
 
-
+    // INIT API ROUTES
     app.get('/clock/', (req, res) => {
         // Get and check args
         let name = req.query.name
         let loggingin = req.query.loggingin
-        console.log(loggingin)
         // Check for existing request arguments
         if (!name || !loggingin) { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
 
@@ -81,7 +75,7 @@ export const setupApi = async (app,token, google_client_secret) => {
             // Log Out
             if (loggedIn[name]) { // Test to make sure person is logged in
                 res.end()
-                addLabHoursSafe(name, (Date.now() - loggedIn[name]) / 3600000)
+                addLabHoursSafe(name, loggedIn[name])
                 delete loggedIn[name]
                 logMember(name, false)
             } else { res.end() }
@@ -100,9 +94,6 @@ export const setupApi = async (app,token, google_client_secret) => {
         res.status(200);
         res.send("pong");
     })
-
-    // Start server
-    // NOPE
 
     // Read log
     const logPath = './api/memberlog.json'
@@ -132,17 +123,16 @@ export const setupApi = async (app,token, google_client_secret) => {
         }
     })();
 
-    // Periodically retry failed requests EVERY HOUR
+    // Periodically retry failed requests EVERY HOUR and on startup
     (async () => {
-        while (true) {
-            // await sleep(1000)
-            await sleep(60 * 60 * 1000)
+        while (true) {            
             const failedCache = failed;
             failed = []
             for (let failedLog of failedCache) {
-                console.log(`attempting to readd ${failedLog.hours} hours to ${failedLog.name}`)
-                await addLabHoursSafe(failedLog.name, failedLog.hours)
+                console.log(`attempting to log ${failedLog.timeIn} to ${failedLog.timeOut} hours for ${failedLog.name}`)
+                await addLabHoursSafe(failedLog.name, failedLog.timeIn, failedLog.timeOut)
             }
+            await sleep(60 * 60 * 1000)
         }
     })();
 
@@ -153,7 +143,7 @@ export const setupApi = async (app,token, google_client_secret) => {
         console.log('hiiii')
         messageUsers.forEach(memberName => {
             console.log(memberName)
-            slackTo(memberName, `Hey ${memberName.split(' ')[0]}! You signed into the lab today but forgot to sign out, so we didnt log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`)
+            sendSlackMessage(memberName, `Hey ${memberName.split(' ')[0]}! You signed into the lab today but forgot to sign out, so we didnt log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`)
         })
     }, null, true, 'America/Los_Angeles')
     cronjob.start()
