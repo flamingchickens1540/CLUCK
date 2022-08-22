@@ -75,18 +75,20 @@ async function run() {
             // fullscreen()
 
             buttonJustPressed = true;
-            // Go up path to find button object
-            click.path.forEach(button => {
-                if (button.className != 'button-in') { return }
-                // Toggle logged in             
-                button.loggedIn = !button.loggedIn
-                // Update style
-                buttonStates[button.loggedIn].forEach(styleSpec => {
-                    button.style.setProperty(styleSpec.styleName, styleSpec.val)
-                })
-                // Cluck API Call
-                clock(button.fullname, button.loggedIn)
+
+            button = click.target;
+            if (click.target.classList.contains('button-text')) {
+                button = click.target.parentElement;
+            }
+            // Toggle logged in             
+            button.loggedIn = !button.loggedIn
+            // Update style
+            buttonStates[button.loggedIn].forEach(styleSpec => {
+                button.style.setProperty(styleSpec.styleName, styleSpec.val)
             })
+            // Cluck API Call
+            clock(button.fullname, button.loggedIn)
+            
         }
 
         // Add name text
