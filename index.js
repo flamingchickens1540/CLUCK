@@ -88,7 +88,7 @@ app.get('/favicon.ico', (req, res) => {
 })
 
 app.get("/", (req, res) => {
-    req.redirect('/dash')
+    res.redirect('/dash')
 })
 
 app.listen(server_port, (err) => { console.log(`listening: ${server_port} | err: ${err !== undefined ? err : "none"}`) });
