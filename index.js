@@ -84,8 +84,11 @@ app.get('/members/refresh', async (req, res) => {
     res.sendFile('members.json', { root: './member-collector' })
 })
 app.get('/favicon.ico', (req, res) => {
-    res.sendFile('cluckcluck!!!!!.png', { root: './sites/img' })
+    res.sendFile('favicon.svg', { root: './sites/img' })
 })
 
+app.get("/", (req, res) => {
+    req.redirect('/dash')
+})
 
 app.listen(server_port, (err) => { console.log(`listening: ${server_port} | err: ${err !== undefined ? err : "none"}`) });
