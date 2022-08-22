@@ -6,6 +6,7 @@ import { collect } from './member-collector/collector.js'
 import { signin_secret, token } from './secrets/slack_secrets.js'
 import express from 'express'
 import { readFileSync, writeFileSync } from 'fs'
+import fetch from 'node-fetch'
 const google_client_secret = JSON.parse(readFileSync('secrets/client_secret.json'))
 
 // Refresh profile images every day // TODO: Switch to CRON job
@@ -27,6 +28,26 @@ function getFileProcessed(filepath) {
 }
 
 // Setup Webpage Routes
+// NEW DASHBOARD
+app.get('/dash', (req, res) => {
+    res.send(getFileProcessed('./sites/NewDashboard/index.html'))
+    // res.sendFile('index.html', {root:'./sites/Dashboard/'})
+})
+let delphiPost = 0;
+app.get('/dash/delphi', async (req, res) => {
+    delphiPost++; delphiPost%=20; // switch to next post
+    let json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json()
+    let id = json.topic_list.topics[delphiPost].id
+    let link = 'https://www.chiefdelphi.com/t/' + id
+    let html = await(await fetch(link)).text()
+    res.send(html)
+})
+app.get('/dash/:resource', (req, res) => {
+    res.sendFile(req.params.resource, { root: './sites/NewDashboard/' })
+})
+
+
+
 // DASHBOARD
 app.get('/dashboard', (req, res) => {
     res.send(getFileProcessed('./sites/Dashboard/index.html'))
