@@ -1,0 +1,147 @@
+html{
+    font-family:sans-serif;
+    background-color: black;
+    color:rgba(240, 248, 255, 0.781);
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+#logo{
+    position:absolute;
+    left:-30vh;
+    height: 140vh;
+    top:-20vh;
+    filter:blur(.9vh) opacity(50%)
+}
+
+#main{
+    display: flex;
+    flex-flow: row;
+    position: absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap:1vw;
+    margin:2vw;
+}
+
+.cont{
+    display: flex;
+    gap:2.7vh;
+
+    flex-flow:column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis:50%
+    /* background-color: blue; */
+}
+
+h1 {
+    color: aliceblue;
+    margin:0;
+    white-space:normal;
+    display: flex;
+    flex-flow: column;
+    gap:1vh;
+
+    background-color: rgba(175, 175, 175, 0.134);
+    padding: 1.4vw;
+    border-radius: 0px;
+
+    font-size: 5vh;
+    /* text-decoration: underline; */
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    /* font-family: sans-serif; */
+}
+
+/* TOPIC TAGS */
+.topics{
+    display: flex;
+    flex-flow:row nowrap;
+    font-size: 3.5vh;
+    font-weight: lighter;
+    color:rgb(204, 204, 204);
+}
+.badge-wrapper{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    /* justify-content: center; */
+    /* background-color: red; */
+}
+.badge-category{
+    display: flex;
+    align-self: center;
+}
+.badge-category-bg{
+    width:3vh;
+    height:3vh;
+    display: inline-block;
+    margin-right: 1vh;
+}
+.category-name{
+    font-size: 3.5vh;
+    font-weight: normal;
+    color:rgb(204, 204, 204);
+    margin-right: 2vh;
+}
+a:link{
+    text-decoration: none;
+}
+h3{
+    margin:0;
+    background-color: rgba(175, 175, 175, 0.134);
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    border-radius: 0px;
+
+    font-size: 4vh;
+    font-family: arial, sans-serif;
+    font-weight: lighter;
+    /* white-space:pre-line; */
+    color:rgba(240, 248, 255, 0.9);
+}
+p{
+    margin: 0;
+    padding:0;
+}
+
+
+#usersCont{
+    flex-grow: 1;
+}
+
+.memberCircle{
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 100%;
+    position: absolute;
+    left:0;
+    /* x y blur spread */
+    box-shadow: .2vw .2vw .7vw .4vw rgba(18, 18, 18, 0.7);
+}
+
+
+
+
+
+.bruh{
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    margin: 0;
+    border: 0;
+}

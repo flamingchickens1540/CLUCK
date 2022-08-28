@@ -30,8 +30,8 @@ function getFileProcessed(filepath) {
 // Setup Webpage Routes
 // NEW DASHBOARD
 app.get('/dash', (req, res) => {
-    res.send(getFileProcessed('./sites/NewDashboard/index.html'))
-    // res.sendFile('index.html', {root:'./sites/Dashboard/'})
+    res.send(getFileProcessed('./www/dash/index.html'))
+    // res.sendFile('index.html', {root:'./www/Dashboard/'})
 })
 let delphiPost = 0;
 app.get('/dash/delphi', async (req, res) => {
@@ -43,38 +43,29 @@ app.get('/dash/delphi', async (req, res) => {
     res.send(html)
 })
 app.get('/dash/:resource', (req, res) => {
-    res.sendFile(req.params.resource, { root: './sites/NewDashboard/' })
+    res.sendFile(req.params.resource, { root: './www/dash/' })
 })
-
-
-
-// DASHBOARD
-app.get('/dashboard', (req, res) => {
-    res.send(getFileProcessed('./sites/Dashboard/index.html'))
-    // res.sendFile('index.html', {root:'./sites/Dashboard/'})
-})
-app.get('/dashboard/:resource', (req, res) => {
-    res.sendFile(req.params.resource, { root: './sites/Dashboard/' })
+app.get('/dash/script/:resource', (req, res) => {
+    res.sendFile(req.params.resource, { root: './www/dash/script/' })
 })
 
 
 // TOUCH LOGIN
 app.get('/grid', (req, res) => {
-    res.send(getFileProcessed('./sites/TouchGrid/index.html'))
-    // res.sendFile('index.html', {root:'./sites/Dashboard/'})
+    res.send(getFileProcessed('./www/grid/index.html'))
 })
 app.get('/grid/:resource', (req, res) => {
-    res.sendFile(req.params.resource, { root: './sites/TouchGrid/' })
+    res.sendFile(req.params.resource, { root: './www/grid/' })
 })
 app.get('/grid/script/:resource', (req, res) => {
-    res.sendFile(req.params.resource, { root: './sites/TouchGrid/script/' })
+    res.sendFile(req.params.resource, { root: './www/grid/script/' })
 })
 
-app.get('/img/:image', (req, res) => {
-    res.sendFile(req.params.image, { root: './sites/img' })
+app.get('/static/img/:image', (req, res) => {
+    res.sendFile(req.params.image, { root: './www/static/img' })
 })
-app.get('/font/:font', (req, res) => {
-    res.sendFile(req.params.font, { root: './sites/font' })
+app.get('/static/font/:font', (req, res) => {
+    res.sendFile(req.params.font, { root: './www/static/font' })
 })
 app.get('/members', (req, res) => {
     res.sendFile('members.json', { root: './member-collector' })
@@ -84,7 +75,7 @@ app.get('/members/refresh', async (req, res) => {
     res.sendFile('members.json', { root: './member-collector' })
 })
 app.get('/favicon.ico', (req, res) => {
-    res.sendFile('favicon.svg', { root: './sites/img' })
+    res.sendFile('favicon.svg', { root: './www/static/img' })
 })
 
 app.get("/", (req, res) => {
