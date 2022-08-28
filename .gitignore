@@ -3,6 +3,7 @@
 
 loggedin.json
 memberlog.json
+members.json
 failed.json
 
 **/.DS_Store

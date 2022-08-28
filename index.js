@@ -11,7 +11,7 @@ const google_client_secret = JSON.parse(readFileSync('secrets/client_secret.json
 
 // Refresh profile images every day // TODO: Switch to CRON job
 setInterval(() => collect(signin_secret, token, google_client_secret), 24 * 60 * 60 * 1000)
-collect(signin_secret, token, google_client_secret)
+collect(token)
 
 // Init Express App
 const app = express()
@@ -71,7 +71,7 @@ app.get('/members', (req, res) => {
     res.sendFile('members.json', { root: './member-collector' })
 })
 app.get('/members/refresh', async (req, res) => {
-    await collect(signin_secret, token, google_client_secret)
+    await collect(token)
     res.sendFile('members.json', { root: './member-collector' })
 })
 app.get('/favicon.ico', (req, res) => {

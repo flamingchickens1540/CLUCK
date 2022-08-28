@@ -20,8 +20,7 @@ function fullscreen() {
 async function run() {
     // Fetch Members
     let members = await (await fetch('/members')).json()
-    members = members.filter((val)=>val.pict);
-
+    
     // Calculate & Set grid size
     root = Math.sqrt(members.length)
     wid = Math.ceil(root)
