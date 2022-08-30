@@ -1,6 +1,7 @@
 
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
+import { memberListFilePath } from "../../consts";
 
 export type Member = {
     name: string;
@@ -39,7 +40,7 @@ export const collect = async (token) => {
         return 0;
       })
 
-    writeFileSync('member-collector/members.json', JSON.stringify(members))
+    writeFileSync(memberListFilePath, JSON.stringify(members))
 }
 
 export default collect

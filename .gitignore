@@ -2,11 +2,7 @@
 /secrets/
 /coverage/
 /dist/
-
-loggedin.json
-memberlog.json
-members.json
-failed.json
+/data/
 
 **/.DS_Store
 

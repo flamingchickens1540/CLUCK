@@ -1,6 +1,4 @@
-const protocol = 'http';
-const public_ip = 'localhost';
-const server_port = 2021;
+
 
 import { WebClient } from '@slack/web-api';
 import express from 'express';
@@ -10,7 +8,8 @@ import { collect } from './backend/member-collector/collector';
 import { token } from '../secrets/slack_secrets.js';
 import { setupApi } from './backend/api/index.js';
 import { CronJob } from 'cron';
-
+import { baseurl, dataDirectory, memberListFilePath, protocol, public_ip, server_port } from './consts';
+import {existsSync, mkdirSync} from 'fs';
 // Refresh profile images every day
 new CronJob({
     cronTime: '0 0 * * *',
@@ -23,6 +22,11 @@ new CronJob({
 // Init Express App
 const app = express()
 
+// Init data directory
+if (!existsSync(dataDirectory)) {
+    mkdirSync(dataDirectory);
+}
+
 // Setup API Routes
 const slack_client = new WebClient(token)
 setupApi(app, slack_client)
@@ -30,7 +34,7 @@ setupApi(app, slack_client)
 // Function to map sources to defined ip
 function getFileProcessed(filepath) {
     let preprocessed = readFileSync(filepath).toString()
-    let processed = preprocessed.replace(/\$\{\i\p\}/g, `${protocol}://${public_ip}:${server_port}`)
+    let processed = preprocessed.replace(/\$\{\i\p\}/g, baseurl)
     return processed;
 }
 
@@ -38,7 +42,6 @@ function getFileProcessed(filepath) {
 // NEW DASHBOARD
 app.get('/dash', (req, res) => {
     res.send(getFileProcessed('./www/dash/index.html'))
-    // res.sendFile('index.html', {root:'./www/Dashboard/'})
 })
 let delphiPost = 0;
 app.get('/dash/delphi', async (req, res) => {
@@ -75,11 +78,11 @@ app.get('/static/font/:font', (req, res) => {
     res.sendFile(req.params.font, { root: './www/static/font' })
 })
 app.get('/members', (req, res) => {
-    res.sendFile('members.json', { root: './member-collector' })
+    res.sendFile(memberListFilePath)
 })
 app.get('/members/refresh', async (req, res) => {
     await collect(token)
-    res.sendFile('members.json', { root: './member-collector' })
+    res.sendFile(memberListFilePath)
 })
 app.get('/favicon.ico', (req, res) => {
     res.sendFile('favicon.svg', { root: './www/static/img' })
@@ -89,4 +92,4 @@ app.get("/", (req, res) => {
     res.redirect('/dash')
 })
 
-app.listen(server_port, () => { console.log(`listening: ${server_port}`) });
+app.listen(server_port, () => { console.log(`listening: ${baseurl}`) });

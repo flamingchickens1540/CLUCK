@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import type { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import type { SpyInstance } from 'jest-mock';
 import type { FailedEntry, LoggedIn } from '.';
-import { loggedin_sheet_name, log_sheet_name } from './consts';
+import { loggedin_sheet_name, log_sheet_name } from '../../consts';
 import { addLabHours, addLabHoursSafe, configureDrive, getSpreadsheet, updateLoggedIn } from './spreadsheet';
 
 

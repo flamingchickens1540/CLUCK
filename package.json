@@ -3,11 +3,12 @@
   "type": "module",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index",
   "scripts": {
     "serve": "node dist/app.cjs",
     "test": "jest",
-    "build": "esbuild index.ts --bundle --outfile=dist/app.cjs --platform=node --minify --sourcemap"
+    "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --minify --sourcemap",
+    "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs"
   },
   "keywords": [],
   "author": "",

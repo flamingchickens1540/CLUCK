@@ -5,6 +5,7 @@ import { WebClient } from "@slack/web-api"
 import { Express } from 'express'
 import { addLabHoursSafe, configureDrive } from "./spreadsheet";
 import { logMember, saveMemberLog } from "./memberlog";
+import { failedFilePath, loggedInFilePath } from '../../consts'
 
 
 let memberlist
@@ -22,10 +23,10 @@ export type LoggedIn = {
 
 
 let loggedIn: LoggedIn = {}
-if (fs.existsSync('api/loggedin.json')) { loggedIn = JSON.parse(fs.readFileSync('api/loggedin.json', "utf-8")) }
+if (fs.existsSync(loggedInFilePath)) { loggedIn = JSON.parse(fs.readFileSync(loggedInFilePath, "utf-8")) }
 
 let failed: FailedEntry[] = []
-if (fs.existsSync('api/failed.json')) { failed = JSON.parse(fs.readFileSync('api/failed.json', "utf-8")) }
+if (fs.existsSync(failedFilePath)) { failed = JSON.parse(fs.readFileSync(failedFilePath, "utf-8")) }
 
 
 configureDrive()
@@ -104,9 +105,8 @@ export const setupApi = async (app: Express, slack_client: WebClient) => {
 // Periodically save
 const cronSave = () => {
     try {
-        console.log("Saving...")
-        fs.writeFileSync('api/loggedin.json', JSON.stringify(loggedIn))
-        fs.writeFileSync('api/failed.json', JSON.stringify(failed))
+        fs.writeFileSync(loggedInFilePath, JSON.stringify(loggedIn))
+        fs.writeFileSync(failedFilePath, JSON.stringify(failed))
         saveMemberLog()
     } catch (error) { console.log(error) }
 }
