@@ -1,5 +1,7 @@
 /node_modules/
 /secrets/
+/coverage/
+/dist/
 
 loggedin.json
 memberlog.json
@@ -7,3 +9,4 @@ members.json
 failed.json
 
 **/.DS_Store
+

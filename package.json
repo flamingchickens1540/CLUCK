@@ -5,7 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "node index.js"
+    "serve": "node dist/app.cjs",
+    "test": "jest",
+    "build": "esbuild index.ts --bundle --outfile=dist/app.cjs --platform=node --minify --sourcemap"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,20 @@
     "cron": "^2.1.0",
     "express": "^4.18.1",
     "google-spreadsheet": "^3.3.0",
-    "node-fetch": "^3.2.10"
+    "node-fetch": "^3.2.10",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.13",
+    "@babel/preset-env": "^7.18.10",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/cron": "^2.0.0",
+    "@types/express": "^4.17.13",
+    "babel-jest": "^28.0.1",
+    "jest": "^28.0.1",
+    "rewire": "^6.0.0",
+    "ts-jest": "^28.0.8",
+    "ts-node": "^10.9.1",
+    "esbuild": "^0.15.6"
   }
 }

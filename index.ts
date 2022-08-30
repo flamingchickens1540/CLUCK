@@ -2,23 +2,30 @@ const protocol = 'http';
 const public_ip = 'localhost';
 const server_port = 2021;
 
-import { collect } from './member-collector/collector.js'
-import { signin_secret, token } from './secrets/slack_secrets.js'
-import express from 'express'
-import { readFileSync, writeFileSync } from 'fs'
-import fetch from 'node-fetch'
-const google_client_secret = JSON.parse(readFileSync('secrets/client_secret.json'))
+import { WebClient } from '@slack/web-api';
+import express from 'express';
+import { readFileSync } from 'fs';
+import fetch from 'node-fetch';
+import { collect } from './backend/member-collector/collector';
+import { token } from './secrets/slack_secrets.js';
+import { setupApi } from './backend/api/index.js';
+import { CronJob } from 'cron';
 
-// Refresh profile images every day // TODO: Switch to CRON job
-setInterval(() => collect(signin_secret, token, google_client_secret), 24 * 60 * 60 * 1000)
-collect(token)
+// Refresh profile images every day
+new CronJob({
+    cronTime: '0 0 * * *',
+    start: true,
+    timeZone: 'America/Los_Angeles',
+    runOnInit: true,
+    onTick: () => collect(token)
+})
 
 // Init Express App
 const app = express()
 
 // Setup API Routes
-import { setupApi } from './api/index.js'
-await setupApi(app, token, google_client_secret)
+const slack_client = new WebClient(token)
+setupApi(app, slack_client)
 
 // Function to map sources to defined ip
 function getFileProcessed(filepath) {
@@ -35,11 +42,11 @@ app.get('/dash', (req, res) => {
 })
 let delphiPost = 0;
 app.get('/dash/delphi', async (req, res) => {
-    delphiPost++; delphiPost%=20; // switch to next post
-    let json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json()
+    delphiPost++; delphiPost %= 20; // switch to next post
+    let json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json() as any
     let id = json.topic_list.topics[delphiPost].id
     let link = 'https://www.chiefdelphi.com/t/' + id
-    let html = await(await fetch(link)).text()
+    let html = await (await fetch(link)).text()
     res.send(html)
 })
 app.get('/dash/:resource', (req, res) => {
@@ -82,4 +89,4 @@ app.get("/", (req, res) => {
     res.redirect('/dash')
 })
 
-app.listen(server_port, (err) => { console.log(`listening: ${server_port} | err: ${err !== undefined ? err : "none"}`) });
+app.listen(server_port, () => { console.log(`listening: ${server_port}`) });
