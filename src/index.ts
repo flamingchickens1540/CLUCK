@@ -7,7 +7,7 @@ import express from 'express';
 import { readFileSync } from 'fs';
 import fetch from 'node-fetch';
 import { collect } from './backend/member-collector/collector';
-import { token } from './secrets/slack_secrets.js';
+import { token } from '../secrets/slack_secrets.js';
 import { setupApi } from './backend/api/index.js';
 import { CronJob } from 'cron';
 

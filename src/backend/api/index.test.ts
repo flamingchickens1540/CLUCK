@@ -5,7 +5,7 @@ import fs from 'fs';
 import type { SpyInstance } from 'jest-mock';
 import fetch from 'node-fetch';
 import { setupApi, cronJobs, accessFailed, accessLoggedIn, sendSlackMessage, refreshSlackMemberlist } from '.';
-import { token } from '../../secrets/slack_secrets';
+import { token } from '../../../secrets/slack_secrets';
 import { logMember, saveMemberLog } from './memberlog';
 import rewire from 'rewire'
 import { addLabHoursSafe } from './spreadsheet';
