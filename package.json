@@ -8,9 +8,9 @@
     "serve": "node dist/app.cjs",
     "test": "jest",
     "lint": "eslint --ext .ts src",
-    "lint:report": "eslint --ext .ts --output-file eslint_report.json --format json src",
     "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --minify --sourcemap",
-    "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs"
+    "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs",
+    "actions:lint": "eslint --ext .ts --output-file eslint_report.json --format json src"
   },
   "keywords": [],
   "author": "",

@@ -2,7 +2,7 @@
 	"extends": ["eslint:recommended"],
 	"overrides": [
 		{ // Typescript files
-            "files": "**/*.ts",
+            "files": ["**/*.ts", "secrets/*.js"],
             "parserOptions": {
                 "ecmaVersion": "latest",
                 "sourceType": "module"
@@ -24,7 +24,7 @@
 			"extends": ["plugin:@typescript-eslint/recommended"]
 		},
 		{ // Javascript files
-            "files": "**/*.js",  
+            "files": "www/*.js",  
             "parser": "@babel/eslint-parser",
             "parserOptions": {
                 "ecmaVersion": "latest",
