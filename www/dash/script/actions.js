@@ -1,5 +1,6 @@
+/* exported openFullscreen */
 function openFullscreen() {
-    elem = document.documentElement
+    let elem = document.documentElement
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) { /* Safari */

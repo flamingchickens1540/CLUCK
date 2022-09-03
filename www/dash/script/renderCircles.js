@@ -1,3 +1,5 @@
+/* globals maxX minX maxY minY */
+/* exported redrawCircles */
 let membersDiv = document.getElementById('members')
 
 function renderCircle(circle) {

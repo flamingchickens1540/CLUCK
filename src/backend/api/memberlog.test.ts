@@ -43,13 +43,13 @@ describe("logMember", () => {
 describe("saveMemberLog", () => {
     test("should save current member log", async () => {
         // Create dummy member log
-        let memberlog = { loggingin:true, name: "Test Chicken", time: Date.now() }
+        const memberlog = { loggingin:true, name: "Test Chicken", time: Date.now() }
         setMemberlog([memberlog]);
 
         await saveMemberLog()
         
         expect(fs.appendFileSync).toBeCalledTimes(1)
-        let mockedAppendFileSync = jest.mocked(fs.appendFileSync)
+        const mockedAppendFileSync = jest.mocked(fs.appendFileSync)
         expect(JSON.parse(mockedAppendFileSync.mock.calls[0][1] as string)).toEqual(memberlog)
     })
 })

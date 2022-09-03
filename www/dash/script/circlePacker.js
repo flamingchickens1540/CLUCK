@@ -1,15 +1,16 @@
-function sleep(m) {return new Promise(res=>setTimeout(res,m))}
+/* exported MemberCircle placeCircles */
 
 // note: circle radii are normalized on render
-STEP_DISTANCE = .02
-MARGIN = .14
+const STEP_DISTANCE = .02
+const MARGIN = .14
 
-unplacedCircles = []
-placedCircles = []
-maxX = 0;
-minX = 0;
-maxY = 0;
-minY = 0;
+var unplacedCircles = []
+var placedCircles = []
+var maxX = 0;
+var minX = 0;
+var maxY = 0;
+var minY = 0;
+
 
 class MemberCircle {
     x; y; r; name; imgurl;
@@ -44,11 +45,6 @@ function getAngleFromAToB(a,b) {
     // return Math.atan2(det, dot) 
     return 2*Math.atan((b.y-a.y)/((b.x-a.x)+Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y))))
 }
-
-function generateCircleSizes(list) {
-    // sort list
-    // generate sizes
-}
 function placeCircle(circle) {
     // random starting position
     let angle = Math.random()*2*Math.PI-Math.PI
@@ -57,7 +53,7 @@ function placeCircle(circle) {
     
     // move inwards until touching
     let collided = null
-    while(true) {
+    while(d>0 && !collided) {
         collided = getCollided(circle,MARGIN);
         if(collided || d<=0) {break}
         d-=STEP_DISTANCE;

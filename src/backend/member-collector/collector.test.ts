@@ -3,7 +3,7 @@ import { expect, test, jest } from '@jest/globals';
 import fs from 'fs';
 
 import collect from './collector';
-import { token } from '../../secrets/slack_secrets';
+import { token } from '../../../secrets/slack_secrets';
 
 jest.mock('fs')
 
@@ -17,6 +17,6 @@ test('should save members as json', async () => {
         firstname: expect.stringMatching(/\w+/),
         img: expect.stringMatching(/https:\/\/avatars.slack-edge.com\/.+_original.png/),
     }
-    let results = JSON.parse((<any>fs.writeFileSync).mock.calls[0][1])
+    const results = JSON.parse(jest.mocked(fs.writeFileSync).mock.calls[0][1] as string)
     expect(results).toEqual(expect.arrayContaining([expectedResult]))
 })

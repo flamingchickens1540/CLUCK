@@ -41,15 +41,17 @@ export async function sendSlackMessage(fullname: string, text: string) {
         console.warn("Slack Client not loaded yet")
         return
     }
-    let user = memberlist.find(userobj => userobj.real_name!.toLowerCase().includes(fullname.toLowerCase()))
+    const user = memberlist.find(userobj => userobj.real_name?.toLowerCase().includes(fullname.toLowerCase()) ?? false)
     if (user == null || user.id == null) { throw Error("Could not send message to " + fullname) }
-        
+    console.log(`Sending message to ${user.id}`)
     return await client.chat.postMessage({ channel: user.id, text: text })
 
 }
 
 export async function refreshSlackMemberlist() {
-    memberlist = (await client.users.list()).members!;
+    const users = await client.users.list()
+    if (users.members == null) { console.warn("Could not load memberlist") }
+    memberlist = users.members
 }
 
 export const setupApi = async (app: Express, slack_client: WebClient) => {
@@ -57,12 +59,13 @@ export const setupApi = async (app: Express, slack_client: WebClient) => {
     
     // INIT SLACKBOT
     client = slack_client
+    
     refreshSlackMemberlist()
     // INIT API ROUTES
     app.get('/clock/', (req, res) => {
         // Get and check args
-        let name = req.query.name as string
-        let loggingin = req.query.loggingin
+        const name = req.query.name as string
+        const loggingin = req.query.loggingin
         // Check for existing request arguments
         if (!name || !loggingin) { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
         
@@ -76,9 +79,10 @@ export const setupApi = async (app: Express, slack_client: WebClient) => {
             if (loggedIn[name]) { // Test to make sure person is logged in
                 res.end()
                 console.log(`Logging out ${name}`)
-                delete loggedIn[name]
                 addLabHoursSafe(name, failed, loggedIn[name])
+                delete loggedIn[name]
                 logMember(name, false, loggedIn)
+                
             } else { res.end() }
         }
     })
@@ -119,17 +123,17 @@ new CronJob({
     onTick: cronSave
 })
 
-// Periodically retry failed requests hourly and on startup
+// Periodically retry failed requests every 15 minutes and on startup
 const cronRetryFailed = async () => {
     const failedCache = failed;
     failed = []
-    for (let failedLog of failedCache) {
+    for (const failedLog of failedCache) {
         console.log(`attempting to log ${failedLog.timeIn} to ${failedLog.timeOut} hours for ${failedLog.name}`)
         await addLabHoursSafe(failedLog.name, failed, failedLog.timeIn, failedLog.timeOut)
     }
 }
 new CronJob({
-    cronTime: '0 * * * *',
+    cronTime: '*/15 * * * *',
     start: true,
     timeZone: 'America/Los_Angeles',
     runOnInit: true,
@@ -138,7 +142,7 @@ new CronJob({
 
 // sign out at midnight
 const cronSignout = () => {
-    let messageUsers = Object.keys(loggedIn)
+    const messageUsers = Object.keys(loggedIn)
     loggedIn = {}
     console.log('hiiii')
     messageUsers.forEach(async (memberName) => {

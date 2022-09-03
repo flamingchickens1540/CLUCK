@@ -1,7 +1,9 @@
-
+/* globals MemberCircle placeCircles placedCircles redrawCircles*/
+var members
+var loggedInCache
 
 function regenCircles(loggedin) {
-    circles = []
+    let circles = []
     let now = Date.now()
     Object.entries(loggedin).forEach(ent=>{
         let member = members.find(o=>o.name==ent[0])
@@ -25,7 +27,6 @@ function update() {
 }
 
 async function start() {
-
 members = await (await fetch('/members')).json()
 loggedInCache = []
 

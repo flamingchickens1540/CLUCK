@@ -1,15 +1,14 @@
-import { beforeAll, afterAll, describe, expect, jest, test, beforeEach } from '@jest/globals';
+import { afterAll, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { ChatPostMessageArguments, ChatPostMessageResponse, UsersListArguments, UsersListResponse, WebClient } from "@slack/web-api";
 import express from 'express';
 import fs from 'fs';
+import { Server } from 'http';
 import type { SpyInstance } from 'jest-mock';
 import fetch from 'node-fetch';
-import { setupApi, cronJobs, accessFailed, accessLoggedIn, sendSlackMessage, refreshSlackMemberlist } from '.';
+import { accessFailed, accessLoggedIn, cronJobs, sendSlackMessage, setupApi } from '.';
 import { token } from '../../../secrets/slack_secrets';
 import { logMember, saveMemberLog } from './memberlog';
-import rewire from 'rewire'
 import { addLabHoursSafe } from './spreadsheet';
-import { Server } from 'http';
 
 jest.mock('fs')
 jest.mock('cron')
@@ -29,16 +28,17 @@ let chatSpy: SpyInstance<(options?: ChatPostMessageArguments | undefined) => Pro
 
 beforeAll(() => {
     slack_client = new WebClient(token)
+    chatSpy = jest.spyOn(slack_client.chat, "postMessage").mockImplementation(async () => {return {ok:true}})
     memberSpy = jest.spyOn(slack_client.users, 'list')
     memberSpy.mockResolvedValue({
         ok: true, 
         members: [{"id":"UCHICKEN", "real_name": "Test Chicken"}]
     })
-    chatSpy = jest.spyOn(slack_client.chat, "postMessage").mockImplementation(async () => {return {ok:true}})
+    
 
     // Stop console output during tests
     jest.spyOn(console, "log").mockImplementation(() => { })
-    jest.spyOn(console, "error").mockImplementation(() => { })
+    // jest.spyOn(console, "error").mockImplementation(() => { })
 })
 
 describe('API', () => {
@@ -79,12 +79,24 @@ describe('API', () => {
             expect(logMember).toHaveBeenCalledTimes(1)
         })
         test('logs member out', async () => {
-            accessLoggedIn({ "Test Chicken": Date.now() })
+            const timeIn = new Date().setMinutes(new Date().getMinutes() - 10)
+            accessLoggedIn({ "Test Chicken": timeIn })
+            
+            // Use mock implementation to ensure the loggedin list is updated before calling logMember
+            jest.mocked(logMember).mockImplementation(async (name, loggingin, loggedin) => { 
+                expect(name).toEqual("Test Chicken")
+                expect(loggingin).toEqual(false)
+                expect(loggedin).toEqual({})
+            })
+
             const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=false`)
             expect(res.status).toBe(200)
-            expect(accessLoggedIn()).toEqual({})
+
+            expect(addLabHoursSafe).toHaveBeenCalledTimes(1)
+            expect(addLabHoursSafe).toHaveBeenCalledWith("Test Chicken", [], timeIn)
+            
             expect(logMember).toHaveBeenCalledTimes(1)
-            expect(logMember).toHaveBeenCalledWith("Test Chicken", false, {})
+            expect(accessLoggedIn()).toEqual({})
         })
         test('does not continue if member was not logged in', async () => {
             const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=false`)
@@ -140,15 +152,15 @@ describe('Tasks', () => {
             expect(saveMemberLog).toBeCalledTimes(1)
         })
         test('should save correct values', () => {
-            let timeIn = new Date("1540-1-1 12:00 AM").getTime()
-            let timeOut = new Date("1540-1-1 12:15 AM").getTime()
+            const timeIn = new Date("1540-1-1 12:00 AM").getTime()
+            const timeOut = new Date("1540-1-1 12:15 AM").getTime()
 
             accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut }])
             accessLoggedIn({ "Test Chicken": timeIn })
 
             cronJobs.save()
 
-            let mockedWriteFileSync = jest.mocked(fs.writeFileSync)
+            const mockedWriteFileSync = jest.mocked(fs.writeFileSync)
             // Check that it saved logged in members
             expect(JSON.parse(mockedWriteFileSync.mock.calls[0][1] as string)).toEqual({ "Test Chicken": timeIn })
             // Check that it saved failed requests
@@ -164,8 +176,8 @@ describe('Tasks', () => {
             expect(accessFailed()).toEqual([])
         })
         test('should retry failed requests', async () => {
-            let timeIn = new Date("1540-1-1 12:00 AM").getTime()
-            let timeOut = new Date("1540-1-1 12:15 AM").getTime()
+            const timeIn = new Date("1540-1-1 12:00 AM").getTime()
+            const timeOut = new Date("1540-1-1 12:15 AM").getTime()
             accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut }])
             cronJobs.retryFailed()
             expect(addLabHoursSafe).toBeCalledTimes(1)
