@@ -7,10 +7,10 @@
   "scripts": {
     "serve": "node dist/app.cjs",
     "test": "jest",
-    "lint": "eslint --ext .ts src",
+    "lint": "eslint --ext .ts,.js src www",
     "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --minify --sourcemap",
     "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs",
-    "actions:lint": "eslint --ext .ts --output-file eslint_report.json --format json src"
+    "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src www"
   },
   "keywords": [],
   "author": "",
@@ -26,7 +26,6 @@
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
     "async-mutex": "^0.3.2",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^28.0.1",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",

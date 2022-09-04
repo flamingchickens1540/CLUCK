@@ -1,30 +1,16 @@
+/* globals clock ping cluckedIn */
 let buttonJustPressed = false;
 
-// import { signin_secret, token, bruh } from './secrets.js'
-// const importit = (module) => { return new Promise(ret => { require([module], ret) }) }
 
-// Shiffle list code yoinked from online
-function shuffle(array) { let currentIndex = array.length, randomIndex; while (currentIndex != 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; } return array; }
-
-function fullscreen() {
-    let elem = document.documentElement
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-        elem.msRequestFullscreen();
-    }
-}
 
 async function run() {
     // Fetch Members
     let members = await (await fetch('/members')).json()
     
     // Calculate & Set grid size
-    root = Math.sqrt(members.length)
-    wid = Math.ceil(root)
-    hei = Math.round(root)
+    const root = Math.sqrt(members.length)
+    const wid = Math.ceil(root)
+    const hei = Math.round(root)
     document.documentElement.style.setProperty('--width', wid)
     document.documentElement.style.setProperty('--height', hei)
 
@@ -65,7 +51,7 @@ async function run() {
     // Make member buttons 
     members.forEach(member => {
         // Init button
-        memberButton = document.createElement('person-button');
+        let memberButton = document.createElement('person-button');
         memberButton.fullname = member.name;
         memberButton.id = member.fullname
 
@@ -75,7 +61,7 @@ async function run() {
 
             buttonJustPressed = true;
 
-            button = click.target;
+            let button = click.target;
             if (click.target.classList.contains('button-text')) {
                 button = click.target.parentElement;
             }
@@ -91,7 +77,7 @@ async function run() {
         }
 
         // Add name text
-        text = document.createElement('person-name')
+        let text = document.createElement('person-name')
         text.className = 'button-text'
         text.innerHTML = member.firstname
 
