@@ -3,7 +3,7 @@ import type { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import type { SpyInstance } from 'jest-mock';
 import type { FailedEntry, LoggedIn } from '.';
 import { loggedin_sheet_name, log_sheet_name } from '../../consts';
-import { addLabHours, addLabHoursSafe, configureDrive, getSpreadsheet, updateLoggedIn } from './spreadsheet';
+import { addHours, addHoursSafe, configureDrive, getSpreadsheet, updateLoggedIn } from './spreadsheet';
 import PQueue from 'p-queue';
 
 
@@ -19,7 +19,7 @@ describe('Timeclock Interface', () => {
 
     describe('Unauthenticated', () => {
         test('addLabHours should throw error if not authed', async () => {
-            await expect(addLabHours('Test Chicken', 0, 0)).rejects.toThrow('Google drive not authed')
+            await expect(addHours('Test Chicken', 0, 0, 'lab')).rejects.toThrow('Google drive not authed')
         })
         test('updateLoggedIn should throw error if not authed', async () => {
             await expect(updateLoggedIn({})).rejects.toThrow('Google drive not authed')
@@ -36,12 +36,12 @@ describe('Timeclock Interface', () => {
             
         })
 
-        describe('addLabHours', () => {
+        describe('addHours', () => {
             test('should add row with correct values', async () => {
                 // Create dates with a duration of 0.25 hours
                 const timeIn = new Date("1540-1-1 1:00 PM").getTime()
                 const timeOut = new Date("1540-1-1 1:15 PM").getTime()
-                await addLabHours("Test Chicken", timeIn, timeOut)
+                await addHours("Test Chicken", timeIn, timeOut, 'lab')
                 expect(addRowSpy).toBeCalledTimes(1)
                 expect(addRowSpy).toBeCalledWith([timeIn/1000, timeOut/1000, "Test Chicken", "0.25", "lab"])
             })
@@ -50,7 +50,7 @@ describe('Timeclock Interface', () => {
                 // Create dates with a duration of less than 0.01 hours (36 seconds)
                 const timeIn = new Date("1540-1-1 1:00 PM").getTime()
                 const timeOut = new Date("1540-1-1 1:00:35 PM").getTime()
-                await addLabHours("Test Chicken", timeIn, timeOut)
+                await addHours("Test Chicken", timeIn, timeOut, 'lab')
                 expect(addRowSpy).toBeCalledTimes(0)
             })
 
@@ -58,8 +58,16 @@ describe('Timeclock Interface', () => {
                 // Create dates with a negative duration
                 const timeIn = new Date("1540-1-1 1:15 PM").getTime()
                 const timeOut = new Date("1540-1-1 1:00 PM").getTime()
-                await addLabHours("Test Chicken", timeIn, timeOut)
+                await addHours("Test Chicken", timeIn, timeOut, 'lab')
                 expect(addRowSpy).toBeCalledTimes(0)
+            })
+            test('should add activity', async () => {
+                // Create dates with a negative duration
+                const timeIn = new Date("1540-1-1 1:00 PM").getTime()
+                const timeOut = new Date("1540-1-1 1:15 PM").getTime()
+                await addHours("Test Chicken", timeIn, timeOut, 'activity')
+                expect(addRowSpy).toBeCalledTimes(1)
+                expect(addRowSpy).toBeCalledWith([timeIn/1000, timeOut/1000, "Test Chicken", "0.25", "activity"])
             })
         })
 
@@ -70,10 +78,24 @@ describe('Timeclock Interface', () => {
                 const timeIn = new Date("1540-1-1 1:00 PM").getTime()
                 const timeOut = new Date("1540-1-1 1:15 PM").getTime()
                 
-                await addLabHoursSafe("Test Chicken", failedEntries, timeIn, timeOut)
+                await addHoursSafe("Test Chicken", failedEntries, timeIn, timeOut)
                 // Confirm that the rows were added
                 expect(addRowSpy).toBeCalledTimes(1)
                 expect(addRowSpy).toBeCalledWith([timeIn/1000, timeOut/1000, "Test Chicken", "0.25", "lab"])
+                // Ensure that it did not mark the entry as failed
+                expect(failedEntries.length).toEqual(0)
+            })
+
+            test('should store activity', async () => {
+                const failedEntries: FailedEntry[] = []
+                // Create dates with a duration of 0.25 hours
+                const timeIn = new Date("1540-1-1 1:00 PM").getTime()
+                const timeOut = new Date("1540-1-1 1:15 PM").getTime()
+                
+                await addHoursSafe("Test Chicken", failedEntries, timeIn, timeOut, 'activity')
+                // Confirm that the rows were added
+                expect(addRowSpy).toBeCalledTimes(1)
+                expect(addRowSpy).toBeCalledWith([timeIn/1000, timeOut/1000, "Test Chicken", "0.25", "activity"])
                 // Ensure that it did not mark the entry as failed
                 expect(failedEntries.length).toEqual(0)
             })
@@ -89,7 +111,7 @@ describe('Timeclock Interface', () => {
                 const timeOut = new Date("1540-1-1 1:15 PM").getTime()
 
                 const failedEntries: FailedEntry[] = []
-                await addLabHoursSafe("Test Chicken", failedEntries, timeIn, timeOut)
+                await addHoursSafe("Test Chicken", failedEntries, timeIn, timeOut)
 
                 // Confirm that it marked the entry as failed
                 expect(failedEntries.length).toEqual(1)
@@ -97,6 +119,30 @@ describe('Timeclock Interface', () => {
                     name: "Test Chicken",
                     timeIn: timeIn,
                     timeOut: timeOut,
+                    activity: 'lab',
+                }])
+            })
+
+            test('should save failed activities', async () => {
+                // Prevent errors from being printed to console
+                jest.spyOn(global.console, 'error').mockImplementation(() => { });
+                // Force an error
+                jest.spyOn(timesheet, 'addRow').mockImplementation(() => { throw Error("Test Error") })
+
+                // Create dates, values shouldn't matter
+                const timeIn = new Date("1540-1-1 1:00 PM").getTime()
+                const timeOut = new Date("1540-1-1 1:15 PM").getTime()
+
+                const failedEntries: FailedEntry[] = []
+                await addHoursSafe("Test Chicken", failedEntries, timeIn, timeOut, 'activity')
+
+                // Confirm that it marked the entry as failed
+                expect(failedEntries.length).toEqual(1)
+                expect(failedEntries).toMatchObject([{
+                    name: "Test Chicken",
+                    timeIn: timeIn,
+                    timeOut: timeOut,
+                    activity: 'activity',
                 }])
             })
         })
@@ -158,7 +204,6 @@ describe('Timeclock Interface', () => {
 
                 expect(resizeSpy).toBeCalledTimes(2)
                 expect(addRowsSpy).toBeCalledTimes(2)
-                console.info(addRowsSpy.mock.calls)
                 expect(addRowsSpy).toHaveBeenLastCalledWith([["Test Chicken", "12:00 AM"], ["Test Turkey", "1:00 AM"]])
 
             })

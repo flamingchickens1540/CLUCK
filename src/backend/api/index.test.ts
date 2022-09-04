@@ -8,7 +8,7 @@ import fetch from 'node-fetch';
 import { accessFailed, accessLoggedIn, cronJobs, sendSlackMessage, setupApi } from '.';
 import { token } from '../../../secrets/slack_secrets';
 import { logMember, saveMemberLog } from './memberlog';
-import { addLabHoursSafe } from './spreadsheet';
+import { addHoursSafe } from './spreadsheet';
 
 jest.mock('fs')
 jest.mock('cron')
@@ -22,23 +22,34 @@ const test_port = 3000
 const app = express()
 const api_url = `http://localhost:${test_port}`
 
-let slack_client: WebClient 
-let memberSpy: SpyInstance<(options?: UsersListArguments | undefined) => Promise<UsersListResponse>> 
+let slack_client: WebClient
+let memberSpy: SpyInstance<(options?: UsersListArguments | undefined) => Promise<UsersListResponse>>
 let chatSpy: SpyInstance<(options?: ChatPostMessageArguments | undefined) => Promise<ChatPostMessageResponse>>
+
+async function apiPost(endpoint: string, body: Record<string, unknown>) {
+    return await fetch(`${api_url}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+}
 
 beforeAll(() => {
     slack_client = new WebClient(token)
-    chatSpy = jest.spyOn(slack_client.chat, "postMessage").mockImplementation(async () => {return {ok:true}})
+    chatSpy = jest.spyOn(slack_client.chat, "postMessage").mockImplementation(async () => { return { ok: true } })
     memberSpy = jest.spyOn(slack_client.users, 'list')
     memberSpy.mockResolvedValue({
-        ok: true, 
-        members: [{"id":"UCHICKEN", "real_name": "Test Chicken"}]
+        ok: true,
+        members: [{ "id": "UCHICKEN", "real_name": "Test Chicken" }]
     })
-    
+
 
     // Stop console output during tests
     jest.spyOn(console, "log").mockImplementation(() => { })
-    // jest.spyOn(console, "error").mockImplementation(() => { })
+    jest.spyOn(console, "error").mockImplementation(() => { })
 })
 
 describe('API', () => {
@@ -52,11 +63,12 @@ describe('API', () => {
 
     describe('GET /clock', () => {
         beforeAll(async () => {
-            jest.useFakeTimers({ advanceTimers: false })
+            jest.useFakeTimers({ advanceTimers: false }).setSystemTime(new Date("2022-01-01 5:00 PM"))
         })
         beforeEach(() => {
             // Reset logged in between tests
             accessLoggedIn({})
+            accessFailed([])
         })
 
         test('does not continue without name', async () => {
@@ -81,9 +93,9 @@ describe('API', () => {
         test('logs member out', async () => {
             const timeIn = new Date().setMinutes(new Date().getMinutes() - 10)
             accessLoggedIn({ "Test Chicken": timeIn })
-            
+
             // Use mock implementation to ensure the loggedin list is updated before calling logMember
-            jest.mocked(logMember).mockImplementation(async (name, loggingin, loggedin) => { 
+            jest.mocked(logMember).mockImplementation(async (name, loggingin, loggedin) => {
                 expect(name).toEqual("Test Chicken")
                 expect(loggingin).toEqual(false)
                 expect(loggedin).toEqual({})
@@ -92,9 +104,9 @@ describe('API', () => {
             const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=false`)
             expect(res.status).toBe(200)
 
-            expect(addLabHoursSafe).toHaveBeenCalledTimes(1)
-            expect(addLabHoursSafe).toHaveBeenCalledWith("Test Chicken", [], timeIn)
-            
+            expect(addHoursSafe).toHaveBeenCalledTimes(1)
+            expect(addHoursSafe).toHaveBeenCalledWith("Test Chicken", [], timeIn)
+
             expect(logMember).toHaveBeenCalledTimes(1)
             expect(accessLoggedIn()).toEqual({})
         })
@@ -103,6 +115,39 @@ describe('API', () => {
             expect(res.status).toBe(200)
             expect(accessLoggedIn()).toEqual({})
             expect(logMember).toHaveBeenCalledTimes(0)
+        })
+    })
+
+    describe('POST /log', () => {
+        test('returns status 200 with valid parameters', async () => {
+            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
+            expect(res.status).toBe(200)
+        })
+
+        test('returns status 400 without valid parameters', async () => {
+            // Without name
+            let res = await apiPost("log", { hours: new Date().getTime(), activity: "Test Activity" })
+            expect(res.status).toBe(400)
+            // Without hours
+            res = await apiPost("log", { name: "Test Chicken", activity: "Test Activity" })
+            expect(res.status).toBe(400)
+            // Without activity
+            res = await apiPost("log", { name: "Test Chicken", hours: new Date().getTime() })
+            expect(res.status).toBe(400)
+            // Without any parameters
+            res = await apiPost("log", {})
+            expect(res.status).toBe(400)
+
+            // Without valid time
+            res = await apiPost("log", { name: "Test Chicken", hours: "notanumber", activity: "Test Activity" })
+            expect(res.status).toBe(400)
+        })
+
+        test('stores correct data', async () => {
+            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
+            expect(res.status).toBe(200)
+            expect(addHoursSafe).toHaveBeenCalledTimes(1)
+            expect(addHoursSafe).toHaveBeenCalledWith("Test Chicken", [], new Date("2022-01-01 4:00 PM").getTime(), Date.now(), "Test Activity")
         })
     })
 
@@ -155,7 +200,7 @@ describe('Tasks', () => {
             const timeIn = new Date("1540-1-1 12:00 AM").getTime()
             const timeOut = new Date("1540-1-1 12:15 AM").getTime()
 
-            accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut }])
+            accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut, activity: "activity" }])
             accessLoggedIn({ "Test Chicken": timeIn })
 
             cronJobs.save()
@@ -164,24 +209,22 @@ describe('Tasks', () => {
             // Check that it saved logged in members
             expect(JSON.parse(mockedWriteFileSync.mock.calls[0][1] as string)).toEqual({ "Test Chicken": timeIn })
             // Check that it saved failed requests
-            expect(JSON.parse(mockedWriteFileSync.mock.calls[1][1] as string)).toEqual([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut }])
+            expect(JSON.parse(mockedWriteFileSync.mock.calls[1][1] as string)).toEqual([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut, activity: "activity" }])
         })
     })
     describe("retryFailed", () => {
         test('should remove failed requests after retrying', () => {
-
-
-            accessFailed([{ name: 'Test Chicken', timeIn: Date.now(), timeOut: Date.now() }])
+            accessFailed([{ name: 'Test Chicken', timeIn: Date.now(), timeOut: Date.now(), activity: "activity" }])
             cronJobs.retryFailed()
             expect(accessFailed()).toEqual([])
         })
         test('should retry failed requests', async () => {
             const timeIn = new Date("1540-1-1 12:00 AM").getTime()
             const timeOut = new Date("1540-1-1 12:15 AM").getTime()
-            accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut }])
+            accessFailed([{ name: 'Test Chicken', timeIn: timeIn, timeOut: timeOut, activity: "activity" }])
             cronJobs.retryFailed()
-            expect(addLabHoursSafe).toBeCalledTimes(1)
-            await expect(addLabHoursSafe).toBeCalledWith('Test Chicken', [], timeIn, timeOut)
+            expect(addHoursSafe).toBeCalledTimes(1)
+            await expect(addHoursSafe).toBeCalledWith('Test Chicken', [], timeIn, timeOut, "activity")
         })
     })
     describe("signout", () => {
@@ -207,7 +250,7 @@ describe('Tasks', () => {
         test('should send message to slack', async () => {
             await sendSlackMessage('Test Chicken', 'Test Message')
             expect(chatSpy).toBeCalledTimes(1)
-            expect(chatSpy).toBeCalledWith({ channel:"UCHICKEN", text: 'Test Message' })
+            expect(chatSpy).toBeCalledWith({ channel: "UCHICKEN", text: 'Test Message' })
         })
 
         test('should not attempt to send message if it cannot find user', async () => {

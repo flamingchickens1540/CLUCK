@@ -3,10 +3,10 @@ import fs from 'fs'
 import { CronJob } from 'cron'
 import { WebClient } from "@slack/web-api"
 import { Express } from 'express'
-import { addLabHoursSafe, configureDrive } from "./spreadsheet";
+import { addHoursSafe, configureDrive } from "./spreadsheet";
 import { logMember, saveMemberLog } from "./memberlog";
 import { failedFilePath, loggedInFilePath } from '../../consts'
-
+import bodyParser from 'body-parser';
 
 let memberlist
 let client: WebClient
@@ -16,6 +16,7 @@ export type FailedEntry = {
     name: string;
     timeIn: number;
     timeOut: number;
+    activity: string;
 }
 export type LoggedIn = {
     [key:string]:number
@@ -56,6 +57,8 @@ export async function refreshSlackMemberlist() {
 
 export const setupApi = async (app: Express, slack_client: WebClient) => {
     app.use(cors())
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json());
     
     // INIT SLACKBOT
     client = slack_client
@@ -79,12 +82,33 @@ export const setupApi = async (app: Express, slack_client: WebClient) => {
             if (loggedIn[name]) { // Test to make sure person is logged in
                 res.end()
                 console.log(`Logging out ${name}`)
-                addLabHoursSafe(name, failed, loggedIn[name])
+                addHoursSafe(name, failed, loggedIn[name])
                 delete loggedIn[name]
                 logMember(name, false, loggedIn)
                 
             } else { res.end() }
         }
+    })
+
+    app.post('/log', (req, res) => {
+        // Get and check args
+        const name = req.body.name // User name to add hours to
+        const hours = parseFloat(req.body.hours) // Time to add in hours
+        const activity = req.body.activity // Activity
+        
+        // Check for existing request arguments
+        if (!name) { res.status(400).send('Must include name in body').end(); return; }
+        if (!hours) { res.status(400).send('Must include hours in body').end(); return; }
+        if (isNaN(hours)) { res.status(400).send('Must include hours as number in body').end(); return; }
+        if (!activity) { res.status(400).send('Must include activity in body').end(); return; }
+        
+        
+        const time_out = Date.now()
+        const time_in = time_out - (hours * 60 * 60 * 1000)
+
+        res.end()
+        // Convert hours to time in and out        
+        addHoursSafe(name, failed, time_in, time_out, activity)
     })
     
     app.get('/void', (req, res) => {
@@ -127,9 +151,9 @@ new CronJob({
 const cronRetryFailed = async () => {
     const failedCache = failed;
     failed = []
-    for (const failedLog of failedCache) {
-        console.log(`attempting to log ${failedLog.timeIn} to ${failedLog.timeOut} hours for ${failedLog.name}`)
-        await addLabHoursSafe(failedLog.name, failed, failedLog.timeIn, failedLog.timeOut)
+    for (const failedEntry of failedCache) {
+        console.log(`attempting to log ${failedEntry.timeIn} to ${failedEntry.timeOut} hours for ${failedEntry.name} for ${failedEntry.activity}`)
+        await addHoursSafe(failedEntry.name, failed, failedEntry.timeIn, failedEntry.timeOut, failedEntry.activity)
     }
 }
 new CronJob({

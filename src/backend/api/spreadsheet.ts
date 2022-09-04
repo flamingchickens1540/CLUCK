@@ -27,11 +27,11 @@ export async function configureDrive(doc?: GoogleSpreadsheet) {
 }
 
 
-export async function addLabHours(name: string, timeIn: number, timeOut?: number) {
+export async function addHours(name: string, timeIn: number, timeOut: number, activity: string) {
     if (!google_drive_authed) {
         throw Error("Google drive not authed")
     }
-    
+
     timeOut = timeOut ?? Date.now();
     const timeInSec = timeIn / 1000
     const timeOutSec = timeOut / 1000
@@ -41,22 +41,23 @@ export async function addLabHours(name: string, timeIn: number, timeOut?: number
     if (hours < 0.01) { return }
     // Round to nearest hundredth
     const hoursRounded = hours.toFixed(2)
-    
+
     // Prevent concurrent access to the spreadsheet
     await timsheetMutex.runExclusive(async () => {
         // Add to sheet
         await timesheet.loadCells()
-        await timesheet.addRow([timeInSec, timeOutSec, name, hoursRounded, 'lab'])
+        await timesheet.addRow([timeInSec, timeOutSec, name, hoursRounded, activity])
         await timesheet.saveUpdatedCells()
     })
 }
 
-export async function addLabHoursSafe(name: string, failed: FailedEntry[], timeIn: number, timeOut?: number) {
+export async function addHoursSafe(name: string, failed: FailedEntry[], timeIn: number, timeOut?: number, activity?: string) {
     timeOut = timeOut ?? Date.now()
+    activity = activity ?? 'lab'
     try {
-        await addLabHours(name, timeIn, timeOut)
+        await addHours(name, timeIn, timeOut, activity)
     } catch (e) {
-        failed.push({ name, timeIn, timeOut })
+        failed.push({ name, timeIn, timeOut, activity })
         console.error(`failed hours add operation: ${name} : ${timeIn}, ${timeOut}`)
         console.error(e)
     }
@@ -66,7 +67,7 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
     if (!google_drive_authed) {
         throw Error("Google drive not authed")
     }
-    
+
     const rows = Object.entries(loggedIn).map(entry => {
         const date = new Date(entry[1]).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
         return [entry[0], date]

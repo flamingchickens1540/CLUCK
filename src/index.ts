@@ -9,6 +9,7 @@ import { token } from '../secrets/slack_secrets.js';
 import { setupApi } from './backend/api/index.js';
 import { collect } from './backend/member-collector/collector';
 import { baseurl, dataDirectory, memberListFilePath, server_port } from './consts';
+
 // Refresh profile images every day
 new CronJob({
     cronTime: '0 0 * * *',
@@ -28,6 +29,8 @@ if (!existsSync(dataDirectory)) {
 
 // Setup API Routes
 const slack_client = new WebClient(token)
+
+
 setupApi(app, slack_client)
 
 // Function to map sources to defined ip
