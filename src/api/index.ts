@@ -7,7 +7,7 @@ import cors from 'cors'
 import { CronJob } from 'cron'
 import { Router } from 'express'
 import fs from 'fs'
-import { slack_token } from '../../secrets/consts'
+import { slack_token, cluck_api_key } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
 import { addHoursSafe, configureDrive } from "./spreadsheet"
@@ -63,6 +63,9 @@ router.post('/log', (req, res) => {
     const name = req.body.name // User name to add hours to
     const hours = parseFloat(req.body.hours) // Time to add in hours
     const activity = req.body.activity // Activity
+
+    // Authenticate
+    if(req.body.api_key != cluck_api_key) {res.status(400).send('Bad Cluck API Key').end(); return; }
     
     // Check for existing request arguments
     if (!name) { res.status(400).send('Must include name in body').end(); return; }
