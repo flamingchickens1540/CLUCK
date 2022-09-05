@@ -41,7 +41,7 @@ router.get('/dash/delphi', async (req, res) => {
 
 // Grid
 
-router.use('/grid', express.static("./www/grid"))
+router.use('/grid', express.static("./www/grid", {extensions: ['html']}))
 
 // Member Collector
 
