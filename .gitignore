@@ -1,8 +1,9 @@
-secrets
-node_modules
-*/node_modules
-package-lock.json
-loggedin.json
-memberlog.json
-failed.json
-*/.DS_Store
+/node_modules/
+/secrets/*
+!/secrets/*.example.*
+/coverage/
+/dist/
+/data/
+
+**/.DS_Store
+
