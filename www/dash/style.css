@@ -129,7 +129,29 @@ p{
     position: absolute;
     left:0;
     /* x y blur spread */
+    box-shadow: .2vw .2vw .7vw .4vw rgba(18, 18, 18, 0.7);    
+    display: flex;
+    justify-content: center;
+
+}
+.bubblename{
+    /* text */
+    color: white;
+    font-weight: bold;
     box-shadow: .2vw .2vw .7vw .4vw rgba(18, 18, 18, 0.7);
+
+    /* position: absolute; */
+    display: flex;
+    align-self:flex-end;
+    margin-bottom: 0vw;
+    justify-self: center;
+    background-color: rgba(170, 170, 170, 0.8);
+    justify-content: center;
+
+    border-radius: 2vw;
+    font-size: 2vw;
+    padding-left: 1.4vw;
+    padding-right: 1.4vw;
 }
 
 

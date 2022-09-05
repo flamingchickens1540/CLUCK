@@ -2,6 +2,7 @@
 /* exported redrawCircles */
 let membersDiv = document.getElementById('members')
 
+let BUBBLE_COLORS = ['rgba(35,132,198,.5)','rgba(255,214,0,.5)','rgba(241,93,34,.5)','rgba(108,157,204,.5)']
 function renderCircle(circle) {
     let maxLength = Math.max(maxX-minX,maxY-minY)
     let multiplier = 1/maxLength*48
@@ -16,6 +17,16 @@ function renderCircle(circle) {
     elem.style.backgroundImage = `url(${circle.imgurl})`
     // elem.innerHTML = 'hi'
     membersDiv.appendChild(elem)
+
+
+      // bubble name
+    // blue, yellow, orange, lightblue, red
+
+    let name = document.createElement('name')
+    name.innerHTML = circle.name
+    name.className = 'bubblename'
+    name.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+    elem.appendChild(name)
 }
 
 function redrawCircles(circles) {

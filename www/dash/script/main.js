@@ -1,4 +1,4 @@
-/* globals MemberCircle placeCircles placedCircles redrawCircles*/
+/* globals MemberCircle unplacedCircles placeCircles placedCircles redrawCircles*/
 var members
 var loggedInCache
 
@@ -13,6 +13,8 @@ function regenCircles(loggedin) {
             member.img
         ))
     });
+    placedCircles = []
+    unplacedCircles = []
     placeCircles(circles)
     redrawCircles(placedCircles)
 }
