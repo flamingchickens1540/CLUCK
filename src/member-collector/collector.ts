@@ -22,7 +22,7 @@ export const collect = async () => {
         
         if (user == null || user.real_name == null) return
         members.push({
-            name: user.real_name,
+            name: user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             firstname: user.real_name.split(" ")[0],
             img: user.profile?.image_original ?? "/static/img/default_member.png"
         })
