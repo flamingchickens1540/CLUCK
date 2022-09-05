@@ -1,6 +1,7 @@
 // Spreadsheet
 export const log_sheet_name = "Log"
 export const loggedin_sheet_name = "Logged In"
+export const avatars_sheet_name = "Avatars"
 
 // Web server
 export const protocol = 'http';

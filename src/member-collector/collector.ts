@@ -4,6 +4,7 @@ import { writeFileSync } from 'fs';
 import { slack_token } from "../../secrets/consts";
 import { memberListFilePath } from "../consts";
 import { Member } from "../types";
+import { updateProfilePictures } from "../api/spreadsheet";
 
 const client = new WebClient(slack_token);
 
@@ -41,6 +42,7 @@ export const collect = async () => {
       })
 
     writeFileSync(memberListFilePath, JSON.stringify(members))
+    updateProfilePictures(members)
 }
 
 export default collect
