@@ -3,8 +3,9 @@
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
+import { server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
-import { baseurl, dataDirectory, server_port } from './consts';
+import { baseurl, dataDirectory } from './consts';
 import { collect } from './member-collector/collector';
 import { router as frontendRouter } from './router';
 
