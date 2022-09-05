@@ -1,9 +1,21 @@
 /* exported clock cluckedIn ping*/
-const api_server = ''
+const api_server = '/api'
 
 const clock = async (name, clockingIn) => {
-    await fetch(`${api_server}/clock?name=${encodeURIComponent(name)}&loggingin=${encodeURIComponent(clockingIn)}`)
+    let body = {
+        name: name,
+        loggingin: clockingIn
+    }
+    return await fetch(`${api_server}/clock`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
 }
+
 const cluckedIn = async () => {
     let res = await fetch(api_server + "/loggedin")
     let json = await res.json()

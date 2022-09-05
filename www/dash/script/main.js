@@ -18,7 +18,7 @@ function regenCircles(loggedin) {
 }
 
 function update() {
-    fetch('/loggedin').then(res=>res.json().then(loggedin=>{
+    fetch('/api/loggedin').then(res=>res.json().then(loggedin=>{
         // return if there's no change
         if(JSON.stringify(loggedInCache) == JSON.stringify(loggedin)) {return}
         loggedInCache = loggedin

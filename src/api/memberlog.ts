@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { LoggedIn } from '.'
-import { memberLogFilePath } from '../../consts';
+import { LoggedIn } from '../types'
+import { memberLogFilePath } from '../consts';
 import { updateLoggedIn } from './spreadsheet'
 
 

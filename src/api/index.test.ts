@@ -1,12 +1,12 @@
+import type { ChatPostMessageArguments, ChatPostMessageResponse, UsersListArguments, UsersListResponse } from "@slack/web-api";
+import type { Server } from 'http';
+import type { SpyInstance } from 'jest-mock';
+
 import { afterAll, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
-import { ChatPostMessageArguments, ChatPostMessageResponse, UsersListArguments, UsersListResponse, WebClient } from "@slack/web-api";
 import express from 'express';
 import fs from 'fs';
-import { Server } from 'http';
-import type { SpyInstance } from 'jest-mock';
 import fetch from 'node-fetch';
-import { accessFailed, accessLoggedIn, cronJobs, sendSlackMessage, setupApi } from '.';
-import { token } from '../../../secrets/slack_secrets';
+import { accessFailed, accessLoggedIn, client, cronJobs, router, sendSlackMessage } from '.';
 import { logMember, saveMemberLog } from './memberlog';
 import { addHoursSafe } from './spreadsheet';
 
@@ -22,7 +22,6 @@ const test_port = 3000
 const app = express()
 const api_url = `http://localhost:${test_port}`
 
-let slack_client: WebClient
 let memberSpy: SpyInstance<(options?: UsersListArguments | undefined) => Promise<UsersListResponse>>
 let chatSpy: SpyInstance<(options?: ChatPostMessageArguments | undefined) => Promise<ChatPostMessageResponse>>
 
@@ -38,9 +37,8 @@ async function apiPost(endpoint: string, body: Record<string, unknown>) {
 }
 
 beforeAll(() => {
-    slack_client = new WebClient(token)
-    chatSpy = jest.spyOn(slack_client.chat, "postMessage").mockImplementation(async () => { return { ok: true } })
-    memberSpy = jest.spyOn(slack_client.users, 'list')
+    chatSpy = jest.spyOn(client.chat, "postMessage").mockImplementation(async () => { return { ok: true } })
+    memberSpy = jest.spyOn(client.users, 'list')
     memberSpy.mockResolvedValue({
         ok: true,
         members: [{ "id": "UCHICKEN", "real_name": "Test Chicken" }]
@@ -56,12 +54,12 @@ describe('API', () => {
 
     let server: Server
     beforeAll(async () => {
-        await setupApi(app, slack_client)
+        app.use(router)
         server = app.listen(test_port)
 
     })
 
-    describe('GET /clock', () => {
+    describe('POST /api/clock', () => {
         beforeAll(async () => {
             jest.useFakeTimers({ advanceTimers: false }).setSystemTime(new Date("2022-01-01 5:00 PM"))
         })
@@ -71,22 +69,20 @@ describe('API', () => {
             accessFailed([])
         })
 
-        test('does not continue without name', async () => {
-            const res = await fetch(`${api_url}/clock?loggingin=true`)
-            expect(res.status).toBe(400)
-        })
-        test('does not continue without loggingin', async () => {
-            const res = await fetch(`${api_url}/clock?name=Test Chicken`)
-            expect(res.status).toBe(400)
-        })
         test('does not continue without parameters', async () => {
-            const res = await fetch(`${api_url}/clock`)
+            let res = await apiPost('clock', { loggingin: true })
+            expect(res.status).toBe(400)
+
+            res = await apiPost('clock', { name: "Test Chicken" })
+            expect(res.status).toBe(400)
+
+            res = await apiPost('clock', {})
             expect(res.status).toBe(400)
         })
 
         test('logs member in', async () => {
-            const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=true`)
-            expect(res.status).toBe(200)
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: true })
+            expect(res.ok).toBeTruthy()
             expect(accessLoggedIn()).toEqual({ "Test Chicken": Date.now() })
             expect(logMember).toHaveBeenCalledTimes(1)
         })
@@ -101,8 +97,8 @@ describe('API', () => {
                 expect(loggedin).toEqual({})
             })
 
-            const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=false`)
-            expect(res.status).toBe(200)
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false })
+            expect(res.ok).toBeTruthy()
 
             expect(addHoursSafe).toHaveBeenCalledTimes(1)
             expect(addHoursSafe).toHaveBeenCalledWith("Test Chicken", [], timeIn)
@@ -111,17 +107,17 @@ describe('API', () => {
             expect(accessLoggedIn()).toEqual({})
         })
         test('does not continue if member was not logged in', async () => {
-            const res = await fetch(`${api_url}/clock?name=Test Chicken&loggingin=false`)
-            expect(res.status).toBe(200)
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false })
+            expect(res.ok).toBeTruthy()
             expect(accessLoggedIn()).toEqual({})
             expect(logMember).toHaveBeenCalledTimes(0)
         })
     })
 
-    describe('POST /log', () => {
+    describe('POST /api/log', () => {
         test('returns status 200 with valid parameters', async () => {
             const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
-            expect(res.status).toBe(200)
+            expect(res.ok).toBeTruthy()
         })
 
         test('returns status 400 without valid parameters', async () => {
@@ -145,33 +141,23 @@ describe('API', () => {
 
         test('stores correct data', async () => {
             const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
-            expect(res.status).toBe(200)
+            expect(res.ok).toBeTruthy()
             expect(addHoursSafe).toHaveBeenCalledTimes(1)
             expect(addHoursSafe).toHaveBeenCalledWith("Test Chicken", [], new Date("2022-01-01 4:00 PM").getTime(), Date.now(), "Test Activity")
         })
     })
-
-    describe('GET /void', () => {
-        test('removes voided user', async () => {
-            accessLoggedIn({ "Test Chicken": Date.now() })
-            const res = await fetch(`${api_url}/void?name=Test Chicken`)
-            expect(res.status).toBe(200)
-            expect(accessLoggedIn()).toEqual({})
-        })
-    })
-
-    describe('GET /loggedin', () => {
+    describe('GET /api/loggedin', () => {
         test('returns logged in users', async () => {
             const res = await fetch(`${api_url}/loggedin`)
-            expect(res.status).toBe(200)
+            expect(res.ok).toBeTruthy()
             await expect(res.json()).resolves.toEqual(accessLoggedIn())
         })
     })
 
-    describe('GET /ping', () => {
+    describe('GET /api/ping', () => {
         test('responds with code 200', async () => {
             const res = await fetch(`${api_url}/ping`)
-            expect(res.status).toBe(200)
+            expect(res.ok).toBeTruthy()
         })
     })
 

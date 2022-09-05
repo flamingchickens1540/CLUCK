@@ -39,7 +39,8 @@
     "node-fetch": "^3.2.10",
     "p-queue": "^7.3.0",
     "ts-jest": "^28.0.8",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "@jitbit/htmlsanitizer": "^2.0.2"
   },
   "bundleDependencies": [
     "@slack/web-api",
@@ -47,6 +48,7 @@
     "cron",
     "express",
     "google-spreadsheet",
-    "node-fetch"
+    "node-fetch",
+    "@jitbit/htmlsanitizer"
   ]
 }

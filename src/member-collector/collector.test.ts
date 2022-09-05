@@ -3,7 +3,7 @@ import { expect, test, jest } from '@jest/globals';
 import fs from 'fs';
 
 import collect from './collector';
-import { token } from '../../../secrets/slack_secrets';
+import { token } from '../../secrets/slack_secrets';
 
 jest.mock('fs')
 

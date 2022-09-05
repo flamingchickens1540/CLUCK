@@ -1,8 +1,8 @@
 import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { hours_spreadsheet_id, loggedin_sheet_name, log_sheet_name } from '../../consts';
-import google_client_secret from "../../../secrets/client_secret.json"
-import type { FailedEntry, LoggedIn } from '.';
+import { hours_spreadsheet_id, loggedin_sheet_name, log_sheet_name } from '../consts';
+import google_client_secret from "../../secrets/client_secret.json"
+import type { FailedEntry, LoggedIn } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 
 let google_drive_authed = false

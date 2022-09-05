@@ -1,15 +1,13 @@
 
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
-import { memberListFilePath } from "../../consts";
+import { token } from "../../secrets/slack_secrets";
+import { memberListFilePath } from "../consts";
+import { Member } from "../types";
 
-export type Member = {
-    name: string;
-    firstname: string;
-    img: string;
-}
 
-export const collect = async (token) => {
+
+export const collect = async () => {
     const client = new WebClient(token);
 
     // Load slack users in the students group
