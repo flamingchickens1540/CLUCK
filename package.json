@@ -38,9 +38,9 @@
     "jest": "^28.0.1",
     "node-fetch": "^3.2.10",
     "p-queue": "^7.3.0",
+    "sanitize-html": "^2.7.1",
     "ts-jest": "^28.0.8",
-    "ts-node": "^10.9.1",
-    "@jitbit/htmlsanitizer": "^2.0.2"
+    "ts-node": "^10.9.1"
   },
   "bundleDependencies": [
     "@slack/web-api",
@@ -49,6 +49,6 @@
     "express",
     "google-spreadsheet",
     "node-fetch",
-    "@jitbit/htmlsanitizer"
+    "sanitize-html"
   ]
 }
