@@ -1,9 +1,10 @@
 import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { hours_spreadsheet_id, loggedin_sheet_name, log_sheet_name } from '../consts';
+import { loggedin_sheet_name, log_sheet_name } from '../consts';
 import google_client_secret from "../../secrets/client_secret.json"
 import type { FailedEntry, LoggedIn } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
+import { hours_spreadsheet_id } from '../../secrets/consts';
 
 let google_drive_authed = false
 let timesheet: GoogleSpreadsheetWorksheet
@@ -13,7 +14,7 @@ const timsheetMutex = new Mutex()
 const loggedInMutex = new Mutex()
 
 export async function getSpreadsheet() {
-    const doc = await new GoogleSpreadsheet(hours_spreadsheet_id)
+    const doc = new GoogleSpreadsheet(hours_spreadsheet_id)
     await doc.useServiceAccountAuth(google_client_secret)
     await doc.loadInfo()
     return doc

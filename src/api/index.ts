@@ -7,7 +7,7 @@ import cors from 'cors'
 import { CronJob } from 'cron'
 import { Router } from 'express'
 import fs from 'fs'
-import { token } from '../../secrets/slack_secrets'
+import { slack_token } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
 import { addHoursSafe, configureDrive } from "./spreadsheet"
@@ -15,7 +15,7 @@ import { addHoursSafe, configureDrive } from "./spreadsheet"
 
 
 let memberlist: Member[]
-export const client: WebClient = new WebClient(token)
+export const client: WebClient = new WebClient(slack_token)
 
 let loggedIn: LoggedIn = {}
 if (fs.existsSync(loggedInFilePath)) { loggedIn = JSON.parse(fs.readFileSync(loggedInFilePath, "utf-8")) }

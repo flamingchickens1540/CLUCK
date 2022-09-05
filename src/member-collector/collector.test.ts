@@ -3,12 +3,10 @@ import { expect, test, jest } from '@jest/globals';
 import fs from 'fs';
 
 import collect from './collector';
-import { token } from '../../secrets/slack_secrets';
-
 jest.mock('fs')
 
 test('should save members as json', async () => {
-    await collect(token)
+    await collect()
     // Check that it attempted to save the file once
     expect(fs.writeFileSync).toBeCalledTimes(1);
     // Check that it saved an array of members

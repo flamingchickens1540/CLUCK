@@ -1,14 +1,14 @@
 
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
-import { token } from "../../secrets/slack_secrets";
+import { slack_token } from "../../secrets/consts";
 import { memberListFilePath } from "../consts";
 import { Member } from "../types";
 
-
+const client = new WebClient(slack_token);
 
 export const collect = async () => {
-    const client = new WebClient(token);
+    
 
     // Load slack users in the students group
     const userlist = await client.usergroups.users.list({ usergroup: "S040BCAMCRF", include_disabled: false })

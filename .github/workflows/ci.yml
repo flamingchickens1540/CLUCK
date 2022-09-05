@@ -46,9 +46,11 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
       # Build
-      - name: Add secret files
+      - name: Rename secret files
         run: |
-          mv secrets/slack_secrets.example.js secrets/slack_secrets.js
-          mv secrets/client_secret.example.json secrets/client_secret.json
+          for i in secrets/*.example.*
+          do
+            mv "$i" "`echo $i | sed 's/.example//'`"
+          done
       - name: Build
         run: npm run build
