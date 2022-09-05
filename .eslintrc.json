@@ -36,7 +36,9 @@
                 "browser": true
             },
 			"rules": {
-                "no-constant-condition": ["error", { "checkLoops": false }]
+                "no-constant-condition": ["error", { "checkLoops": false }],
+                "no-unused-vars": "off",
+                "no-global-assign":"off"
             }
 		}
 	]

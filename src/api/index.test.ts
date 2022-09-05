@@ -9,6 +9,7 @@ import fetch from 'node-fetch';
 import { accessFailed, accessLoggedIn, client, cronJobs, router, sendSlackMessage } from '.';
 import { logMember, saveMemberLog } from './memberlog';
 import { addHoursSafe } from './spreadsheet';
+import { cluck_api_key } from "../../secrets/consts";
 
 jest.mock('fs')
 jest.mock('cron')
@@ -70,18 +71,30 @@ describe('API', () => {
         })
 
         test('does not continue without parameters', async () => {
-            let res = await apiPost('clock', { loggingin: true })
-            expect(res.status).toBe(400)
+            let res = await apiPost('clock', { loggingin: true, api_key:cluck_api_key})
+            expect(res.ok).toBeFalsy()
 
-            res = await apiPost('clock', { name: "Test Chicken" })
-            expect(res.status).toBe(400)
+            res = await apiPost('clock', { name: "Test Chicken", api_key:cluck_api_key })
+            expect(res.ok).toBeFalsy()
 
+            res = await apiPost('clock', {api_key:cluck_api_key})
+            expect(res.ok).toBeFalsy()
             res = await apiPost('clock', {})
-            expect(res.status).toBe(400)
+            expect(res.ok).toBeFalsy()
+
+            expect(addHoursSafe).not.toHaveBeenCalled()
+            expect(accessLoggedIn()).toEqual({});
+        })
+
+        test('does not continue without authentication', async () => {
+            const res = await apiPost('clock', { name:"Test Chicken", loggingin: true, api_key: "wrong" })
+            expect(res.status).toBe(401)
+            expect(logMember).not.toHaveBeenCalled()
+            expect(accessLoggedIn()).toEqual({});
         })
 
         test('logs member in', async () => {
-            const res = await apiPost('clock', { name: "Test Chicken", loggingin: true })
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: true, api_key:cluck_api_key })
             expect(res.ok).toBeTruthy()
             expect(accessLoggedIn()).toEqual({ "Test Chicken": Date.now() })
             expect(logMember).toHaveBeenCalledTimes(1)
@@ -97,7 +110,7 @@ describe('API', () => {
                 expect(loggedin).toEqual({})
             })
 
-            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false })
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false, api_key:cluck_api_key })
             expect(res.ok).toBeTruthy()
 
             expect(addHoursSafe).toHaveBeenCalledTimes(1)
@@ -107,7 +120,7 @@ describe('API', () => {
             expect(accessLoggedIn()).toEqual({})
         })
         test('does not continue if member was not logged in', async () => {
-            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false })
+            const res = await apiPost('clock', { name: "Test Chicken", loggingin: false, api_key:cluck_api_key })
             expect(res.ok).toBeTruthy()
             expect(accessLoggedIn()).toEqual({})
             expect(logMember).toHaveBeenCalledTimes(0)
@@ -116,34 +129,61 @@ describe('API', () => {
 
     describe('POST /api/log', () => {
         test('returns status 200 with valid parameters', async () => {
-            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
+            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity", api_key:cluck_api_key })
             expect(res.ok).toBeTruthy()
+            expect(addHoursSafe).toHaveBeenCalled()
+        })
+        test('does not continue without authentication', async () => {
+            let res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
+            expect(res.ok).toBeFalsy()
+            res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity", api_key: "wrong"})
+            expect(res.ok).toBeFalsy()
+
+            expect(addHoursSafe).not.toHaveBeenCalled()
         })
 
         test('returns status 400 without valid parameters', async () => {
             // Without name
-            let res = await apiPost("log", { hours: new Date().getTime(), activity: "Test Activity" })
-            expect(res.status).toBe(400)
+            let res = await apiPost("log", { hours: new Date().getTime(), activity: "Test Activity", api_key:cluck_api_key })
+            expect(res.ok).toBeFalsy()
             // Without hours
-            res = await apiPost("log", { name: "Test Chicken", activity: "Test Activity" })
-            expect(res.status).toBe(400)
+            res = await apiPost("log", { name: "Test Chicken", activity: "Test Activity", api_key:cluck_api_key })
+            expect(res.ok).toBeFalsy()
             // Without activity
-            res = await apiPost("log", { name: "Test Chicken", hours: new Date().getTime() })
-            expect(res.status).toBe(400)
+            res = await apiPost("log", { name: "Test Chicken", hours: new Date().getTime(), api_key:cluck_api_key })
+            expect(res.ok).toBeFalsy()
             // Without any parameters
             res = await apiPost("log", {})
-            expect(res.status).toBe(400)
-
+            expect(res.ok).toBeFalsy()
             // Without valid time
-            res = await apiPost("log", { name: "Test Chicken", hours: "notanumber", activity: "Test Activity" })
-            expect(res.status).toBe(400)
+            res = await apiPost("log", { name: "Test Chicken", hours: "notanumber", activity: "Test Activity", api_key:cluck_api_key})
+            expect(res.ok).toBeFalsy()
+            
+            expect(addHoursSafe).not.toBeCalled()
         })
 
         test('stores correct data', async () => {
-            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity" })
+            const res = await apiPost("log", { name: "Test Chicken", hours: 1, activity: "Test Activity", api_key:cluck_api_key })
             expect(res.ok).toBeTruthy()
             expect(addHoursSafe).toHaveBeenCalledTimes(1)
             expect(addHoursSafe).toHaveBeenCalledWith("Test Chicken", [], new Date("2022-01-01 4:00 PM").getTime(), Date.now(), "Test Activity")
+        })
+    })
+
+    describe('POST /api/auth', () => {
+        test('returns status 200 with valid key', async () => {
+            const res = await apiPost("auth", { api_key:cluck_api_key })
+            expect(res.status).toBe(200)
+        })
+
+        test('returns status 401 with invalid key', async () => {
+            const res = await apiPost("auth", { api_key: "wrong" })
+            expect(res.status).toBe(401)
+        })
+
+        test('returns status 401 with no key', async () => {
+            const res = await apiPost("auth", {})
+            expect(res.status).toBe(401)
         })
     })
     describe('GET /api/loggedin', () => {

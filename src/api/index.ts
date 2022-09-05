@@ -37,8 +37,11 @@ router.use(bodyParser.json());
 refreshSlackMemberlist()
 // INIT API ROUTES
 router.post('/clock', (req, res) => {
+    
     // Get and check args
-    const { name, loggingin } = req.body
+    const { name, loggingin, api_key} = req.body
+    // Authenticate
+    if(api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
     if (typeof name === 'undefined' || typeof loggingin === 'undefined') { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
     
     if (loggingin) {
@@ -60,7 +63,7 @@ router.post('/clock', (req, res) => {
 
 router.post('/log', (req, res) => {
     // Authenticate
-    if(req.body.api_key != cluck_api_key) {res.status(400).send('Bad Cluck API Key').end(); return; }
+    if(req.body.api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
    
     // Get and check args
     const name = req.body.name // User name to add hours to
@@ -89,6 +92,14 @@ router.get('/loggedin', (req, res) => {
 router.get('/ping', (req, res) => {
     res.status(200);
     res.send("pong");
+})
+router.post("/auth", (req, res) => {
+    if (req.body.api_key == cluck_api_key) { 
+        res.status(200).send("Authenticated").end()
+    } else {
+        res.status(401).send("Invalid CLUCK API Key").end()
+    }
+    
 })
 
 

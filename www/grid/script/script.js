@@ -1,9 +1,13 @@
-/* globals clock ping cluckedIn */
+/* globals clock ping cluckedIn checkAuth */
 let buttonJustPressed = false;
 
 
 
 async function run() {
+    const authed = await checkAuth();
+    if (!authed) {
+        document.location.replace("/grid/login");
+    }
     // Fetch Members
     let members = await (await fetch('/members')).json()
     
@@ -56,7 +60,7 @@ async function run() {
         memberButton.id = member.fullname
 
         // Set click toggle
-        memberButton.onclick = (click) => {
+        memberButton.onclick = async (click) => {
             // fullscreen()
 
             buttonJustPressed = true;
@@ -65,6 +69,7 @@ async function run() {
             if (click.target.classList.contains('button-text')) {
                 button = click.target.parentElement;
             }
+            
             // Toggle logged in             
             button.loggedIn = !button.loggedIn
             // Update style
@@ -72,8 +77,11 @@ async function run() {
                 button.style.setProperty(styleSpec.styleName, styleSpec.val)
             })
             // Cluck API Call
-            clock(button.fullname, button.loggedIn)
             
+            const res = await clock(button.fullname, button.loggedIn)
+            if (!res.ok) {
+                await refreshMembers()
+            }
         }
 
         // Add name text
@@ -119,19 +127,9 @@ async function run() {
     //////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
     // Update logged in every 30 seconds
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    while (true) {
-        // Get data and update buttons
-        // Query data to map of { Name:TimeCluckedIn } 
+    async function refreshMembers() {
         try {
             let membersIn = await cluckedIn()
             // Update buttons
@@ -145,6 +143,18 @@ async function run() {
                 })
             }
         } catch (err) { console.log(err) }
+    }
+
+
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    while (true) {
+        // Get data and update buttons
+        // Query data to map of { Name:TimeCluckedIn } 
+        await refreshMembers()
         await sleep(5000)
         while (buttonJustPressed) {
             buttonJustPressed = false;
