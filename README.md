@@ -1,7 +1,15 @@
 1. Install all node dependencies
-2. Change port/public ip in index.js if needed
-3. Unzip encrypted "secrets.zip" (use zip linux package -> will end up with "secrets" folder in main dir)
-4. Run index.js!
+2. Change port/public ip in src/consts.ts if needed
+3. Run `npm run build` and `npm run serve`!
 
-Sites: /grid /dash /dashboard (old, forgotten, use /dash instead)
-API: /loggedin /clock
+Pages:
+- `/grid`
+- `/dash`
+
+API:
+- `POST /api/clock`
+- `POST /api/log`
+- `GET /api/loggedin`
+- `GET /api/ping`
+- `GET /members`
+
