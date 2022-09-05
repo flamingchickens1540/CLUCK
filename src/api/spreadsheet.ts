@@ -42,15 +42,17 @@ export async function addHours(name: string, timeIn: number, timeOut: number, ac
     // Calculate duration
     const hours = (timeOut - timeIn) / 3600000
     // Don't log time less than 0.01 hours
-    if (hours < 0.01) { return }
+    if (hours < 0.01) { console.debug("Too few hours:", name, timeIn, timeOut, activity, hours); return }
     // Round to nearest hundredth
     const hoursRounded = hours.toFixed(2)
 
     // Prevent concurrent access to the spreadsheet
     await timsheetMutex.runExclusive(async () => {
         // Add to sheet
+        const row = [timeInSec, timeOutSec, name, hoursRounded, activity]
+        console.debug("Adding row", row)
         await timesheet.loadCells()
-        await timesheet.addRow([timeInSec, timeOutSec, name, hoursRounded, activity])
+        await timesheet.addRow(row)
         await timesheet.saveUpdatedCells()
     })
 }
@@ -73,7 +75,7 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
     }
 
     const rows = Object.entries(loggedIn).map(entry => {
-        const date = new Date(entry[1]).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+        const date = new Date(entry[1]).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZone:"America/Los_Angeles"})
         return [entry[0], date]
     })
 
