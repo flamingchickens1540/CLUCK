@@ -20,3 +20,12 @@ async function refreshDelphi() {
 
 refreshDelphi()
 setInterval(refreshDelphi,1000 * 60 * 5) // refresh post every 5 minutes
+
+
+function setBottomFade() {
+    document.getElementById('bottom_fade').style.visibility = window.innerWidth/window.innerHeight>1.8 ? 'visible' : 'hidden'
+    document.getElementById('bottom_fade').style.height = Math.max(0,Math.min(80*(window.innerWidth/window.innerHeight - 1.7),35)) + 'vh'
+    // 40 at 2, zero at 1.5
+}
+setBottomFade()
+addEventListener('resize',setBottomFade)
