@@ -10,7 +10,7 @@ import fs from 'fs'
 import { slack_token, cluck_api_key } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
-import { addHoursSafe, configureDrive } from "./spreadsheet"
+import { addHoursSafe, configureDrive, getMemberNames } from "./spreadsheet"
 
 
 

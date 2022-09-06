@@ -6,7 +6,8 @@ import type { FailedEntry, LoggedIn } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 import { hours_spreadsheet_id } from '../../secrets/consts';
 
-let google_drive_authed = false
+let google_drive_authed:boolean = false
+let authed_promise:Promise<[GoogleSpreadsheetWorksheet,GoogleSpreadsheetWorksheet,GoogleSpreadsheetWorksheet]>;
 let timesheet: GoogleSpreadsheetWorksheet
 let loggedin_sheet: GoogleSpreadsheetWorksheet
 let avatars_sheet: GoogleSpreadsheetWorksheet
@@ -21,15 +22,32 @@ export async function getSpreadsheet() {
     await doc.loadInfo()
     return doc
 }
+// cannot run twice
 export async function configureDrive(doc?: GoogleSpreadsheet) {
-    doc = doc ?? await getSpreadsheet()
-    timesheet = doc.sheetsByTitle[log_sheet_name]
-    loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
-    avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
-    google_drive_authed = true
-    return [timesheet, loggedin_sheet, avatars_sheet]
+    if(authed_promise) {return authed_promise}
+    authed_promise = new Promise(async res => {
+        doc = doc ?? await getSpreadsheet()
+        timesheet = doc.sheetsByTitle[log_sheet_name]
+        loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
+        avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
+        google_drive_authed = true
+        res([timesheet, loggedin_sheet, avatars_sheet])
+    })
+    return authed_promise;
 }
 
+// get member names from NAMED RANGE "MemberNames"
+export async function getMemberNames():Promise<string[]> {
+    if (!google_drive_authed) {
+        throw Error("Google drive not authed")
+    }
+
+    await timesheet.loadCells('MemberNames')
+    let names = await timesheet.getCellsInRange('MemberNames')
+    names = names.map(name=>name[0])
+
+    return names
+}
 
 export async function addHours(name: string, timeIn: number, timeOut: number, activity: string) {
     if (!google_drive_authed) {
