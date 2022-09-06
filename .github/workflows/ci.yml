@@ -17,9 +17,7 @@ jobs:
         run: npm ci
       
       # Linting
-      - name: Test Code Linting
-        run: npm run lint
-      - name: Save Code Linting Report JSON
+      - name: Run ESLint
         run: npm run actions:lint
         continue-on-error: true
       - name: Annotate Code Linting Results
