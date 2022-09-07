@@ -34,6 +34,9 @@ const ping = async () => {
     }
     return true;
 }
+const refreshMembres = async () => {
+    const res = await fetch("/api/members/refresh")
+}
 const checkAuth = async () => {
     const res = await fetch("/api/auth", {
         method: 'POST',
