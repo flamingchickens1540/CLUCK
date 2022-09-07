@@ -2,32 +2,31 @@ import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import type { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import type { SpyInstance } from 'jest-mock';
 import type { FailedEntry, LoggedIn } from '../types';
-import { loggedin_sheet_name, log_sheet_name } from '../consts';
 import { addHours, addHoursSafe, configureDrive, getSpreadsheet, updateLoggedIn } from './spreadsheet';
 import PQueue from 'p-queue';
 
 
 let doc
+let timesheet: GoogleSpreadsheetWorksheet
+let loggedin_sheet: GoogleSpreadsheetWorksheet
 beforeAll(async () => {
     doc = await getSpreadsheet()
 })
 
 describe('Timeclock Interface', () => {
-    let timesheet: GoogleSpreadsheetWorksheet
-    let loggedin_sheet: GoogleSpreadsheetWorksheet
     let addRowSpy: SpyInstance
 
     describe('Unauthenticated', () => {
-        test('addLabHours should throw error if not authed', async () => {
-            await expect(addHours('Test Chicken', 0, 0, 'lab')).rejects.toThrow('Google drive not authed')
+        test('addLabHours should authenticate itself', async () => {
+            await expect(addHours('Test Chicken', 0, 0, 'lab')).resolves.not.toThrow()
         })
         test('updateLoggedIn should throw error if not authed', async () => {
-            await expect(updateLoggedIn({})).rejects.toThrow('Google drive not authed')
+            await expect(updateLoggedIn({})).resolves.not.toThrow()
         })
     })
     describe('Authenticated', () => {
         beforeAll(async () => {
-            [timesheet, loggedin_sheet] = (await configureDrive(doc))
+            [timesheet, loggedin_sheet] = await configureDrive(doc)
             addRowSpy = jest.spyOn(timesheet, 'addRow').mockImplementation(() => Promise.resolve())
 
             // Override spreadsheet modification functions for speed, not used in tests
@@ -234,25 +233,21 @@ describe('Timeclock Interface', () => {
 describe('Google Spreadsheet Structure', () => {
     describe('Log sheet', () => {
         test('should have log sheet', () => {
-            expect(doc.sheetsByTitle[log_sheet_name]).toBeDefined()
+            expect(timesheet).toBeDefined()
         })
 
         test('log sheet should have correct columns', async () => {
-            const sheet = doc.sheetsByTitle[log_sheet_name]
-            expect(sheet.columnCount).toEqual(5)
-            await sheet.getRows()
-            expect(sheet.headerValues).toEqual(['In', 'Out', 'Name', 'Hours', 'Type'])
+            expect(timesheet.columnCount).toEqual(5)
         })
     })
 
     describe('LoggedIn sheet', () => {
         test('should have loggedin sheet', () => {
-            expect(doc.sheetsByTitle[loggedin_sheet_name]).toBeDefined()
+            expect(loggedin_sheet).toBeDefined()
         })
 
         test('loggedin sheet should have correct columns', async () => {
-            const sheet = doc.sheetsByTitle[loggedin_sheet_name]
-            expect(sheet.columnCount).toEqual(2)
+            expect(loggedin_sheet.columnCount).toEqual(2)
         })
     })
 

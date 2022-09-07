@@ -13,7 +13,7 @@ test('should save members as json', async () => {
     const expectedResult = {
         name: expect.stringMatching(/.+/),
         firstname: expect.stringMatching(/\w+/),
-        img: expect.stringMatching(/https:\/\/avatars.slack-edge.com\/.+_original.png/),
+        img: expect.stringMatching(/https?:\/\/.+\.png/),
     }
     const results = JSON.parse(jest.mocked(fs.writeFileSync).mock.calls[0][1] as string)
     expect(results).toEqual(expect.arrayContaining([expectedResult]))

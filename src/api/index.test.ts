@@ -27,7 +27,7 @@ let memberSpy: SpyInstance<(options?: UsersListArguments | undefined) => Promise
 let chatSpy: SpyInstance<(options?: ChatPostMessageArguments | undefined) => Promise<ChatPostMessageResponse>>
 
 async function apiPost(endpoint: string, body: Record<string, unknown>) {
-    return await fetch(`${api_url}/${endpoint}`, {
+    return await fetch(`${api_url}/api/${endpoint}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -188,7 +188,7 @@ describe('API', () => {
     })
     describe('GET /api/loggedin', () => {
         test('returns logged in users', async () => {
-            const res = await fetch(`${api_url}/loggedin`)
+            const res = await fetch(`${api_url}/api/loggedin`)
             expect(res.ok).toBeTruthy()
             await expect(res.json()).resolves.toEqual(accessLoggedIn())
         })
@@ -196,7 +196,7 @@ describe('API', () => {
 
     describe('GET /api/ping', () => {
         test('responds with code 200', async () => {
-            const res = await fetch(`${api_url}/ping`)
+            const res = await fetch(`${api_url}/api/ping`)
             expect(res.ok).toBeTruthy()
         })
     })
