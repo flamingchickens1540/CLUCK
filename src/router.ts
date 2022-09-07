@@ -1,8 +1,7 @@
 import express, { Router } from "express";
 import fetch from "node-fetch";
 import sanitizeHtml from 'sanitize-html';
-import { memberListFilePath } from './consts';
-import collect from "./member-collector/collector";
+
 // Dashboard
 
 
@@ -43,13 +42,7 @@ router.get('/dash/delphi', async (req, res) => {
 
 router.use('/grid', express.static("./www/grid", {extensions: ['html']}))
 
-// Member Collector
 
-router.get('/members', (req, res) => { res.sendFile(memberListFilePath, { root: "." }) })
-router.get('/members/refresh', async (req, res) => {
-    await collect()
-    res.sendFile(memberListFilePath, { root: "." })
-})
 
 // Assets
 router.use('/static/', express.static("./www/static"))

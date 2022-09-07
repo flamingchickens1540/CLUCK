@@ -7,7 +7,9 @@ import { server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
 import { baseurl, dataDirectory } from './consts';
 import { collect } from './member-collector/collector';
+import { router as memberRouter} from './member-collector/router';
 import { router as frontendRouter } from './router';
+
 
 // Refresh profile images every day
 new CronJob({
@@ -26,6 +28,7 @@ if (!existsSync(dataDirectory)) {
 // Init Express App
 const app = express()
 app.use("/api", apiRouter)
+app.use("/api", memberRouter)
 app.use("/", frontendRouter)
 
 // Init data directory

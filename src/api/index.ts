@@ -10,7 +10,7 @@ import fs from 'fs'
 import { slack_token, cluck_api_key } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
-import { addHoursSafe, configureDrive, getMemberNames } from "./spreadsheet"
+import { addHoursSafe, configureDrive } from "./spreadsheet"
 
 
 
@@ -25,6 +25,7 @@ if (fs.existsSync(failedFilePath)) { failed = JSON.parse(fs.readFileSync(failedF
 
 
 configureDrive()
+
 
 
 // Setup API Routes
@@ -84,6 +85,16 @@ router.post('/log', (req, res) => {
     // Convert hours to time in and out        
     addHoursSafe(name, failed, time_in, time_out, activity)
 })
+
+router.post("/auth", (req, res) => {
+    if (req.body.api_key == cluck_api_key) { 
+        res.status(200).send("Authenticated").end()
+    } else {
+        res.status(401).send("Invalid CLUCK API Key").end()
+    }
+    
+})
+
 router.get('/loggedin', (req, res) => {
     res.send(loggedIn)
     res.end()
@@ -93,14 +104,9 @@ router.get('/ping', (req, res) => {
     res.status(200);
     res.send("pong");
 })
-router.post("/auth", (req, res) => {
-    if (req.body.api_key == cluck_api_key) { 
-        res.status(200).send("Authenticated").end()
-    } else {
-        res.status(401).send("Invalid CLUCK API Key").end()
-    }
-    
-})
+
+router.get('/members/photo')
+
 
 
 
