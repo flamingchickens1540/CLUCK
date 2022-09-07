@@ -29,7 +29,7 @@ function update() {
 }
 
 async function start() {
-members = await (await fetch('/members')).json()
+members = await (await fetch('/api/members')).json()
 loggedInCache = []
 
 update()

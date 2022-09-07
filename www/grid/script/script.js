@@ -9,7 +9,7 @@ async function run() {
         document.location.replace("/grid/login");
     }
     // Fetch Members
-    let members = await (await fetch('/members')).json()
+    let members = await (await fetch('/api/members')).json()
     
     // Calculate & Set grid size
     const root = Math.sqrt(members.length)
@@ -166,6 +166,6 @@ async function run() {
 run()
 
 setTimeout(async ()=>{
-    await fetch('/members/refresh')
+    await fetch('/api/members/refresh')
     window.location.reload(1)
 },60*60*1000)
