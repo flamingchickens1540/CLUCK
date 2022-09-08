@@ -33,7 +33,6 @@ export async function configureDrive(doc?: GoogleSpreadsheet) {
         return
     }
     await authMutex.runExclusive(async () => {
-        console.log("auth started")
         if(google_drive_authed) {return}
         doc = doc ?? await getSpreadsheet()
         timesheet = doc.sheetsByTitle[log_sheet_name]
@@ -52,9 +51,7 @@ async function ensureAuthed() {
 
 // get member names from NAMED RANGE "MemberNames"
 export async function getMemberNames():Promise<string[]> {
-    console.log("Starting auth check")
     await ensureAuthed()
-    console.log("Auth check complete")
     
     await certs_sheet.loadCells(names_range_name)
     let names = await certs_sheet.getCellsInRange(names_range_name)

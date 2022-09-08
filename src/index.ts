@@ -37,8 +37,8 @@ app.use("/", frontendRouter)
 
 // Redirect unknown routes to dashboard
 app.use(function (req,res){
-    console.log("Error 404", req.url)
-	res.status(404).end()
+    console.log("404", req.url)
+	res.status(404).send("Could not find resource").end()
 });
 
 app.listen(server_port, () => { console.log(`listening: ${baseurl}`) });
