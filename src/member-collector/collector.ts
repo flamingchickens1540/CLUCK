@@ -4,8 +4,10 @@ import { writeFileSync } from 'fs';
 import { slack_token } from "../../secrets/consts";
 import { baseurl, memberListFilePath } from "../consts";
 import { Member } from "../types";
-import { configureDrive, getMemberNames } from "../api/spreadsheet";
+import { configureDrive, getMemberNames, updateProfilePictures } from "../api/spreadsheet";
 
+
+let members:Member[] = []
 const client = new WebClient(slack_token);
 
 function tokenizeName(name:string):string {
@@ -36,7 +38,7 @@ export const collect = async () => {
     promises.push(new Promise((resolve) => {getMemberNames().then(membernames => {names = membernames;resolve()})}))
     await Promise.all(promises)
     // For each spreadsheet user, add slack data
-    const members:Member[] = []
+    members = []
     names.forEach(name=>members.push(slackMembers[tokenizeName(name)] ?? ({
         // if person is not in slack, generate default Member object
         name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
@@ -57,6 +59,12 @@ export const collect = async () => {
     })
     
     writeFileSync(memberListFilePath, JSON.stringify(members))
+    updateProfilePictures()
 }
+
+export function getMembers():Member[] {
+    return members
+}
+
 
 export default collect
