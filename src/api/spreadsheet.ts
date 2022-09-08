@@ -28,24 +28,20 @@ export async function getSpreadsheet() {
 }
 // cannot run twice
 export async function configureDrive(doc?: GoogleSpreadsheet) {
-    try {
-        await authMutex.runExclusive(async () => {
-            if(google_drive_authed) {return}
-            doc = doc ?? await getSpreadsheet()
-            timesheet = doc.sheetsByTitle[log_sheet_name]
-            loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
-            avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
-            certs_sheet = doc.sheetsByTitle[certs_sheet_name]
-            google_drive_authed = true
-            authMutex.cancel() // cancel all other requests, only needs to happen once
-        })
-    } catch (e) {
-        // If the update was canceled, ignore the error
-        if (e !== E_CANCELED) {
-            console.error(e)
-            throw e
-        }
+    if(authMutex.isLocked()) { 
+        await authMutex.waitForUnlock()
+        return
     }
+    await authMutex.runExclusive(async () => {
+        console.log("auth started")
+        if(google_drive_authed) {return}
+        doc = doc ?? await getSpreadsheet()
+        timesheet = doc.sheetsByTitle[log_sheet_name]
+        loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
+        avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
+        certs_sheet = doc.sheetsByTitle[certs_sheet_name]
+        google_drive_authed = true
+    })
     return [timesheet, loggedin_sheet, certs_sheet]
 }
 
