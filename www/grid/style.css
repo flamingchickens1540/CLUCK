@@ -15,13 +15,14 @@
     font-family: tcm;
     src: url(/static/font/tcm.ttf);
 }
-
+html {
+    overflow:hidden;
+}
 body {
     background-image: url("/static/img/bg-grid.png");
     background-size: cover;
     background-repeat: no-repeat;
     overscroll-behavior: none;
-
 }
 .blurredBody {
     background-image: url("/static/img/bg-grid-blurred.png");
@@ -92,6 +93,7 @@ box-shadow: inset 0 0 0 1000px rgba(0, 255, 85, 0.2); */
 }
 
 .button-text {
+    user-select: none;
     box-shadow: inset 0 0 0 1000px rgba(70, 255, 169, 0.6);
     border-radius: 14px;
     /* border-radius; */
