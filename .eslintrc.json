@@ -1,5 +1,6 @@
 {
 	"extends": ["eslint:recommended"],
+    "ignorePatterns": ["www/grid/script/moses.js"],
 	"overrides": [
 		{ // Typescript files
             "files": ["**/*.ts", "secrets/*.js", "jest.config.js"],
@@ -27,6 +28,7 @@
 		{ // Javascript files
             "files": "www/**/*.js",  
             "parser": "@babel/eslint-parser",
+            
             "parserOptions": {
                 "ecmaVersion": "latest",
                 "sourceType": "script"
@@ -38,7 +40,8 @@
 			"rules": {
                 "no-constant-condition": ["error", { "checkLoops": false }],
                 "no-unused-vars": "off",
-                "no-global-assign":"off"
+                "no-global-assign":"off",
+                "no-undef":"off"
             }
 		}
 	]
