@@ -16,18 +16,15 @@ export const collect = async () => {
     await configureDrive()
     
     // Load slack users in the students group
-    const userlist = await client.usergroups.users.list({ usergroup: "S040BCAMCRF", include_disabled: false })
-    const slackUsers = userlist.users ?? []
+    const userlist = await client.users.list()
+    const slackUsers = userlist.members ?? []
     
     // Load Names from Spreadsheet
     let names
     
     // Build members catalogue
     const slackMembers:Member[] = []
-    const promises = slackUsers.map(async (user_id) => {
-        const user_response = await client.users.info({ user: user_id })
-        const user = user_response.user
-        
+    const promises = slackUsers.map(async (user) => {
         if (user == null || user.real_name == null) return
         slackMembers[tokenizeName(user.real_name)] = ({
             name: user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
