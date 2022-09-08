@@ -105,10 +105,6 @@ router.get('/ping', (req, res) => {
     res.send("pong");
 })
 
-router.get('/members/photo')
-
-
-
 
 export async function sendSlackMessage(fullname: string, text: string) {
     if (client == null) {
