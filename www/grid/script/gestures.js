@@ -8,13 +8,13 @@ var mosesPatterns = moses.model.MosesPatterns.create();
 var patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE];
  
 // create a sampler
-var div = document.documentElement;
+var div = document.body;
 var sampler = moses.sampler.DistanceSampler.create(div, 5);
 
 // create a recogniser
 var recogniser = moses.recogniser.DefaultRecogniser.create();
 
-// register selecte patterns
+// register selected patterns
 patterns.forEach(function(pattern) {
    recogniser.register(pattern);
 });

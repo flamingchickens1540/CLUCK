@@ -20,6 +20,8 @@ body {
     background-image: url("/static/img/bg-grid.png");
     background-size: cover;
     background-repeat: no-repeat;
+    overscroll-behavior: none;
+
 }
 .blurredBody {
     background-image: url("/static/img/bg-grid-blurred.png");
