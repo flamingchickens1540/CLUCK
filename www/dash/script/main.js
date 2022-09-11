@@ -3,19 +3,25 @@ var members
 var loggedInCache
 
 function regenCircles(loggedin) {
-    let circles = []
-    let now = Date.now()
-    Object.entries(loggedin).forEach(ent=>{
-        let member = members.find(o=>o.name==ent[0])
-        circles.push(new MemberCircle(
-            (now - ent[1])/1000/60/60,
-            member.firstname,
-            member.img
-        ))
-    });
-    placedCircles = []
-    unplacedCircles = []
-    placeCircles(circles)
+    let desiredRatio = 1; // y / x
+    let ratioError = .1;
+    let tries = 0;
+    do{
+        tries++;
+        let circles = []
+        let now = Date.now()
+        Object.entries(loggedin).forEach(ent=>{
+            let member = members.find(o=>o.name==ent[0])
+            circles.push(new MemberCircle(
+                (now - ent[1])/1000/60/60,
+                member.firstname,
+                member.img
+            ))
+        });
+        placedCircles = []
+        unplacedCircles = []
+        placeCircles(circles)
+    } while (tries<1000 && ((maxY-minY) / (maxX-minX) < (desiredRatio-ratioError/desiredRatio) || (maxY-minY) / (maxX-minX) > (desiredRatio+ratioError/desiredRatio))) // test to make sure the dimentions are chill
     redrawCircles(placedCircles)
 }
 

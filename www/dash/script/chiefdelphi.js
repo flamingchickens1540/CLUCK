@@ -16,6 +16,7 @@ async function refreshDelphi() {
     let info = getInfo(html)
     document.getElementById('delphiTitle').innerHTML = info.title + info.topics
     document.getElementById('delphiBody').innerHTML = info.body
+    resetScroll()
 }
 
 refreshDelphi()
@@ -29,3 +30,43 @@ function setBottomFade() {
 }
 setBottomFade()
 addEventListener('resize',setBottomFade)
+
+
+let autoScrollState = {
+    down:true,
+    timeStarted:Date.now(),
+    downSpeed: 0.036, // height/sec
+    upSpeed:1, // height/sec
+    topWait:5,
+    bottomWait:6,
+}
+function resetScroll() {
+    autoScrollState.timeStarted = Date.now();
+    autoScrollState.down = true;
+}
+let delphiBody = document.getElementById('delphiBody')
+function autoScroll() {
+    let element = delphiBody
+    if(autoScrollState.down) {
+        let scrollTo = Math.max(0,
+            element.clientHeight * autoScrollState.downSpeed * (
+                (Date.now() - 1000 * autoScrollState.topWait) // pause at top for topWait seconds
+                -autoScrollState.timeStarted)/1000
+        )
+        if(element.clientHeight + scrollTo > element.scrollHeight) { // if reached end, reverse scroll direction
+            autoScrollState.down = false;
+            autoScrollState.timeStarted = Date.now()
+        } else {
+            element.scrollTop = scrollTo
+        }
+    } else {
+        let scrollTo = (element.scrollHeight - element.clientHeight) - ( element.clientHeight * autoScrollState.upSpeed * Math.max(0,(Date.now()-(1000*autoScrollState.bottomWait)-autoScrollState.timeStarted))/1000 )
+        if(scrollTo < 0) { // if reached end, reverse scroll direction
+            autoScrollState.down = true;
+            autoScrollState.timeStarted = Date.now()
+        } else {
+            element.scrollTop = scrollTo
+        }
+    }
+}
+setInterval(autoScroll,10)
