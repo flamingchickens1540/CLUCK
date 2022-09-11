@@ -34,7 +34,9 @@ export const collect = async () => {
         
         // Load slack users in the students group
         const userlist = await client.users.list()
-        const slackUsers = userlist.members ?? []
+        let slackUsers = userlist.members ?? []
+        slackUsers = slackUsers.filter(elem => !elem.deleted )
+
         
         // Load Names from Spreadsheet
         let names
