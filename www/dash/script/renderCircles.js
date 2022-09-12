@@ -13,7 +13,7 @@ function renderCircle(circle) {
     elem.style.width = circle.r*2*multiplier + 'vw'
     elem.style.height = circle.r*2*multiplier + 'vw'
     elem.style.left = (circle.x-minX + xOffset)*multiplier     - (circle.r*2*multiplier)/2 + 'vw'
-    elem.style.top = (circle.y-minY )*multiplier        - (circle.r*2*multiplier)/2 + 'vw'
+    elem.style.top = (circle.y-minY )*multiplier        - (circle.r*2*multiplier)/2 + 5 + 'vw'
     elem.style.backgroundImage = `url(${circle.imgurl})`
     // elem.innerHTML = 'hi'
     membersDiv.appendChild(elem)

@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html>
-<title>Cluck Dash</title>
-<link rel="stylesheet" href="/dash/style.css">
+
+
+<head>
+    <title>Cluck Dash</title>
+    <link rel="stylesheet" href="/dash/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
 <body onclick="openFullscreen()">
-    <div id="topBar">
-        <!-- lol its actually a bottom bar xD -->
-        <img id="trimetLogo" src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/xpwcewuu2dbvlgvbxqpo">
-        20 To Gresham:
-    </div>
+    
 
     <img src="/dash/logo.svg" id="logo">
     <div id="main">
 
 
-        <div class="cont" id="members">
-
+        <div class='cont' id="">
+            <div id="topBar">
+                <!-- lol its actually a bottom bar xD -->
+                <img id="trimetLogo"
+                    src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/xpwcewuu2dbvlgvbxqpo">
+                <div id="trimet-stops"></div>
+            </div>
+            <div id="members" class="cont"></div>
         </div>
 
         <div class="cont" id="delphi">
@@ -33,5 +40,6 @@
 <script src="/dash/script/main.js"></script>
 <script src="/dash/script/actions.js"></script>
 <script src="/dash/script/chiefdelphi.js"></script>
+<script src="/dash/script/trimet.js"></script>
 
 </html>

@@ -39,13 +39,20 @@ members = await (await fetch('/api/members')).json()
 loggedInCache = []
 
 update()
+updateTrimet()
 
 setInterval(()=>{
     regenCircles(loggedInCache)
 },1000 * 60 );
+
 setInterval(()=>{
     update()
 },1000 * 3 );
+
+setInterval(()=>{
+    updateTrimet()
+},1000 * 30 );
+
 
 }
 
