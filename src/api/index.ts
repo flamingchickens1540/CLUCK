@@ -7,11 +7,11 @@ import cors from 'cors'
 import { CronJob } from 'cron'
 import { Router } from 'express'
 import fs from 'fs'
-import { slack_token, cluck_api_key } from '../../secrets/consts'
+import { slack_token, cluck_api_key, trimet_api_key, trimet_stops } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
 import { addHoursSafe, configureDrive } from "./spreadsheet"
-
+import fetch from 'node-fetch'
 
 
 let memberlist: Member[]
@@ -103,6 +103,16 @@ router.get('/loggedin', (req, res) => {
 router.get('/ping', (req, res) => {
     res.status(200);
     res.send("pong");
+})
+
+let trimet_response
+let trimet_timeout = 0
+router.get('/trimet', async (req, res) => {
+    if (trimet_timeout < Date.now()) {
+        trimet_response = await (await fetch(`http://developer.trimet.org/ws/v2/arrivals?locIDs=${trimet_stops}&appID=${trimet_api_key}`)).json()
+        trimet_timeout = Date.now() + (30 * 1000)
+    }
+    res.send(trimet_response)
 })
 
 
