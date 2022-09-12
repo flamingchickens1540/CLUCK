@@ -221,6 +221,7 @@ function redrawRows() {
     document.documentElement.style.setProperty('--width', ncols)
     document.documentElement.style.setProperty('--height', nrows)
 }
+addEventListener('resize',redrawRows)
 
 setTimeout(async ()=>{
     await fetch('/api/members/refresh')
