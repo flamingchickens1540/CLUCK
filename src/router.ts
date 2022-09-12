@@ -31,6 +31,15 @@ router.get('/dash/delphi', async (req, res) => {
             allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
             transformTags: {
                 'a': "span",
+                "img":function(tagName, attribs) {
+                    return {
+                        tagName: tagName,
+                        attribs: {
+                            ...attribs,
+                            src : attribs.src.replace(/^\//, 'https://www.chiefdelphi.com/')
+                        }
+                    };
+                }
             }
         }))
     } catch (e) {
