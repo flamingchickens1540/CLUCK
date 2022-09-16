@@ -8,7 +8,7 @@
     "serve": "node dist/app.cjs",
     "test": "jest",
     "lint": "eslint --ext .ts,.js src www",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --sourcemap",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --sourcemap && chmod g+w dist/app.cjs dist/app.cjs.map",
     "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs",
     "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src www",
     "deploy": "ssh $DEPLOY_HOST $DEPLOY_SCRIPT"
