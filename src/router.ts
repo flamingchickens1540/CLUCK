@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import fetch from "node-fetch";
 import sanitizeHtml from 'sanitize-html';
+import { server_base_path } from "../secrets/consts";
 
 // Dashboard
 
@@ -11,7 +12,7 @@ export const router = Router()
 let delphiPost = 0;
 
 
-router.get("/", (req, res) => res.redirect("/dash"))
+router.get("/", (req, res) => res.redirect(`${server_base_path}/dash`))
 router.use("/dash", express.static("./www/dash") )
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
