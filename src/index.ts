@@ -3,7 +3,7 @@
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
-import { server_port } from '../secrets/consts.js';
+import { server_base_path, server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
 import { baseurl, dataDirectory } from './consts';
 import { collect } from './member-collector/collector';
@@ -27,9 +27,9 @@ if (!existsSync(dataDirectory)) {
 
 // Init Express App
 const app = express()
-app.use("/api", apiRouter)
-app.use("/api", memberRouter)
-app.use("/", frontendRouter)
+app.use(server_base_path+"/api", apiRouter)
+app.use(server_base_path+"/api", memberRouter)
+app.use(server_base_path+"/", frontendRouter)
 
 // Init data directory
 

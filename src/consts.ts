@@ -1,4 +1,4 @@
-import { server_port } from "../secrets/consts";
+import { protocol, public_ip, server_base_path, server_port } from "../secrets/consts";
 
 // Spreadsheet
 export const log_sheet_name = "Log"
@@ -8,9 +8,8 @@ export const certs_sheet_name = "Certs"
 export const names_range_name = "MemberNames"
 
 // Web server
-export const protocol = 'http';
-export const public_ip = 'cluck.us.to';
-export const baseurl = `${protocol}://${public_ip}:${server_port}`;
+
+export const baseurl = `${protocol}://${public_ip}:${server_port}/${server_base_path}`;
 
 // data files
 export const dataDirectory = './data';
