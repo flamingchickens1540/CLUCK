@@ -20,7 +20,8 @@ router.get("/grid/style.css", (req, res) => {
     res.setHeader("Content-Type", "text/css");
     res.send(fs.readFileSync("./www/grid/style.css", "utf8").replaceAll(/{baseurl}/g, path.join("/", basepath).replace(/\/+$/, "")));
 })
-router.get("/", (req, res) => res.redirect(baseurl+'/dash'))
+router.get("/", (req, res) => res.redirect(baseurl+'/dash/'))
+router.get("/dash", (req, res) => res.sendFile("www/dash/index.html", { root: "./" }))
 router.use("/dash", express.static("./www/dash"))
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
@@ -57,7 +58,7 @@ router.get('/dash/delphi', async (req, res) => {
 })
 
 // Grid
-
+router.get("/grid", (req, res) => res.sendFile("www/grid/index.html", { root: "./" }))
 router.use('/grid', express.static("./www/grid", {extensions: ['html']}))
 
 
