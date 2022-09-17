@@ -1,8 +1,8 @@
 
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
-import { slack_token } from "../../secrets/consts";
-import { baseurl, memberListFilePath } from "../consts";
+import { baseurl, slack_token } from "../../secrets/consts";
+import { memberListFilePath } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getMemberNames, updateProfilePictures } from "../api/spreadsheet";
 

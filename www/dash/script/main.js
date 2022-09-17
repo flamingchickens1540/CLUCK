@@ -26,7 +26,7 @@ function regenCircles(loggedin) {
 }
 
 function update() {
-    fetch('/api/loggedin').then(res=>res.json().then(loggedin=>{
+    fetch(api_url+'/loggedin').then(res=>res.json().then(loggedin=>{
         // return if there's no change
         if(JSON.stringify(loggedInCache) == JSON.stringify(loggedin)) {return}
         loggedInCache = loggedin
@@ -35,7 +35,7 @@ function update() {
 }
 
 async function start() {
-members = await (await fetch('/api/members')).json()
+members = await (await fetch(api_url+'/members')).json()
 loggedInCache = []
 
 update()

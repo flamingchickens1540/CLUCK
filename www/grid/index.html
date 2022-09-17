@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="/grid/style.css">
 <html>
-<title>Cluck Grid</title>
+<head>
+    <title>Cluck Grid</title>
+    <script src="../base.js"></script> <!-- For handling baseurl -->
+    <link rel="stylesheet" href="./style.css">
+    <link rel="shortcut icon" href="/cluck/favicon.ico" type="image/x-icon">
+</head>
 
 <body>
     <noconnect id="noconnect">NOT CONNECTED TO CLUCK API</noconnect>
     <div onclick="openFullscreen()" class=button-grid id=button-grid></div>
-    <script src="/grid/script/clockapi.js"></script>
-    <script src="/grid/script/script.js"></script>
-    <script src="/grid/script/moses.js"></script>
-    <script src="/grid/script/gestures.js"></script>
+    <script src="./script/clockapi.js"></script>
+    <script src="./script/script.js"></script>
+    <script src="./script/moses.js"></script>
+    <script src="./script/gestures.js"></script>
 </body>
 
 </html>

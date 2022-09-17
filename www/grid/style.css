@@ -1,31 +1,31 @@
 /* Fonts */
 @font-face {
     font-family: basics-serif;
-    src: url(/static/font/basics_serif.ttf);
+    src: url(/cluck/static/font/basics_serif.ttf);
 }
 @font-face {
     font-family: cocogoose;
-    src: url(/static/font/cocogoose.ttf);
+    src: url({baseurl}/static/font/cocogoose.ttf);
 }
 @font-face {
     font-family: gilroy;
-    src: url(/static/font/gilroy-bold.otf);
+    src: url({baseurl}/static/font/gilroy-bold.otf);
 }
 @font-face {
     font-family: tcm;
-    src: url(/static/font/tcm.ttf);
+    src: url({baseurl}/static/font/tcm.ttf);
 }
 html {
     overflow:hidden;
 }
 body {
-    background-image: url("/static/img/bg-grid.png");
+    background-image: url("{baseurl}/static/img/bg-grid.png");
     background-size: cover;
     background-repeat: no-repeat;
     overscroll-behavior: none;
 }
 .blurredBody {
-    background-image: url("/static/img/bg-grid-blurred.png");
+    background-image: url("{baseurl}/static/img/bg-grid-blurred.png");
     background-size:cover;
     background-repeat: no-repeat;
     height:100vh;

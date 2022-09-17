@@ -8,23 +8,14 @@
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
     function redirect() {
-        document.location.replace("/grid/")
+        document.location.replace(baseurl+"/grid/")
     }
     let pass = document.getElementById('password');
     let butt = document.getElementById('submit')
     pass.oninput = () => { pass.setCustomValidity("")}
     butt.onclick = async function () {
-        let req = await fetch("/api/auth", {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                api_key: pass.value
-            })
-        })
-        if(req.status == 200) {
+        let authed = await checkAuth(pass.value)
+        if(authed) {
             setCookie('funneeText',pass.value,100)
             redirect();
         } else {

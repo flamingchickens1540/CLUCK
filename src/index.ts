@@ -3,13 +3,12 @@
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
-import { server_port } from '../secrets/consts.js';
+import { baseurl, server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
-import { baseurl, dataDirectory } from './consts';
+import { dataDirectory } from './consts';
 import { collect } from './member-collector/collector';
 import { router as memberRouter} from './member-collector/router';
 import { router as frontendRouter } from './router';
-
 
 // Refresh profile images every day
 new CronJob({
@@ -27,6 +26,13 @@ if (!existsSync(dataDirectory)) {
 
 // Init Express App
 const app = express()
+// app.use("/", proxy("baseurl", {
+//     proxyReqPathResolver: (req) => {
+//         console.log(req.path)
+//         console.log(url.parse(baseurl+req.url).path)
+//         return url.parse(baseurl+req.url).path
+//     }
+// }))
 app.use("/api", apiRouter)
 app.use("/api", memberRouter)
 app.use("/", frontendRouter)

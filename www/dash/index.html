@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html>
-<title>Cluck Dash</title>
-<link rel="stylesheet" href="/dash/style.css">
+
+<head>
+    <title>Cluck Dash</title>
+    <script src="../base.js"></script> <!-- For handling baseurl -->
+    <link rel="stylesheet" href="./style.css">
+    <link rel="shortcut icon" href="/cluck/favicon.ico" type="image/x-icon">
+</head>
 
 <body onclick="openFullscreen()">
     <div id="topBar">
-        <!-- lol its actually a bottom bar xD -->
         <img id="trimetLogo" src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/xpwcewuu2dbvlgvbxqpo">
-        20 To Gresham:
     </div>
-
-    <img src="/dash/logo.svg" id="logo">
+    <img src="./logo.svg" id="logo">
     <div id="main">
-
-
-        <div class="cont" id="members">
-
-        </div>
-
+        <div class="cont" id="members"></div>
         <div class="cont" id="delphi">
-            
             <h1 id="delphiTitle"></h1>
             <h3 id="delphiBody"></h3>
             <div id="bottom_fade"></div>
         </div>
-
-
     </div>
 </body>
-<script src="/dash/script/circlePacker.js"></script>
-<script src="/dash/script/renderCircles.js"></script>
-<script src="/dash/script/main.js"></script>
-<script src="/dash/script/actions.js"></script>
-<script src="/dash/script/chiefdelphi.js"></script>
+
+<script src="./script/circlePacker.js"></script>
+<script src="./script/renderCircles.js"></script>
+<script src="./script/main.js"></script>
+<script src="./script/actions.js"></script>
+<script src="./script/chiefdelphi.js"></script>
 
 </html>

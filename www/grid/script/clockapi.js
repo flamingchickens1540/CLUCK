@@ -1,5 +1,4 @@
-/* exported clock cluckedIn ping*/
-const api_server = '/api'
+/* exported clock cluckedIn ping api_server*/
 function getCookie(name) {
     var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
     if(!result) {return null}
@@ -11,7 +10,7 @@ const clock = async (name, clockingIn) => {
         loggingin: clockingIn,
         api_key: getCookie("funneeText")
     }
-    return await fetch(`${api_server}/clock`, {
+    return await fetch(api_url+'/clock', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -22,30 +21,30 @@ const clock = async (name, clockingIn) => {
 }
 
 const cluckedIn = async () => {
-    let res = await fetch(api_server + "/loggedin")
+    let res = await fetch(api_url + "/loggedin")
     let json = await res.json()
     return json;
 }
 const ping = async () => {
     try {
-        await fetch(api_server + "/ping")
+        await fetch(api_url + "/ping")
     } catch (e) {
         return false;
     }
     return true;
 }
-const refreshMembres = async () => {
-    const res = await fetch("/api/members/refresh")
+const refreshMembers = async () => {
+    const res = await fetch(api_url+"/members/refresh")
 }
-const checkAuth = async () => {
-    const res = await fetch("/api/auth", {
+const checkAuth = async (key = getCookie("funneeText")) => {
+    const res = await fetch(api_url+"/auth", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            api_key: getCookie("funneeText")
+            api_key: key
         })
     })
     return res.ok

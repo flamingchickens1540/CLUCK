@@ -1,8 +1,9 @@
 import express, { Router } from "express";
 import fetch from "node-fetch";
 import sanitizeHtml from 'sanitize-html';
-import { server_base_path } from "../secrets/consts";
-
+import { basepath, baseurl } from "../secrets/consts";
+import path from 'path'
+import fs from 'fs'
 // Dashboard
 
 
@@ -11,9 +12,16 @@ export const router = Router()
 // Dashboard
 let delphiPost = 0;
 
-
-router.get("/", (req, res) => res.redirect(`${server_base_path}/dash`))
-router.use("/dash", express.static("./www/dash") )
+router.get("/base.js", (req, res) => {
+    res.setHeader("Content-Type", "application/javascript");
+    res.send(`const baseurl = "${path.normalize(baseurl).replace(/\/+$/, "")}";const basepath = "/${basepath.replace(/\/+$/, "")}";const api_url = "${path.normalize(path.join("/",basepath, "/api")).replace(/\/+$/, "")}";`);
+})
+router.get("/grid/style.css", (req, res) => {
+    res.setHeader("Content-Type", "text/css");
+    res.send(fs.readFileSync("./www/grid/style.css", "utf8").replaceAll(/{baseurl}/g, path.join("/", basepath).replace(/\/+$/, "")));
+})
+router.get("/", (req, res) => res.redirect(baseurl+'/dash'))
+router.use("/dash", express.static("./www/dash"))
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
     const json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json() as any

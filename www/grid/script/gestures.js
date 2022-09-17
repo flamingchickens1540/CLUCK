@@ -22,7 +22,7 @@ patterns.forEach(function(pattern) {
 // display the result
 recogniser.on('recognised', async function(data) {
    if(data.bestMatch.value > .4) {
-    await refreshMembres()
+    await refreshMembers()
     location.reload()
    }
 });

@@ -21,10 +21,10 @@ let members
 async function run() {
     const authed = await checkAuth();
     if (!authed) {
-        document.location.replace("/grid/login");
+        document.location.replace(baseurl+"/grid/login");
     }
     // Fetch Members
-    members = await (await fetch('/api/members')).json()
+    members = await (await fetch(api_url+'/members')).json()
     
     
     redrawRows()
@@ -113,7 +113,7 @@ async function run() {
         // Do other adding and styling things
         memberButton.appendChild(text)
         memberButton.style.setProperty('background-image', `url(${member.img})`)
-        if (!member.img) { memberButton.style.setProperty('background-image', `url(/assets/img/defaultpicture.jpg)`) }
+        if (!member.img) { memberButton.style.setProperty('background-image', `url(${baseurl}/assets/img/defaultpicture.jpg)`) }
         memberButton.className = 'button-in'
         
         // Add button
@@ -224,6 +224,6 @@ function redrawRows() {
 addEventListener('resize',redrawRows)
 
 setTimeout(async ()=>{
-    await fetch('/api/members/refresh')
+    await fetch(api_url+'/members/refresh')
     window.location.reload(1)
 },60*60*1000)
