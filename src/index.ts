@@ -3,13 +3,13 @@
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
-import { baseurl, server_port } from '../secrets/consts.js';
+import { basepath, baseurl, server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
 import { dataDirectory } from './consts';
 import { collect } from './member-collector/collector';
 import { router as memberRouter} from './member-collector/router';
 import { router as frontendRouter } from './router';
-
+import path from 'path'
 // Refresh profile images every day
 new CronJob({
     cronTime: '0 0 * * *',
@@ -42,9 +42,14 @@ app.use("/", frontendRouter)
 
 
 // Redirect unknown routes to dashboard
-app.use(function (req,res){
-    console.log("404", req.url)
-	res.status(404).send("Could not find resource").end()
-});
+app.use(function(req, res) {
+    if (!req.url.endsWith("/")) {
+        const destination = path.join("/", basepath, path.normalize(req.url), "/");
+        console.log("302", req.url, "->", destination)
+        res.redirect(destination)
+    } else {
+        res.status(404).send("Could not find resource").end()
+    }
+})
 
 app.listen(server_port, () => { console.log(`listening: ${baseurl}`) });
