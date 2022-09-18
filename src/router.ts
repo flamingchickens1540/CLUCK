@@ -19,7 +19,7 @@ router.get("/base.js", (req, res) => {
     const api_url = "${path.normalize(path.join("/",basepath, "/api")).replace(/\/+$/, "")}";`);
 })
 
-router.get("/", (req, res) => res.redirect('dash'))
+router.get("/", (req, res) => res.redirect('/' + baseurl + 'dash'))
 router.use("/dash", express.static("./www/dash"))
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
