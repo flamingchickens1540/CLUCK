@@ -24,6 +24,8 @@ let failed: FailedEntry[] = []
 if (fs.existsSync(failedFilePath)) { failed = JSON.parse(fs.readFileSync(failedFilePath, "utf-8")) }
 
 
+
+
 configureDrive()
 
 

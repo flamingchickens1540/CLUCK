@@ -2,10 +2,10 @@
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { baseurl, slack_token } from "../../secrets/consts";
-import { memberListFilePath } from "../consts";
+import { memberListFilePath, photosFilePath } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getMemberNames, updateProfilePictures } from "../api/spreadsheet";
-
+import fs from 'fs'
 function waitFor(conditionFunction) {
     const poll = resolve => {
         if(conditionFunction()) resolve();
@@ -17,6 +17,17 @@ function waitFor(conditionFunction) {
 
 let members:Member[] = []
 let collecting = false
+
+const photos: {[key:string]:string} = {}
+if (fs.existsSync(photosFilePath)) { 
+    const messy_photos:{[key:string]:string} = JSON.parse(fs.readFileSync(photosFilePath, "utf-8")) 
+    Object.entries(messy_photos).forEach(([key, value]) => {
+        photos[tokenizeName(key)] = value
+    })
+    console.log(photos)
+}
+
+
 const client = new WebClient(slack_token);
 
 function tokenizeName(name:string):string {
@@ -24,10 +35,12 @@ function tokenizeName(name:string):string {
 }
 
 export const collect = async () => {
+    
     if (collecting) { 
         await waitFor(() => !collecting)
         return
     }
+    
     collecting = true
     try {
         await configureDrive()
@@ -45,10 +58,11 @@ export const collect = async () => {
         const slackMembers:Member[] = []
         const promises = slackUsers.map(async (user) => {
             if (user == null || user.real_name == null) return
+            const name = user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             slackMembers[tokenizeName(user.real_name)] = ({
-                name: user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+                name: name,
                 firstname: user.real_name.split(" ")[0],
-                img: user.profile?.image_original ?? `${baseurl}/static/img/default_member.jpg`
+                img: user.profile?.image_original ?? photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
             })
         })
         // Run spreadsheet collection in parallel with slack collection
@@ -60,7 +74,7 @@ export const collect = async () => {
             // if person is not in slack, generate default Member object
             name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             firstname: name.split(" ")[0],
-            img: `${baseurl}/static/img/default_member.jpg`
+            img: photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
         })))
         
         
