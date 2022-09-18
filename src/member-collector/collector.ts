@@ -24,7 +24,6 @@ if (fs.existsSync(photosFilePath)) {
     Object.entries(messy_photos).forEach(([key, value]) => {
         photos[tokenizeName(key)] = value
     })
-    console.log(photos)
 }
 
 
