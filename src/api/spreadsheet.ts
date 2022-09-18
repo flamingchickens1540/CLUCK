@@ -111,9 +111,11 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
         await loggedInMutex.runExclusive(async () => {
             // Update sheet
             await loggedin_sheet.loadCells()
-            await loggedin_sheet.resize({ rowCount: 2, columnCount: 2 })
+            await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 }) // clear rows
             if (rows.length > 0) {
                 await loggedin_sheet.addRows(rows)
+            } else {
+                await loggedin_sheet.resize({ rowCount: 2, columnCount: 2 }) // so that the loggedin checkboxes reset
             }
             await loggedin_sheet.saveUpdatedCells()
         })
@@ -125,6 +127,16 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
         }
     }
 }
+
+ensureAuthed().then(async ()=>{
+    console.log('running test code')
+    await loggedin_sheet.loadCells()
+    await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 })
+    await loggedin_sheet.addRows([['ba','ba']])
+    await loggedin_sheet.addRows([['ba','baboe']])
+    await loggedin_sheet.saveUpdatedCells()
+
+})
 
 export async function updateProfilePictures() {
     await ensureAuthed()
