@@ -11,6 +11,7 @@ Pages:
 API:
 - `POST /api/clock`
 - `POST /api/log`
+- `POST /api/void`
 - `GET /api/loggedin`
 - `GET /api/ping`
 - `GET /api/members`

@@ -35,7 +35,9 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 router.use((req, res, next) => {
     if (!["/ping", "/loggedin"].includes(req.url)) {
-        console.log(req.method, req.url)
+        let body:string = JSON.stringify(req.body)
+        body = body.replace(cluck_api_key, "VALID_API_KEY")
+        console.log(req.method, req.url, body)
     }
     next()
 })
@@ -108,6 +110,18 @@ router.get('/loggedin', (req, res) => {
 router.get('/ping', (req, res) => {
     res.status(200);
     res.send("pong");
+})
+
+router.post('/void', (req, res) => {
+    if(req.body.api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
+    if (!req.body.name) { res.status(400).send('Must include name in body').end(); return; }
+    if (Object.keys(loggedIn).includes(req.body.name)) {
+        delete loggedIn[req.body.name]
+        res.status(200).send('Logged out').end()
+    } else {
+        res.status(422).send('User not logged in').end()
+    }
+    res.end();
 })
 
 
