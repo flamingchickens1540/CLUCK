@@ -111,7 +111,7 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
         await loggedInMutex.runExclusive(async () => {
             // Update sheet
             await loggedin_sheet.loadCells()
-            await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 })
+            await loggedin_sheet.resize({ rowCount: 2, columnCount: 2 })
             if (rows.length > 0) {
                 await loggedin_sheet.addRows(rows)
             }
