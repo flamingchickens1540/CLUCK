@@ -3,7 +3,6 @@ import fetch from "node-fetch";
 import sanitizeHtml from 'sanitize-html';
 import { basepath, baseurl } from "../secrets/consts";
 import path from 'path'
-import fs from 'fs'
 // Dashboard
 
 
@@ -14,12 +13,12 @@ let delphiPost = 0;
 
 router.get("/base.js", (req, res) => {
     res.setHeader("Content-Type", "application/javascript");
-    res.send(`const baseurl = "${path.normalize(baseurl).replace(/\/+$/, "")}";const basepath = "/${basepath.replace(/\/+$/, "")}";const api_url = "${path.normalize(path.join("/",basepath, "/api")).replace(/\/+$/, "")}";`);
+    res.send(`
+    const baseurl = "${path.normalize(baseurl).replace(/\/+$/, "")}";
+    const basepath = "${path.normalize(path.join("/", basepath)).replace(/\/+$/, "")}";
+    const api_url = "${path.normalize(path.join("/",basepath, "/api")).replace(/\/+$/, "")}";`);
 })
-router.get("/grid/style.css", (req, res) => {
-    res.setHeader("Content-Type", "text/css");
-    res.send(fs.readFileSync("./www/grid/style.css", "utf8").replaceAll(/{baseurl}/g, path.join("/", basepath).replace(/\/+$/, "")));
-})
+
 router.get("/", (req, res) => res.redirect(baseurl+'/dash'))
 router.use("/dash", express.static("./www/dash"))
 router.get('/dash/delphi', async (req, res) => {

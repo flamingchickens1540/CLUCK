@@ -8,6 +8,7 @@ function openFullscreen() {
     } else if (elem.msRequestFullscreen) { /* IE11 */
         elem.msRequestFullscreen();
     }
+    redrawRows()
 }
 
 
@@ -17,11 +18,10 @@ function openFullscreen() {
 let buttonJustPressed = false;
 
 let members
-
 async function run() {
     const authed = await checkAuth();
     if (!authed) {
-        document.location.replace(document.location.origin + "/" + basepath + "/grid/login");
+        document.location.replace(basepath+"/grid/login");
     }
     // Fetch Members
     members = await (await fetch(api_url+'/members')).json()
@@ -71,6 +71,7 @@ async function run() {
         memberButton.id = member.fullname
         
         // Set click toggle
+        if (!skipAuth) {
         memberButton.onclick = async (click) => {
             // fullscreen()
             
@@ -93,7 +94,7 @@ async function run() {
             if (!res.ok) {
                 await refreshMembers()
             }
-        }
+        }}
         
         // Add name text
         let text = document.createElement('person-name')
@@ -119,6 +120,7 @@ async function run() {
         // Add button
         document.getElementById('button-grid').appendChild(memberButton)
     })
+
     
     
     

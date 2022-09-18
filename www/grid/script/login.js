@@ -8,11 +8,16 @@
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
     function redirect() {
-        document.location.replace(baseurl+"/grid/")
+        document.location.replace(basepath+"/grid/")
     }
     let pass = document.getElementById('password');
     let butt = document.getElementById('submit')
+    let skip = document.getElementById('skip')
     pass.oninput = () => { pass.setCustomValidity("")}
+    skip.onclick = () => {
+        setCookie("funneeText", "skip", 100)
+        redirect()
+    }
     butt.onclick = async function () {
         let authed = await checkAuth(pass.value)
         if(authed) {
