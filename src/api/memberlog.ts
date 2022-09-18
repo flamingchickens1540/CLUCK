@@ -23,7 +23,7 @@ export async function logMember(name:string, loggingin:boolean, logged_in:Logged
 export function saveMemberLog() {
     // Use jsonl to avoid having to load the entire file into memory
     memberlog.forEach(item => {
-        fs.appendFileSync(memberLogFilePath, JSON.stringify(item))
+        fs.appendFileSync(memberLogFilePath, JSON.stringify(item)+"\n")
     })
     setMemberlog([])
 }
