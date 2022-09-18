@@ -21,7 +21,7 @@ let members
 async function run() {
     const authed = await checkAuth();
     if (!authed) {
-        document.location.replace(baseurl+"/grid/login");
+        document.location.replace(document.location.origin + "/" + basepath + "/grid/login");
     }
     // Fetch Members
     members = await (await fetch(api_url+'/members')).json()
