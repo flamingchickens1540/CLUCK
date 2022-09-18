@@ -33,7 +33,12 @@ export const router = Router()
 router.use(cors())
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
-
+router.use((req, res, next) => {
+    if (!["/ping", "/loggedin"].includes(req.url)) {
+        console.log(req.method, req.url)
+    }
+    next()
+})
 
 refreshSlackMemberlist()
 // INIT API ROUTES

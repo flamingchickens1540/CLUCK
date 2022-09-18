@@ -5,7 +5,7 @@ var mosesPatterns = moses.model.MosesPatterns.create();
  
 // choose patterns from the collection
 // var patterns = [mosesPatterns.V, mosesPatterns.CIRCLE, mosesPatterns.DASH, mosesPatterns.SQUARE, mosesPatterns.SEVEN, mosesPatterns.Z];
-var patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE];
+var patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE, mosesPatterns.V];
  
 // create a sampler
 var div = document.body;
@@ -18,12 +18,22 @@ var recogniser = moses.recogniser.DefaultRecogniser.create();
 patterns.forEach(function(pattern) {
    recogniser.register(pattern);
 });
-
 // display the result
 recogniser.on('recognised', async function(data) {
+   
    if(data.bestMatch.value > .4) {
-    await refreshMembers()
-    location.reload()
+      switch (data.bestMatch.pattern.name) {
+         case mosesPatterns.CIRCLE.name:
+            await refreshMemberList();
+            break;
+         case mosesPatterns.SQUARE.name:
+            await refreshMemberList();
+            break;
+         case mosesPatterns.V.name:
+            openFullscreen();
+            break;
+      }
+      
    }
 });
 
