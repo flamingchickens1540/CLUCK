@@ -27,6 +27,9 @@ const clock = async (name, clockingIn) => {
 
 const cluckedIn = async () => {
     let res = await fetch(api_url + "/loggedin")
+    if (!res.ok) {
+        throw new Error("Could not get logged in")
+    }
     let json = await res.json()
     return json;
 }
@@ -38,8 +41,11 @@ const ping = async () => {
     }
     return true;
 }
-const refreshMembers = async () => {
+const refreshMemberList = async () => {
     const res = await fetch(api_url+"/members/refresh")
+    if (res.ok) {
+        await run(await res.json())
+    }
 }
 const checkAuth = async (key = getCookie("funneeText")) => {
     if (key == "skip") {

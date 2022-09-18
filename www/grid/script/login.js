@@ -8,7 +8,7 @@
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
     function redirect() {
-        document.location.replace(basepath+"/grid/")
+        document.location.assign(basepath+"/grid/")
     }
     let pass = document.getElementById('password');
     let butt = document.getElementById('submit')

@@ -70,7 +70,7 @@ export async function addHours(name: string, timeIn: number, timeOut: number, ac
     // Calculate duration
     const hours = (timeOut - timeIn) / 3600000
     // Don't log time less than 0.01 hours
-    if (hours < 0.01) { console.debug("Too few hours:", name, timeIn, timeOut, activity, hours); return }
+    if (hours < 0.05) { console.debug("Too few hours:", name, timeIn, timeOut, activity, hours); return }
     // Round to nearest hundredth
     const hoursRounded = hours.toFixed(2)
     
