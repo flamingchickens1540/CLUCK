@@ -19,8 +19,10 @@ router.get("/base.js", (req, res) => {
     const api_url = "${path.normalize(path.join("/",basepath, "/api")).replace(/\/+$/, "")}";`);
 })
 
-router.get("/", (req, res) => res.redirect('/' + basepath + 'dash'))
-router.use("/dash", express.static("./www/dash"))
+router.get("/", (req, res) => res.redirect(path.join(basepath, "/dash/")))
+router.use("/dash", express.static("./www/dash", {
+    redirect: false
+}))
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
     const json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json() as any
@@ -57,10 +59,18 @@ router.get('/dash/delphi', async (req, res) => {
 
 // Grid
 
-router.use('/grid', express.static("./www/grid", {extensions: ['html']}))
+router.use('/grid', express.static("./www/grid", {extensions: ['html'], redirect:false}))
 
 
 
 // Assets
 router.use('/static/', express.static("./www/static"))
 router.get('/favicon.ico', (req, res) => { res.sendFile('favicon.svg', { root: './www/static/img' }) })
+
+router.use(function(req, res) {
+    if (!req.url.endsWith("/")) {
+        res.redirect(path.join(basepath, path.normalize(req.url), "/"))
+    } else {
+        res.status(404).send("Could not find resource").end()
+    }
+})
