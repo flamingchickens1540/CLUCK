@@ -6,6 +6,7 @@ import { memberListFilePath, photosFilePath } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getMemberNames, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
+
 function waitFor(conditionFunction) {
     const poll = resolve => {
         if(conditionFunction()) resolve();
@@ -88,7 +89,7 @@ export const collect = async () => {
             return 0;
         })
         
-        writeFileSync(memberListFilePath, JSON.stringify(members))
+        writeFileSync(memberListFilePath, JSON.stringify(members, null, 4))
         updateProfilePictures()
     } finally {
         collecting = false
