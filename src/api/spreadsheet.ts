@@ -128,16 +128,6 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
     }
 }
 
-ensureAuthed().then(async ()=>{
-    console.log('running test code')
-    await loggedin_sheet.loadCells()
-    await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 })
-    await loggedin_sheet.addRows([['ba','ba']])
-    await loggedin_sheet.addRows([['ba','baboe']])
-    await loggedin_sheet.saveUpdatedCells()
-
-})
-
 export async function updateProfilePictures() {
     await ensureAuthed()
     
