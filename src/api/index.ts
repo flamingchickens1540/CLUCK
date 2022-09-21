@@ -150,8 +150,8 @@ export async function refreshSlackMemberlist() {
 // Periodically save
 const cronSave = () => {
     try {
-        fs.writeFileSync(loggedInFilePath, JSON.stringify(loggedIn))
-        fs.writeFileSync(failedFilePath, JSON.stringify(failed))
+        fs.writeFileSync(loggedInFilePath, JSON.stringify(loggedIn, null, 4))
+        fs.writeFileSync(failedFilePath, JSON.stringify(failed, null, 4))
         saveMemberLog()
     } catch (error) { console.log(error) }
 }
