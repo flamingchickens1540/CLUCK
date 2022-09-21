@@ -1,8 +1,8 @@
-import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
-import { GoogleSpreadsheet } from "google-spreadsheet";
-import { loggedin_sheet_name, log_sheet_name, certs_sheet_name, names_range_name, avatars_sheet_name } from '../consts';
+// import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
+import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet, GoogleSpreadsheetRow } from "google-spreadsheet";
+import { loggedin_sheet_name, log_sheet_name, certs_sheet_name, avatars_sheet_name } from '../consts';
 import google_client_secret from "../../secrets/client_secret.json"
-import type { FailedEntry, LoggedIn } from '../types';
+import type { FailedEntry, LoggedIn, SpreadsheetMemberInfo } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 import { hours_spreadsheet_id } from '../../secrets/consts';
 import { getMembers } from '../member-collector/collector';
@@ -49,16 +49,26 @@ async function ensureAuthed() {
     await configureDrive()
 }
 
+
+
 // get member names from NAMED RANGE "MemberNames"
-export async function getMemberNames():Promise<string[]> {
+export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
     await ensureAuthed()
     
-    await certs_sheet.loadCells(names_range_name)
-    let names = await certs_sheet.getCellsInRange(names_range_name)
+    await certs_sheet.loadCells()
+    const rows:GoogleSpreadsheetRow[] = await certs_sheet.getRows()
     
-    names = names.map(name=>name[0])
-    
-    return names
+    const members:SpreadsheetMemberInfo[] = []
+    rows.forEach(row=>{
+        if (row.Name == "") {
+            return;
+        }
+        members.push({
+            name: row.Name,
+            goodPhoto: row.Photo == "TRUE"
+        })
+    })
+    return members
 }
 
 export async function addHours(name: string, timeIn: number, timeOut: number, activity: string) {
@@ -79,9 +89,9 @@ export async function addHours(name: string, timeIn: number, timeOut: number, ac
         // Add to sheet
         const row = [timeInSec, timeOutSec, name, hoursRounded, activity]
         console.debug("Adding row", row)
-        await timesheet.loadCells()
-        await timesheet.addRow(row)
-        await timesheet.saveUpdatedCells()
+        // await timesheet.loadCells()
+        // await timesheet.addRow(row)
+        // await timesheet.saveUpdatedCells()
     })
 }
 

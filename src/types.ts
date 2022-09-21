@@ -13,3 +13,8 @@ export type Member = {
     firstname: string;
     img: string;
 }
+
+export type SpreadsheetMemberInfo = {
+    name: string,
+    goodPhoto: boolean,
+}

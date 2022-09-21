@@ -3,8 +3,8 @@ import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { baseurl, slack_token } from "../../secrets/consts";
 import { memberListFilePath, photosFilePath } from "../consts";
-import { Member } from "../types";
-import { configureDrive, getMemberNames, updateProfilePictures } from "../api/spreadsheet";
+import { Member, SpreadsheetMemberInfo } from "../types";
+import { configureDrive, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
 
 function waitFor(conditionFunction) {
@@ -49,10 +49,10 @@ export const collect = async () => {
         const userlist = await client.users.list()
         let slackUsers = userlist.members ?? []
         slackUsers = slackUsers.filter(elem => !elem.deleted )
-
+        
         
         // Load Names from Spreadsheet
-        let names
+        let spreadsheetMember:SpreadsheetMemberInfo[]
         
         // Build members catalogue
         const slackMembers:Member[] = []
@@ -61,27 +61,35 @@ export const collect = async () => {
             const name = user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             slackMembers[tokenizeName(user.real_name)] = ({
                 name: name,
-                firstname: user.real_name.split(" ")[0],
-                img: user.profile?.image_original ?? photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
+                firstname: name.split(" ")[0],
+                img: user.profile.image_original
             })
         })
         // Run spreadsheet collection in parallel with slack collection
-        promises.push(new Promise((resolve) => {getMemberNames().then(membernames => {names = membernames;resolve()})}))
+        promises.push(new Promise((resolve) => {getMemberInfo().then(membernames => {spreadsheetMember = membernames;resolve()})}))
         await Promise.all(promises)
         // For each spreadsheet user, add slack data
         members = []
-        names.forEach(name=>members.push(slackMembers[tokenizeName(name)] ?? ({
-            // if person is not in slack, generate default Member object
-            name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
-            firstname: name.split(" ")[0],
-            img: photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
-        })))
-        
+        spreadsheetMember.forEach(member=>{
+            const name = member.name;
+            let image:string;
+            if (member.goodPhoto) {
+                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
+            } else {
+                image = photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
+            }
+            members.push({
+                // if person is not in slack, generate default Member object
+                name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+                firstname: name.split(" ")[0],
+                img: image
+            })
+        })
         
         // Sort members alphabetically by name
         members.sort(function (a, b) {
-            let aname = a.name.includes("Cynthia Yang") ? "Chloe Janke2" : a.name;
-            let bname = b.name.includes("Cynthia Yang") ? "Chloe Janke2" :b.name;
+            const aname = a.name.includes("Cynthia Yang") ? "Chloe Jahncke2" : a.name;
+            const bname = b.name.includes("Cynthia Yang") ? "Chloe Jahncke2" :b.name;
             if (aname < bname) {
                 return -1;
             }
