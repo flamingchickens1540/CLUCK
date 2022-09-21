@@ -79,10 +79,12 @@ export const collect = async () => {
         
         // Sort members alphabetically by name
         members.sort(function (a, b) {
-            if (a.name < b.name) {
+            let aname = a.name.includes("Cynthia Yang") ? "Chloe Janke2" : a.name;
+            let bname = b.name.includes("Cynthia Yang") ? "Chloe Janke2" :b.name;
+            if (aname < bname) {
                 return -1;
             }
-            if (a.name > b.name) {
+            if (aname > bname) {
                 return 1;
             }
             return 0;
