@@ -89,9 +89,9 @@ export async function addHours(name: string, timeIn: number, timeOut: number, ac
         // Add to sheet
         const row = [timeInSec, timeOutSec, name, hoursRounded, activity]
         console.debug("Adding row", row)
-        // await timesheet.loadCells()
-        // await timesheet.addRow(row)
-        // await timesheet.saveUpdatedCells()
+        await timesheet.loadCells()
+        await timesheet.addRow(row)
+        await timesheet.saveUpdatedCells()
     })
 }
 
