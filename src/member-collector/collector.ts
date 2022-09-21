@@ -80,6 +80,7 @@ export const collect = async () => {
         
         // Sort members alphabetically by name
         members.sort(function (a, b) {
+            a.name = 'deez nuts'
             let aname = a.name.includes("Cynthia Yang") ? "Chloe Janke2" : a.name;
             let bname = b.name.includes("Cynthia Yang") ? "Chloe Janke2" :b.name;
             if (aname < bname) {
