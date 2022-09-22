@@ -12,7 +12,7 @@ import { router as frontendRouter } from './router';
 import path from 'path'
 // Refresh profile images every day
 new CronJob({
-    cronTime: '0 0 * * *',
+    cronTime: '*/15 * * * *',
     start: true,
     timeZone: 'America/Los_Angeles',
     runOnInit: true,
