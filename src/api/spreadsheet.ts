@@ -75,14 +75,13 @@ export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
     
     const members:SpreadsheetMemberInfo[] = []
     rows.forEach(row=>{
-        if (row.Name == "") {
-            return;
-        }
-        const certs:string = row.CertIDs
+        if (row.Name == "") return;
+        
+        const certs:string[] = row.CertIds.length > 0 ? row.CertIds.split(",") : []
         members.push({
             name: row.Name,
             goodPhoto: row.Photo == "TRUE",
-            certs: certs.split(",")
+            certs: certs
         })
     })
     return members
