@@ -4,7 +4,7 @@ import { writeFileSync } from 'fs';
 import { baseurl, slack_token } from "../../secrets/consts";
 import { memberListFilePath, photosFilePath } from "../consts";
 import { Member, SpreadsheetMemberInfo } from "../types";
-import { configureDrive, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
+import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
 
 function waitFor(conditionFunction) {
@@ -70,6 +70,7 @@ export const collect = async () => {
         await Promise.all(promises)
         // For each spreadsheet user, add slack data
         members = []
+        const certs = await getCertifications()
         spreadsheetMember.forEach(member=>{
             const name = member.name;
             let image:string;
@@ -82,7 +83,8 @@ export const collect = async () => {
                 // if person is not in slack, generate default Member object
                 name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 firstname: name.split(" ")[0],
-                img: image
+                img: image,
+                certs: member.certs.map((cert) => certs[cert])
             })
         })
         

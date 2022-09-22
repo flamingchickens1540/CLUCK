@@ -1,8 +1,8 @@
 // import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet, GoogleSpreadsheetRow } from "google-spreadsheet";
-import { loggedin_sheet_name, log_sheet_name, certs_sheet_name, avatars_sheet_name } from '../consts';
+import { loggedin_sheet_name, log_sheet_name, certs_sheet_name, avatars_sheet_name, cert_names_sheet_name } from '../consts';
 import google_client_secret from "../../secrets/client_secret.json"
-import type { FailedEntry, LoggedIn, SpreadsheetMemberInfo } from '../types';
+import type { Certification, FailedEntry, LoggedIn, SpreadsheetMemberInfo } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 import { hours_spreadsheet_id } from '../../secrets/consts';
 import { getMembers } from '../member-collector/collector';
@@ -14,6 +14,7 @@ let timesheet: GoogleSpreadsheetWorksheet
 let loggedin_sheet: GoogleSpreadsheetWorksheet
 let avatars_sheet: GoogleSpreadsheetWorksheet
 let certs_sheet: GoogleSpreadsheetWorksheet
+let certs_names_sheet: GoogleSpreadsheetWorksheet
 
 const timsheetMutex = new Mutex()
 const loggedInMutex = new Mutex()
@@ -39,6 +40,7 @@ export async function configureDrive(doc?: GoogleSpreadsheet) {
         loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
         avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
         certs_sheet = doc.sheetsByTitle[certs_sheet_name]
+        certs_names_sheet = doc.sheetsByTitle[cert_names_sheet_name]
         google_drive_authed = true
     })
     return [timesheet, loggedin_sheet, certs_sheet]
@@ -49,7 +51,20 @@ async function ensureAuthed() {
     await configureDrive()
 }
 
+export async function getCertifications():Promise<{[key: string]:Certification}> {
+    await ensureAuthed();
 
+    await certs_names_sheet.loadCells()
+    const rows:GoogleSpreadsheetRow[] = await certs_names_sheet.getRows()
+    const output:{[key: string]:Certification} = {}
+    rows.forEach((row) => {
+        output[row.ID] = {
+            id:row.ID,
+            name:row.Name
+        }
+    })
+    return output
+}
 
 // get member names from NAMED RANGE "MemberNames"
 export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
@@ -63,9 +78,11 @@ export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
         if (row.Name == "") {
             return;
         }
+        const certs:string = row.CertIDs
         members.push({
             name: row.Name,
-            goodPhoto: row.Photo == "TRUE"
+            goodPhoto: row.Photo == "TRUE",
+            certs: certs.split(",")
         })
     })
     return members
