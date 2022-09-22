@@ -20,7 +20,7 @@ async function refreshDelphi() {
 }
 
 refreshDelphi()
-setInterval(refreshDelphi,1000 * 60 * 5) // refresh post every 5 minutes
+setInterval(refreshDelphi,1000 * 60 * 1) // refresh post every 1 minute
 
 
 function setBottomFade() {
