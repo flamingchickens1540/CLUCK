@@ -10,7 +10,7 @@ import fs from 'fs'
 import { slack_token, cluck_api_key } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
-import { addHoursSafe, configureDrive } from "./spreadsheet"
+import { addHoursSafe, configureDrive, updateLoggedIn } from "./spreadsheet"
 
 
 
@@ -120,6 +120,7 @@ router.post('/void', (req, res) => {
     if (Object.keys(loggedIn).includes(req.body.name)) {
         delete loggedIn[req.body.name]
         res.status(200).send('Logged out').end()
+        updateLoggedIn(loggedIn)
     } else {
         res.status(422).send('User not logged in').end()
     }
