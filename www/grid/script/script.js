@@ -53,10 +53,10 @@ async function run(memberlist) {
 		center: [],
 	};
 	const verticalPos = {
-		top: [
-			{ styleName: "border-top-right-radus", val: 0 },
-			{ styleName: "border-top-left-radus", val: 0 },
-		],
+		// top: [
+		// 	{ styleName: "border-top-right-radus", val: 0 },
+		// 	{ styleName: "border-top-left-radus", val: 0 },
+		// ],
 		bottom: [
 			{ styleName: "bottom", val: 0 },
 			{ styleName: "border-bottom-right-radius", val: 0 },
