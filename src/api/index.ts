@@ -187,6 +187,7 @@ const cronSignout = () => {
     const messageUsers = Object.keys(loggedIn)
     loggedIn = {}
     console.log('Logging out users')
+    updateLoggedIn(loggedIn)
     messageUsers.forEach(async (memberName) => {
         try {
             await sendSlackMessage(memberName, `Hey ${memberName.split(' ')[0]}! You signed into the lab today but forgot to sign out, so we didnt log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`)
@@ -194,6 +195,7 @@ const cronSignout = () => {
             console.error(error)
         }
     })
+    
 }
 new CronJob({
     cronTime: '0 0 * * *',
