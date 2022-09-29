@@ -2,34 +2,48 @@ function getInfo(siteHTML) {
     let ret = {}
 
     let doc = document.createElement( 'html' );
-    doc.innerHTML = siteHTML
+    doc.innerHTML = siteHTML;
 
-    ret.body = doc.querySelector('.cooked, .post').innerHTML
-    ret.title = doc.querySelector('#topic-title').children[0].children[0].innerHTML
-    ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>'
+    ret.body = doc.querySelector('.cooked, .post').innerHTML;
+    ret.title = doc.querySelector('#topic-title').children[0].children[0].innerHTML;
+    ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
 
     return ret;
 }
 
 async function refreshDelphi() {
-    let html = await (await fetch(basepath+'/dash/delphi')).text()
-    let info = getInfo(html)
-    document.getElementById('delphiTitle').innerHTML = info.title + info.topics
-    document.getElementById('delphiBody').innerHTML = info.body
-    resetScroll()
+    let html = await (await fetch(basepath+'/dash/delphi')).text();
+    let info = getInfo(html);
+    document.getElementById('delphiTitle').innerHTML = info.title + info.topics;
+    document.getElementById('delphiBody').innerHTML = info.body;
+    let n= 2;
+    if(ret.topics.height< document.getElementById('delphiBody').height){
+        while(ret.topics.height < document.getElementById('delphiBody').height){
+            let comment = doc.querySelector(`#post_${n} > div`);
+            if(ret.topics.height+=comment<= document.getElementById('delphiBody').height){
+                ret.topics += comment;
+            n++;
+            }else{
+                break;
+            }
+            
+        }
+    document.getElementById('delphiBody').innerHTML = info.body + ret.topics;
+    }
+    resetScroll();
 }
 
-refreshDelphi()
-setInterval(refreshDelphi,1000 * 60 * 2) // refresh post every 1 minute
+refreshDelphi();
+setInterval(refreshDelphi,1000 * 60 * 2); // refresh post every 1 minute
 
 
 function setBottomFade() {
-    document.getElementById('bottom_fade').style.visibility = window.innerWidth/window.innerHeight>1.8 ? 'visible' : 'hidden'
-    document.getElementById('bottom_fade').style.height = Math.max(0,Math.min(80*(window.innerWidth/window.innerHeight - 1.7),25)) + 'vh'
+    document.getElementById('bottom_fade').style.visibility = window.innerWidth/window.innerHeight>1.8 ? 'visible' : 'hidden';
+    document.getElementById('bottom_fade').style.height = Math.max(0,Math.min(80*(window.innerWidth/window.innerHeight - 1.7),25)) + 'vh';
     // 40 at 2, zero at 1.5
 }
-setBottomFade()
-addEventListener('resize',setBottomFade)
+setBottomFade();
+addEventListener('resize',setBottomFade);
 
 
 let autoScrollState = {
@@ -44,29 +58,29 @@ function resetScroll() {
     autoScrollState.timeStarted = Date.now();
     autoScrollState.down = true;
 }
-let delphiBody = document.getElementById('delphiBody')
+let delphiBody = document.getElementById('delphiBody');
 function autoScroll() {
-    let element = delphiBody
+    let element = delphiBody;
     if(autoScrollState.down) {
         let scrollTo = Math.max(0,
             element.clientHeight * autoScrollState.downSpeed * (
                 (Date.now() - 1000 * autoScrollState.topWait) // pause at top for topWait seconds
                 -autoScrollState.timeStarted)/1000
-        )
+        );
         if(element.clientHeight + scrollTo > element.scrollHeight) { // if reached end, reverse scroll direction
             autoScrollState.down = false;
-            autoScrollState.timeStarted = Date.now()
+            autoScrollState.timeStarted = Date.now();
         } else {
-            element.scrollTop = scrollTo
+            element.scrollTop = scrollTo;
         }
     } else {
-        let scrollTo = (element.scrollHeight - element.clientHeight) - ( element.clientHeight * autoScrollState.upSpeed * Math.max(0,(Date.now()-(1000*autoScrollState.bottomWait)-autoScrollState.timeStarted))/1000 )
+        let scrollTo = (element.scrollHeight - element.clientHeight) - ( element.clientHeight * autoScrollState.upSpeed * Math.max(0,(Date.now()-(1000*autoScrollState.bottomWait)-autoScrollState.timeStarted))/1000 );
         if(scrollTo < 0) { // if reached end, reverse scroll direction
             autoScrollState.down = true;
-            autoScrollState.timeStarted = Date.now()
+            autoScrollState.timeStarted = Date.now();
         } else {
-            element.scrollTop = scrollTo
+            element.scrollTop = scrollTo;
         }
     }
 }
-setInterval(autoScroll,10)
+setInterval(autoScroll,10);
