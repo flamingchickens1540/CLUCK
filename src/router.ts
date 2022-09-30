@@ -58,8 +58,6 @@ router.get('/dash/delphi', async (req, res) => {
 // Grid
 
 router.use('/grid/', express.static("./www/grid", {extensions: ['html'], redirect:false}))
-router.use('/grid/ofdeath', express.static("./www/grid", {extensions: ['html'], redirect:false}))
-router.get('/grid/ofdeath', (req,res)=>{res.sendFile('www/grid/index.ofdeath.html',{root:'.'})})
 
 
 

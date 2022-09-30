@@ -1,3 +1,4 @@
+/*globals moses refreshMemberList openFullscreen */
 // USES MOSES LIBRARY: https://github.com/ifrost/moses
 
 // create collection of predefined patterns

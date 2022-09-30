@@ -1,4 +1,5 @@
-/* exported clock cluckedIn ping api_server*/
+/* exported clock cluckedIn ping refreshMemberList checkAuth*/
+/* globals run */
 var skipAuth = false;
 
 function getCookie(name) {
@@ -6,7 +7,7 @@ function getCookie(name) {
     if(!result) {return null}
     return result[1];
 }
-const clock = async (name, clockingIn) => {
+async function clock(name, clockingIn) {
     if (skipAuth) {
         return;
     }

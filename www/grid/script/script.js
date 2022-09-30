@@ -1,3 +1,4 @@
+/* globals clock cluckedIn checkAuth skipAuth refreshMemberList */
 /* exported openFullscreen */
 function openFullscreen() {
 	let elem = document.documentElement;
@@ -13,9 +14,9 @@ function openFullscreen() {
 	redrawRows();
 }
 
-/* globals clock ping cluckedIn checkAuth */
 
-const buttonStates = {
+
+window.buttonStates = window.buttonStates ?? {
 	false: [
 		{ styleName: "filter", val: "grayscale(100%)" },
 		{
@@ -93,7 +94,7 @@ async function run(memberlist) {
 				// Toggle logged in
 				button.loggedIn = !button.loggedIn;
 				// Update style
-				buttonStates[button.loggedIn].forEach((styleSpec) => {
+				window.buttonStates[button.loggedIn].forEach((styleSpec) => {
 					button.style.setProperty(styleSpec.styleName, styleSpec.val);
 				});
 				// Cluck API Call
@@ -163,7 +164,7 @@ async function refreshLoggedIn() {
 	for (let i = 0; i < buttons.length; i++) {
 		let button = buttons[i];
 		button.loggedIn = button.fullname in membersIn;
-		buttonStates[button.loggedIn].forEach((styleSpec) => {
+		window.buttonStates[button.loggedIn].forEach((styleSpec) => {
 			button.style.setProperty(styleSpec.styleName, styleSpec.val);
 		});
 	}
@@ -198,15 +199,13 @@ function redrawRows() {
 	var cell_size2 = x / ncols2;
 
 	// Find the best values
-	var nrows, ncols, cell_size;
+	var nrows, ncols;
 	if (cell_size1 < cell_size2) {
 		nrows = nrows2;
 		ncols = ncols2;
-		cell_size = cell_size2;
 	} else {
 		nrows = nrows1;
 		ncols = ncols1;
-		cell_size = cell_size1;
 	}
 
 	document.documentElement.style.setProperty("--width", ncols);

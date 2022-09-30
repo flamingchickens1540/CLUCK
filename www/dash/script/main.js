@@ -1,4 +1,4 @@
-/* globals MemberCircle unplacedCircles placeCircles placedCircles redrawCircles*/
+/* globals MemberCircle unplacedCircles:true placeCircles placedCircles:writable redrawCircles maxY maxX minY minX*/ // eslint-disable-line no-unused-vars
 var members
 var loggedInCache
 

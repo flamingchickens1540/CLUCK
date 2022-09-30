@@ -38,10 +38,12 @@
                 "browser": true
             },
 			"rules": {
-                "no-constant-condition": ["error", { "checkLoops": false }],
-                "no-unused-vars": "off",
-                "no-global-assign":"off",
-                "no-undef":"off"
+                "no-constant-condition": ["error", { "checkLoops": false }]
+            },
+            "globals": {
+                "basepath":"readonly",
+                "baseurl": "readonly",
+                "api_url": "readonly"
             }
 		}
 	]

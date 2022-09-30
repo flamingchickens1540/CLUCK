@@ -1,4 +1,4 @@
-
+/* globals checkAuth */
 
 (async()=>{
     function setCookie(cname, cvalue, exdays) {
