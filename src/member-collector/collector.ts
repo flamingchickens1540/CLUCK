@@ -3,7 +3,7 @@ import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { baseurl, slack_token } from "../../secrets/consts";
 import { memberListFilePath, photosFilePath } from "../consts";
-import { Member, SpreadsheetMemberInfo } from "../types";
+import { Member } from "../types";
 import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
 
@@ -52,11 +52,11 @@ export const collect = async () => {
         
         
         // Load Names from Spreadsheet
-        let spreadsheetMember:SpreadsheetMemberInfo[]
+        
         
         // Build members catalogue
         const slackMembers:Member[] = []
-        const promises = slackUsers.map(async (user) => {
+        slackUsers.forEach((user) => {
             if (user == null || user.real_name == null) return
             const name = user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             slackMembers[tokenizeName(user.real_name)] = ({
@@ -66,8 +66,8 @@ export const collect = async () => {
             })
         })
         // Run spreadsheet collection in parallel with slack collection
-        promises.push(new Promise((resolve) => {getMemberInfo().then(membernames => {spreadsheetMember = membernames;resolve()})}))
-        await Promise.all(promises)
+        const spreadsheetMember = await getMemberInfo()
+
         // For each spreadsheet user, add slack data
         members = []
         const certs = await getCertifications()
