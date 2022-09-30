@@ -15,8 +15,9 @@ async function refreshDelphi() {
     let html = await (await fetch(basepath+'/dash/delphi')).text()
     let info = getInfo(html)
     document.getElementById('delphiTitle').innerHTML = info.title + info.topics
-    document.getElementById('delphiBody').innerHTML = info.body
+    document.getElementById('delphiBody').innerHTML = info.body;
     resetScroll()
+    
 }
 
 refreshDelphi()
