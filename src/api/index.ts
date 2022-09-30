@@ -49,9 +49,9 @@ refreshSlackMemberlist()
 router.post('/clock', (req, res) => {
     
     // Get and check args
-    const { name, loggingin, api_key} = req.body
+    const { name, loggingin, api_key: apiKey} = req.body
     // Authenticate
-    if(api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
+    if(apiKey != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
     if (typeof name === 'undefined' || typeof loggingin === 'undefined') { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
     
     if (loggingin) {
@@ -87,12 +87,12 @@ router.post('/log', (req, res) => {
     if (!activity) { res.status(400).send('Must include activity in body').end(); return; }
     
     
-    const time_out = Date.now()
-    const time_in = time_out - (hours * 60 * 60 * 1000)
+    const timeOut = Date.now()
+    const timeIn = timeOut - (hours * 60 * 60 * 1000)
     
     res.end()
     // Convert hours to time in and out        
-    addHoursSafe(name, failed, time_in, time_out, activity)
+    addHoursSafe(name, failed, timeIn, timeOut, activity)
 })
 
 router.post("/auth", (req, res) => {

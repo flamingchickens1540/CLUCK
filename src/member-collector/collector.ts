@@ -21,8 +21,8 @@ let collecting = false
 
 const photos: {[key:string]:string} = {}
 if (fs.existsSync(photosFilePath)) { 
-    const messy_photos:{[key:string]:string} = JSON.parse(fs.readFileSync(photosFilePath, "utf-8")) 
-    Object.entries(messy_photos).forEach(([key, value]) => {
+    const messyPhotos:{[key:string]:string} = JSON.parse(fs.readFileSync(photosFilePath, "utf-8")) 
+    Object.entries(messyPhotos).forEach(([key, value]) => {
         photos[tokenizeName(key)] = value
     })
 }

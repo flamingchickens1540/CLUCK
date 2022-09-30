@@ -1,12 +1,12 @@
 
 
 // Spreadsheet
-export const log_sheet_name = "Log"
-export const loggedin_sheet_name = "Logged In"
-export const avatars_sheet_name = "Avatars"
-export const certs_sheet_name = "Certs"
-export const cert_names_sheet_name = "Cert Names"
-export const names_range_name = "MemberNames"
+export const logSheetName = "Log"
+export const loggedinSheetName = "Logged In"
+export const avatarsSheetName = "Avatars"
+export const certsSheetName = "Certs"
+export const certNamesSheetName = "Cert Names"
+export const namesRangeName = "MemberNames"
 
 // Web server
 

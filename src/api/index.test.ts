@@ -19,15 +19,15 @@ jest.mock('./spreadsheet')
 jest.mocked(fs.existsSync).mockReturnValue(false)
 
 
-const test_port = 3000
+const testPort = 3000
 const app = express()
-const api_url = `http://localhost:${test_port}`
+const apiUrl = `http://localhost:${testPort}`
 
 let memberSpy: SpyInstance<(options?: UsersListArguments | undefined) => Promise<UsersListResponse>>
 let chatSpy: SpyInstance<(options?: ChatPostMessageArguments | undefined) => Promise<ChatPostMessageResponse>>
 
 async function apiPost(endpoint: string, body: Record<string, unknown>) {
-    return await fetch(`${api_url}/api/${endpoint}`, {
+    return await fetch(`${apiUrl}/api/${endpoint}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -56,7 +56,7 @@ describe('API', () => {
     let server: Server
     beforeAll(async () => {
         app.use(router)
-        server = app.listen(test_port)
+        server = app.listen(testPort)
 
     })
 
@@ -188,7 +188,7 @@ describe('API', () => {
     })
     describe('GET /api/loggedin', () => {
         test('returns logged in users', async () => {
-            const res = await fetch(`${api_url}/api/loggedin`)
+            const res = await fetch(`${apiUrl}/api/loggedin`)
             expect(res.ok).toBeTruthy()
             await expect(res.json()).resolves.toEqual(accessLoggedIn())
         })
@@ -196,7 +196,7 @@ describe('API', () => {
 
     describe('GET /api/ping', () => {
         test('responds with code 200', async () => {
-            const res = await fetch(`${api_url}/api/ping`)
+            const res = await fetch(`${apiUrl}/api/ping`)
             expect(res.ok).toBeTruthy()
         })
     })

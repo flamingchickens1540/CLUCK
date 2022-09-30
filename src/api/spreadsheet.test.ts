@@ -8,7 +8,7 @@ import PQueue from 'p-queue';
 
 let doc
 let timesheet: GoogleSpreadsheetWorksheet
-let loggedin_sheet: GoogleSpreadsheetWorksheet
+let loggedinSheet: GoogleSpreadsheetWorksheet
 beforeAll(async () => {
     doc = await getSpreadsheet()
 })
@@ -26,7 +26,7 @@ describe('Timeclock Interface', () => {
     })
     describe('Authenticated', () => {
         beforeAll(async () => {
-            [timesheet, loggedin_sheet] = await configureDrive(doc)
+            [timesheet, loggedinSheet] = await configureDrive(doc)
             addRowSpy = jest.spyOn(timesheet, 'addRow').mockImplementation(() => Promise.resolve())
 
             // Override spreadsheet modification functions for speed, not used in tests
@@ -151,53 +151,53 @@ describe('Timeclock Interface', () => {
             let addRowsSpy: SpyInstance
             
             beforeAll(() => {
-                resizeSpy = jest.spyOn(loggedin_sheet, 'resize').mockImplementation(() => Promise.resolve())
-                addRowsSpy = jest.spyOn(loggedin_sheet, 'addRows').mockImplementation(() => Promise.resolve()) as unknown as SpyInstance
+                resizeSpy = jest.spyOn(loggedinSheet, 'resize').mockImplementation(() => Promise.resolve())
+                addRowsSpy = jest.spyOn(loggedinSheet, 'addRows').mockImplementation(() => Promise.resolve()) as unknown as SpyInstance
             })
 
             test('should add rows', async () => {
-                const logged_in: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 AM").getTime() }
-                await updateLoggedIn(logged_in)
+                const loggedIn: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 AM").getTime() }
+                await updateLoggedIn(loggedIn)
                 expect(resizeSpy).toBeCalledTimes(1)
                 expect(addRowsSpy).toBeCalledTimes(1)
             })
 
             test('should not add rows without logged in members', async () => {
-                const logged_in: LoggedIn = {}
-                await updateLoggedIn(logged_in)
+                const loggedIn: LoggedIn = {}
+                await updateLoggedIn(loggedIn)
                 expect(resizeSpy).toBeCalledTimes(1)
                 expect(addRowsSpy).toBeCalledTimes(0)
             })
 
             test('should not run in parallel', async () => {
                 // Add delay to loadCells to prevent the calls from finishing before the next call
-                jest.spyOn(loggedin_sheet, 'loadCells').mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 50)))
+                jest.spyOn(loggedinSheet, 'loadCells').mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 50)))
 
                 const chickenTime = new Date("1540-01-01 12:00 AM").getTime()
                 const turkeyTime = new Date("1540-01-01 1:00 AM").getTime()
-                const logged_in: LoggedIn = { "Test Chicken": chickenTime }
+                const loggedIn: LoggedIn = { "Test Chicken": chickenTime }
                 const queue = new PQueue({concurrency: 6});
                 await queue.addAll([
-                    async () => await updateLoggedIn(logged_in),
+                    async () => await updateLoggedIn(loggedIn),
                     async () => {
-                        logged_in["Test Pigeon"] = new Date("1540-01-01 12:00 AM").getTime(),
-                        await updateLoggedIn(logged_in)
+                        loggedIn["Test Pigeon"] = new Date("1540-01-01 12:00 AM").getTime(),
+                        await updateLoggedIn(loggedIn)
                     },
                     async () => {
-                        logged_in["Test Turkey"] = turkeyTime
-                        await updateLoggedIn(logged_in)
+                        loggedIn["Test Turkey"] = turkeyTime
+                        await updateLoggedIn(loggedIn)
                     },
                     async () => {
-                        delete logged_in["Test Pigeon"]
-                        await updateLoggedIn(logged_in)
+                        delete loggedIn["Test Pigeon"]
+                        await updateLoggedIn(loggedIn)
                     },
                     async () => {
-                        logged_in["Test Goose"] = new Date("1540-01-01 12:00 AM").getTime(),
-                        await updateLoggedIn(logged_in)
+                        loggedIn["Test Goose"] = new Date("1540-01-01 12:00 AM").getTime(),
+                        await updateLoggedIn(loggedIn)
                     },
                     async () => {
-                        delete logged_in["Test Goose"]
-                        await updateLoggedIn(logged_in)
+                        delete loggedIn["Test Goose"]
+                        await updateLoggedIn(loggedIn)
                     },
                 ])
 
@@ -209,20 +209,20 @@ describe('Timeclock Interface', () => {
 
             describe('time formatting', () => {
                 test('should properly format 12:00 AM', async () => {
-                    const logged_in: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 AM").getTime() }
-                    await updateLoggedIn(logged_in)
+                    const loggedIn: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 AM").getTime() }
+                    await updateLoggedIn(loggedIn)
                     expect(addRowsSpy).toBeCalledWith([["Test Chicken", "12:00 AM"]])
                 })
 
                 test('should properly format 12:00 PM', async () => {
-                    const logged_in: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 PM").getTime() }
-                    await updateLoggedIn(logged_in)
+                    const loggedIn: LoggedIn = { "Test Chicken": new Date("1540-01-01 12:00 PM").getTime() }
+                    await updateLoggedIn(loggedIn)
                     expect(addRowsSpy).toBeCalledWith([["Test Chicken", "12:00 PM"]])
                 })
 
                 test('should properly format 3:40 PM', async () => {
-                    const logged_in: LoggedIn = { "Test Chicken": new Date("1540-01-01 3:40 PM").getTime() }
-                    await updateLoggedIn(logged_in)
+                    const loggedIn: LoggedIn = { "Test Chicken": new Date("1540-01-01 3:40 PM").getTime() }
+                    await updateLoggedIn(loggedIn)
                     expect(addRowsSpy).toBeCalledWith([["Test Chicken", "3:40 PM"]])
                 })
             })
@@ -243,11 +243,11 @@ describe('Google Spreadsheet Structure', () => {
 
     describe('LoggedIn sheet', () => {
         test('should have loggedin sheet', () => {
-            expect(loggedin_sheet).toBeDefined()
+            expect(loggedinSheet).toBeDefined()
         })
 
         test('loggedin sheet should have correct columns', async () => {
-            expect(loggedin_sheet.columnCount).toEqual(2)
+            expect(loggedinSheet.columnCount).toEqual(2)
         })
     })
 
