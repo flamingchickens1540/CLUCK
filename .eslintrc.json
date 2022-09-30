@@ -2,13 +2,7 @@
 	"extends": ["eslint:recommended"],
 	"ignorePatterns": ["www/grid/script/moses.js"],
 	"overrides": [
-        {
-			// Typescript files
-			"files": ["secrets/*.js"],
-            "rules": {
-                "@typescript-eslint/naming-convention":false
-            }
-        },
+        
 		{
 			// Typescript files
 			"files": ["**/*.ts", "secrets/*.js", "jest.config.js"],
@@ -83,6 +77,13 @@
 				"baseurl": "readonly",
 				"api_url": "readonly"
 			}
-		}
+		},
+        {
+			// Secrets files
+			"files": ["secrets/*.js"],
+            "rules": {
+                "@typescript-eslint/naming-convention":"off"
+            }
+        }
 	]
 }
