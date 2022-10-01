@@ -1,4 +1,4 @@
-/* globals skipAuth getCookie */
+/* globals skipAuth getApiKey */
 /* exported clock */
 async function clock(name, clockingIn) {
     if (skipAuth) {
@@ -7,7 +7,7 @@ async function clock(name, clockingIn) {
     let body = {
         name: name,
         loggingin: clockingIn,
-        api_key: getCookie("funneeText")
+        api_key: getApiKey()
     }
     return await fetch(api_url+'/void', {
         method: 'POST',

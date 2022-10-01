@@ -7,21 +7,26 @@
         let expires = "expires="+ d.toUTCString();
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
+    function generateApiKey(id, key) {
+        return window.btoa(id)+":"+window.btoa(key)
+    }
     function redirect() {
         document.location.assign(basepath+"/grid/")
     }
+    let id = document.getElementById('id');
     let pass = document.getElementById('password');
     let butt = document.getElementById('submit')
     let skip = document.getElementById('skip')
     pass.oninput = () => { pass.setCustomValidity("")}
     skip.onclick = () => {
-        setCookie("funneeText", "skip", 100)
+        setCookie("apiKey", "skip", 100)
         redirect()
     }
     butt.onclick = async function () {
-        let authed = await checkAuth(pass.value)
+        const apiKey = generateApiKey(id.value, pass.value)
+        let authed = await checkAuth(apiKey)
         if(authed) {
-            setCookie('funneeText',pass.value,100)
+            setCookie('apiKey',apiKey,100)
             redirect();
         } else {
             pass.setCustomValidity("Incorrect password")

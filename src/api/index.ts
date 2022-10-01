@@ -7,7 +7,7 @@ import cors from 'cors'
 import { CronJob } from 'cron'
 import { Router } from 'express'
 import fs from 'fs'
-import { slack_token, cluck_api_key } from '../../secrets/consts'
+import { slack_token, cluck_api_keys } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
 import { logMember, saveMemberLog } from "./memberlog"
 import { addHoursSafe, configureDrive, updateLoggedIn } from "./spreadsheet"
@@ -28,6 +28,16 @@ if (fs.existsSync(failedFilePath)) { failed = JSON.parse(fs.readFileSync(failedF
 
 configureDrive()
 
+function decodeAuth(apiKey:string) {
+    const id = Buffer.from(apiKey.split(":")[0], 'base64').toString('ascii')
+    const key = Buffer.from(apiKey.split(":")[1], 'base64').toString('ascii')
+    return [id, key]
+}
+function isValidAuth(apiKey:string):boolean {
+    const [id, key] = decodeAuth(apiKey)
+    if (cluck_api_keys[id] == key) { return true }
+    return false
+}
 
 
 // Setup API Routes
@@ -37,9 +47,14 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 router.use((req, res, next) => {
     if (!["/ping", "/loggedin"].includes(req.url)) {
-        let body:string = JSON.stringify(req.body)
-        body = body.replace(cluck_api_key, "VALID_API_KEY")
-        console.log(req.method, req.url, body)
+        
+        const body = Object.fromEntries(Object.entries(req.body))
+        let authString = "none"
+        if(body["api_key"] != null) {
+            body["api_key"] = isValidAuth(req.body.api_key) ? "VALID_API_KEY" : "INVALID_API_KEY"
+            authString = decodeAuth(req.body.api_key)[0]
+        }
+        console.log(req.method, req.url, "("+authString+")", JSON.stringify(body))
     }
     next()
 })
@@ -51,7 +66,7 @@ router.post('/clock', (req, res) => {
     // Get and check args
     const { name, loggingin, api_key: apiKey} = req.body
     // Authenticate
-    if(apiKey != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
+    if(!isValidAuth(apiKey)) {res.status(401).send('Bad Cluck API Key').end(); return; }
     if (typeof name === 'undefined' || typeof loggingin === 'undefined') { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
     
     if (loggingin) {
@@ -73,7 +88,7 @@ router.post('/clock', (req, res) => {
 
 router.post('/log', (req, res) => {
     // Authenticate
-    if(req.body.api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
+    if(!isValidAuth(req.body.api_key)) {res.status(401).send('Bad Cluck API Key').end(); return; }
    
     // Get and check args
     const name = req.body.name // User name to add hours to
@@ -96,12 +111,11 @@ router.post('/log', (req, res) => {
 })
 
 router.post("/auth", (req, res) => {
-    if (req.body.api_key == cluck_api_key) { 
-        res.status(200).send("Authenticated").end()
+    if(isValidAuth(req.body.api_key)) {
+        res.status(200).send("Authentication successful")
     } else {
-        res.status(401).send("Invalid CLUCK API Key").end()
+        res.status(401).send("Invalid CLUCK API Key")
     }
-    
 })
 
 router.get('/loggedin', (req, res) => {
@@ -115,7 +129,7 @@ router.get('/ping', (req, res) => {
 })
 
 router.post('/void', (req, res) => {
-    if(req.body.api_key != cluck_api_key) {res.status(401).send('Bad Cluck API Key').end(); return; }
+    if(!isValidAuth(req.body.api_key)) {res.status(401).send('Bad Cluck API Key').end(); return; }
     if (!req.body.name) { res.status(400).send('Must include name in body').end(); return; }
     if (Object.keys(loggedIn).includes(req.body.name)) {
         delete loggedIn[req.body.name]

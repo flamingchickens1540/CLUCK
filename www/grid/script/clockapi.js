@@ -1,4 +1,4 @@
-/* exported clock cluckedIn ping refreshMemberList checkAuth*/
+/* exported clock cluckedIn ping refreshMemberList getApiKey checkAuth*/
 /* globals run */
 var skipAuth = false;
 
@@ -7,6 +7,9 @@ function getCookie(name) {
     if(!result) {return null}
     return result[1];
 }
+function getApiKey() {
+    return getCookie("apiKey")
+}
 async function clock(name, clockingIn) {
     if (skipAuth) {
         return;
@@ -14,7 +17,7 @@ async function clock(name, clockingIn) {
     let body = {
         name: name,
         loggingin: clockingIn,
-        api_key: getCookie("funneeText")
+        api_key: getApiKey()
     }
     return await fetch(api_url+'/clock', {
         method: 'POST',
@@ -48,7 +51,7 @@ const refreshMemberList = async () => {
         await run(await res.json())
     }
 }
-const checkAuth = async (key = getCookie("funneeText")) => {
+const checkAuth = async (key = getApiKey()) => {
     if (key == "skip") {
         skipAuth = true;
         return true;
