@@ -1,40 +1,22 @@
-/* globals clock cluckedIn checkAuth skipAuth refreshMemberList */
-/* exported openFullscreen */
-function openFullscreen() {
-	let elem = document.documentElement;
-	if (elem.requestFullscreen) {
-		elem.requestFullscreen();
-	} else if (elem.webkitRequestFullscreen) {
-		/* Safari */
-		elem.webkitRequestFullscreen();
-	} else if (elem.msRequestFullscreen) {
-		/* IE11 */
-		elem.msRequestFullscreen();
+import { cluckApiUrl, cluckBasepath, cluckBaseurl } from "../../consts";
+import type { LoggedIn, Member } from "../../types";
+import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
+import { getButtonState } from "./style";
+
+declare global {
+    interface Window { 
+		skipAuth:boolean;
 	}
-	redrawRows();
+}
+
+type HTMLMemberButtonElement = HTMLElement & {
+	loggedIn:boolean;
 }
 
 
 
-window.buttonStates = window.buttonStates ?? {
-	false: [
-		{ styleName: "filter", val: "grayscale(100%)" },
-		{
-			styleName: "box-shadow",
-			val: "inset 0 0 0 1000px rgba(255, 255, 255, 0.4), 0px 0px 10px rgba(255, 0, 0,.5)",
-		},
-	],
-	true: [
-		{ styleName: "filter", val: "grayscale(0%)" },
-		{
-			styleName: "box-shadow",
-			val: "inset 0 0 0 1000px rgba(255, 255, 255, 0.0), 0px 0px 15px 7px rgb(0, 255, 136)",
-		},
-	],
-};
-
-let members;
-async function run(memberlist) {
+let members:Member[];
+export async function run(memberlist:Member[]) {
 	// Fetch Members
 	members = memberlist;
 	redrawRows();
@@ -78,28 +60,27 @@ async function run(memberlist) {
 	document.getElementById("button-grid").replaceChildren();
 	members.forEach((member) => {
 		// Init button
-		let memberButton = document.createElement("person-button");
-		memberButton.fullname = member.name;
-		memberButton.id = member.fullname;
+		const memberButton = document.createElement("person-button");
+		memberButton.id = member.name;
 
 		// Set click toggle
-		if (!skipAuth) {
+		if (!window.skipAuth) {
 			memberButton.onclick = async (click) => {
 				// fullscreen()
-				let button = click.target;
-				if (click.target.classList.contains("button-text")) {
-					button = click.target.parentElement;
+				let button = click.target as HTMLMemberButtonElement;
+				if (button.classList.contains("button-text")) {
+					button = button.parentElement as HTMLMemberButtonElement;
 				}
 
 				// Toggle logged in
-				button.loggedIn = !button.loggedIn;
+				button.loggedIn =  !button.loggedIn
 				// Update style
-				window.buttonStates[button.loggedIn].forEach((styleSpec) => {
+				getButtonState(button.loggedIn).forEach((styleSpec) => {
 					button.style.setProperty(styleSpec.styleName, styleSpec.val);
 				});
 				// Cluck API Call
 
-				const res = await clock(button.fullname, button.loggedIn);
+				const res = await clock(button.id, button.loggedIn);
 				if (!res.ok) {
 					await refreshLoggedIn();
 				}
@@ -107,17 +88,17 @@ async function run(memberlist) {
 		}
 
 		// Add name text
-		let text = document.createElement("person-name");
+		const text = document.createElement("person-name");
 		text.className = "button-text";
 		text.innerHTML = member.firstname;
 
 		// Randomize mix and match text styles
 		styleCatagories.forEach((styleCatagory) => {
-			let styleOptions = Object.values(styleCatagory);
+			const styleOptions = Object.values(styleCatagory);
 			if (styleOptions.length == 0) {
 				return;
 			}
-			let toSet = styleOptions[Math.floor(Math.random() * styleOptions.length)];
+			const toSet = styleOptions[Math.floor(Math.random() * styleOptions.length)];
 			toSet.forEach((attribute) => {
 				text.style.setProperty(attribute.styleName, attribute.val);
 			});
@@ -129,7 +110,7 @@ async function run(memberlist) {
 		if (!member.img) {
 			memberButton.style.setProperty(
 				"background-image",
-				`url(${baseurl}/assets/img/defaultpicture.jpg)`
+				`url(${cluckBaseurl}/assets/img/defaultpicture.jpg)`
 			);
 		}
 		memberButton.className = "button-in";
@@ -139,18 +120,19 @@ async function run(memberlist) {
 	});
     refreshLoggedIn();
 }
+
 (async () => {
 	const authed = await checkAuth();
 	if (!authed) {
-		document.location.assign(basepath + "/grid/login");
+		document.location.assign(cluckBasepath + "/grid/login");
 	}
-	await run(await (await fetch(api_url + "/members")).json());
+	await run(await (await fetch(cluckApiUrl + "/members")).json());
 	addEventListener("resize", redrawRows);
 })();
 
 async function refreshLoggedIn() {
-	let membersIn;
-	let noconnect = document.getElementById("noconnect");
+	let membersIn:LoggedIn;
+	const noconnect = document.getElementById("noconnect");
 	try {
 		membersIn = await cluckedIn();
 		noconnect.style.setProperty("visibility", "hidden");
@@ -160,47 +142,47 @@ async function refreshLoggedIn() {
 	}
 
 	// Update buttons
-	let buttons = document.getElementsByTagName("person-button");
+	const buttons = document.getElementsByTagName("person-button") as HTMLCollectionOf<HTMLMemberButtonElement>;
 	for (let i = 0; i < buttons.length; i++) {
-		let button = buttons[i];
-		button.loggedIn = button.fullname in membersIn;
-		window.buttonStates[button.loggedIn].forEach((styleSpec) => {
+		const button = buttons[i];
+		button.loggedIn = button.id in membersIn;
+		getButtonState(button.loggedIn).forEach((styleSpec) => {
 			button.style.setProperty(styleSpec.styleName, styleSpec.val);
 		});
 	}
 	redrawRows();
 }
 
-function redrawRows() {
+export function redrawRows() {
 	// Compute number of rows and columns, and cell size
-	var n = members.length;
-	var x = document.documentElement.clientWidth;
-	var y = document.documentElement.clientHeight;
-	var ratio = x / y;
-	var ncols_float = Math.sqrt(n * ratio);
-	var nrows_float = n / ncols_float;
+	const n = members.length;
+	const x = document.documentElement.clientWidth;
+	const y = document.documentElement.clientHeight;
+	const ratio = x / y;
+	const ncolsFloat = Math.sqrt(n * ratio);
+	const nrowsFloat = n / ncolsFloat;
 
 	// Find best option filling the whole height
-	var nrows1 = Math.ceil(nrows_float);
-	var ncols1 = Math.ceil(n / nrows1);
+	let nrows1 = Math.ceil(nrowsFloat);
+	let ncols1 = Math.ceil(n / nrows1);
 	while (nrows1 * ratio < ncols1) {
 		nrows1++;
 		ncols1 = Math.ceil(n / nrows1);
 	}
-	var cell_size1 = y / nrows1;
+	const cellSize1 = y / nrows1;
 
 	// Find best option filling the whole width
-	var ncols2 = Math.ceil(ncols_float);
-	var nrows2 = Math.ceil(n / ncols2);
+	let ncols2 = Math.ceil(ncolsFloat);
+	let nrows2 = Math.ceil(n / ncols2);
 	while (ncols2 < nrows2 * ratio) {
 		ncols2++;
 		nrows2 = Math.ceil(n / ncols2);
 	}
-	var cell_size2 = x / ncols2;
+	const cellSize2 = x / ncols2;
 
 	// Find the best values
-	var nrows, ncols;
-	if (cell_size1 < cell_size2) {
+	let nrows, ncols;
+	if (cellSize1 < cellSize2) {
 		nrows = nrows2;
 		ncols = ncols2;
 	} else {

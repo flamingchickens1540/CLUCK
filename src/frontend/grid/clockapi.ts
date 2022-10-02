@@ -1,25 +1,32 @@
 /* exported clock cluckedIn ping refreshMemberList getApiKey checkAuth*/
-/* globals run */
-var skipAuth = false;
+
+import { cluckApiUrl } from "../../consts";
+import { run } from ".";
+import { getClockEndpoint } from "./style";
+import type { LoggedIn } from "../../types";
+
+window.skipAuth = false;
 
 function getCookie(name) {
-    var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    const result = document.cookie.match(new RegExp(name + '=([^;]+)'));
     if(!result) {return null}
     return result[1];
 }
-function getApiKey() {
+
+export function getApiKey() {
     return getCookie("apiKey")
 }
-async function clock(name, clockingIn) {
-    if (skipAuth) {
+
+export async function clock(name, clockingIn) {
+    if (window.skipAuth) {
         return;
     }
-    let body = {
+    const body = {
         name: name,
         loggingin: clockingIn,
         api_key: getApiKey()
     }
-    return await fetch(api_url+'/clock', {
+    return await fetch(cluckApiUrl+getClockEndpoint(), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -29,34 +36,34 @@ async function clock(name, clockingIn) {
     })
 }
 
-const cluckedIn = async () => {
-    let res = await fetch(api_url + "/loggedin")
+export const cluckedIn = async ():Promise<LoggedIn> => {
+    const res = await fetch(cluckApiUrl + "/loggedin")
     if (!res.ok) {
         throw new Error("Could not get logged in")
     }
-    let json = await res.json()
+    const json = await res.json()
     return json;
 }
-const ping = async () => {
+export const ping = async () => {
     try {
-        await fetch(api_url + "/ping")
+        await fetch(cluckApiUrl + "/ping")
     } catch (e) {
         return false;
     }
     return true;
 }
-const refreshMemberList = async () => {
-    const res = await fetch(api_url+"/members/refresh")
+export const refreshMemberList = async () => {
+    const res = await fetch(cluckApiUrl+"/members/refresh")
     if (res.ok) {
         await run(await res.json())
     }
 }
-const checkAuth = async (key = getApiKey()) => {
+export const checkAuth = async (key = getApiKey()):Promise<boolean> => {
     if (key == "skip") {
-        skipAuth = true;
+        window.skipAuth = true;
         return true;
     }
-    const res = await fetch(api_url+"/auth", {
+    const res = await fetch(cluckApiUrl+"/auth", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

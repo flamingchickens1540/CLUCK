@@ -1,14 +1,15 @@
-/* globals maxX minX maxY minY */
-/* exported redrawCircles */
-let membersDiv = document.getElementById('members')
+import { getBounds, MemberCircle } from "./circlePacker"
 
-let BUBBLE_COLORS = ['rgba(35,132,198,.5)','rgba(255,214,0,.5)','rgba(241,93,34,.5)','rgba(108,157,204,.5)']
-function renderCircle(circle) {
-    let maxLength = Math.max(maxX-minX,maxY-minY)
-    let multiplier = 1/maxLength*48
-    let xOffset = (maxLength - (maxX-minX))/2 // center shape on x axis
+const membersDiv = document.getElementById('members')
 
-    let elem = document.createElement('member')
+const BUBBLE_COLORS = ['rgba(35,132,198,.5)','rgba(255,214,0,.5)','rgba(241,93,34,.5)','rgba(108,157,204,.5)']
+function renderCircle(circle:MemberCircle) {
+    const {maxX,maxY,minX,minY} = getBounds()
+    const maxLength = Math.max(maxX-minX,maxY-minY)
+    const multiplier = 1/maxLength*48
+    const xOffset = (maxLength - (maxX-minX))/2 // center shape on x axis
+
+    const elem = document.createElement('member')
     elem.className = 'memberCircle'
     elem.style.width = circle.r*2*multiplier + 'vw'
     elem.style.height = circle.r*2*multiplier + 'vw'
@@ -22,14 +23,14 @@ function renderCircle(circle) {
       // bubble name
     // blue, yellow, orange, lightblue, red
 
-    let name = document.createElement('name')
+    const name = document.createElement('name')
     name.innerHTML = circle.name
     name.className = 'bubblename'
     name.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
     elem.appendChild(name)
 }
 
-function redrawCircles(circles) {
+export function redrawCircles(circles) {
     membersDiv.innerHTML = ''
     circles.forEach(renderCircle)
 }

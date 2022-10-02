@@ -1,7 +1,18 @@
-function getInfo(siteHTML) {
-    let ret = {}
+import { cluckBasepath } from "../../consts"
 
-    let doc = document.createElement( 'html' );
+type DelphiInfo = {
+    body:string
+    title:string
+    topics:string
+}
+function getInfo(siteHTML) {
+    const ret:DelphiInfo = {
+        body:"",
+        title:"",
+        topics:""
+    }
+
+    const doc = document.createElement( 'html' );
     doc.innerHTML = siteHTML
 
     ret.body = doc.querySelector('.cooked, .post').innerHTML
@@ -11,17 +22,15 @@ function getInfo(siteHTML) {
     return ret;
 }
 
-async function refreshDelphi() {
-    let html = await (await fetch(basepath+'/dash/delphi')).text()
-    let info = getInfo(html)
+export async function refreshDelphi() {
+    const html = await (await fetch(cluckBasepath+'/dash/delphi')).text()
+    const info = getInfo(html)
     document.getElementById('delphiTitle').innerHTML = info.title + info.topics
     document.getElementById('delphiBody').innerHTML = info.body;
     resetScroll()
-    
 }
 
-refreshDelphi()
-setInterval(refreshDelphi,1000 * 60 * 2) // refresh post every 1 minute
+
 
 
 function setBottomFade() {
@@ -33,7 +42,7 @@ setBottomFade()
 addEventListener('resize',setBottomFade)
 
 
-let autoScrollState = {
+const autoScrollState = {
     down:true,
     timeStarted:Date.now(),
     downSpeed: 0.036, // height/sec
@@ -45,11 +54,11 @@ function resetScroll() {
     autoScrollState.timeStarted = Date.now();
     autoScrollState.down = true;
 }
-let delphiBody = document.getElementById('delphiBody')
+const delphiBody = document.getElementById('delphiBody')
 function autoScroll() {
-    let element = delphiBody
+    const element = delphiBody
     if(autoScrollState.down) {
-        let scrollTo = Math.max(0,
+        const scrollTo = Math.max(0,
             element.clientHeight * autoScrollState.downSpeed * (
                 (Date.now() - 1000 * autoScrollState.topWait) // pause at top for topWait seconds
                 -autoScrollState.timeStarted)/1000
@@ -61,7 +70,7 @@ function autoScroll() {
             element.scrollTop = scrollTo
         }
     } else {
-        let scrollTo = (element.scrollHeight - element.clientHeight) - ( element.clientHeight * autoScrollState.upSpeed * Math.max(0,(Date.now()-(1000*autoScrollState.bottomWait)-autoScrollState.timeStarted))/1000 )
+        const scrollTo = (element.scrollHeight - element.clientHeight) - ( element.clientHeight * autoScrollState.upSpeed * Math.max(0,(Date.now()-(1000*autoScrollState.bottomWait)-autoScrollState.timeStarted))/1000 )
         if(scrollTo < 0) { // if reached end, reverse scroll direction
             autoScrollState.down = true;
             autoScrollState.timeStarted = Date.now()

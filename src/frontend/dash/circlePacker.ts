@@ -1,19 +1,28 @@
-/* exported MemberCircle placeCircles */
-
 // note: circle radii are normalized on render
 const STEP_DISTANCE = .02
 const MARGIN = .14
 
-var unplacedCircles = []
-var placedCircles = []
-var maxX = 0;
-var minX = 0;
-var maxY = 0;
-var minY = 0;
+let placedCircles:MemberCircle[] = []
+let maxX = 0;
+let minX = 0;
+let maxY = 0;
+let minY = 0;
 
+export function getBounds() {
+    return {
+        maxX,
+        maxY,
+        minX,
+        minY
+    }
+}
 
-class MemberCircle {
-    x; y; r; name; imgurl;
+export class MemberCircle {
+    x:number;
+    y:number;
+    r:number;
+    name:string;
+    imgurl:string;
     constructor(hours, name,imgurl) {
         this.name = name;
         this.imgurl= imgurl;
@@ -29,7 +38,7 @@ function isColliding(a,b,margin) {
     return distance(a,b) < a.r + b.r + margin
 }
 function getCollided(circle, margin) {
-    for (let placedCircle of placedCircles) {
+    for (const placedCircle of placedCircles) {
         if(isColliding(circle,placedCircle,margin)) {return placedCircle}
     }
     return null;
@@ -47,7 +56,7 @@ function getAngleFromAToB(a,b) {
 }
 function placeCircle(circle) {
     // random starting position
-    let angle = Math.random()*2*Math.PI-Math.PI
+    const angle = Math.random()*2*Math.PI-Math.PI
     let d = Math.max(maxX,Math.max(Math.abs(minX),Math.max(maxY, Math.abs(minY)))) + circle.r
     placeCircleFromPoint(circle,0,0,angle,d)
     
@@ -77,7 +86,7 @@ function placeCircle(circle) {
     for(A=a; Math.abs(A-a)<Math.abs(STEP_ANGLE); a-=(STEP_ANGLE/5)) {
         console.log('doing')
         placeCircleFromPoint(circle,collided.x,collided.y,a,collided.r+circle.r+MARGIN+.1)
-        if(!getCollided(circle,MARGIN)) {console.log('YEETED');break}
+        if(!getCollided(circle,MARGIN)) {break}
 
         // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
         // await sleep(10) /// REDRAWWWWW
@@ -96,26 +105,26 @@ function placeCircle(circle) {
 
 // assumes unplacedCircles is EMPTY
 // and placedCircles is FILLED
-function placeCircles(circles) {
+export function placeCircles(circles:MemberCircle[]) {
 
     // normalize
-    let max = Math.max.apply(Math,circles.map(circle=>circle.r))
+    const max = Math.max(...circles.map(circle=>circle.r))
     circles.forEach(circle=>{circle.r/=max})
 
     if(circles.length == 0) {return}
     circles.sort((a,b)=>(b.r-a.r));
     placedCircles = []
-    unplacedCircles = circles
-    let circle = unplacedCircles.shift()
+    const unplacedCircles = circles
+    const circle = unplacedCircles.shift()
     circle.x=0;circle.y=0;
     minY = minX = -(maxX = maxY = circle.r) // HAHA THIS IS SO COOL
     placedCircles.push(circle)
 
     while(unplacedCircles.length != 0) {
-        let circle = unplacedCircles.shift()
+        const circle = unplacedCircles.shift()
         placeCircle(circle)
         placedCircles.push(circle)
     }
-    console.log('done')
+    return placedCircles
 }
 
