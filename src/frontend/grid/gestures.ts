@@ -1,8 +1,8 @@
 // USES MOSES LIBRARY: https://github.com/ifrost/moses
 import { refreshMemberList } from "./clockapi";
-import moses from "./moses"
 import { openFullscreen } from "../util";
 import { redrawRows } from ".";
+declare const moses:any
 // create collection of predefined patterns
 const mosesPatterns = moses.model.MosesPatterns.create();
 
@@ -15,7 +15,7 @@ const div = document.body;
 const sampler = moses.sampler.DistanceSampler.create(div, 5);
 
 // create a recogniser
-export function register() {
+export function registerGestures() {
    const recogniser = moses.recogniser.DefaultRecogniser.create();
    
    // register selected patterns

@@ -1,7 +1,8 @@
 import { cluckApiUrl, cluckBasepath, cluckBaseurl } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
 import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
-import { getButtonState } from "./style";
+import { registerGestures } from "./gestures";
+import { getButtonState, randomizedStyleCategories } from "./style";
 
 declare global {
     interface Window { 
@@ -9,7 +10,7 @@ declare global {
 	}
 }
 
-type HTMLMemberButtonElement = HTMLElement & {
+export type HTMLMemberButtonElement = HTMLElement & {
 	loggedIn:boolean;
 }
 
@@ -21,38 +22,7 @@ export async function run(memberlist:Member[]) {
 	members = memberlist;
 	redrawRows();
 
-	// Setup Randomized Button Style Options
-	const horizPos = {
-		left: [
-			{ styleName: "right", val: "auto" },
-			{ styleName: "border-top-left-radius", val: 0 },
-			{ styleName: "border-bottom-left-radius", val: 0 },
-		],
-		right: [
-			{ styleName: "left", val: "auto" },
-			{ styleName: "border-top-right-radius", val: 0 },
-			{ styleName: "border-bottom-right-radius", val: 0 },
-		],
-		center: [],
-	};
-	const verticalPos = {
-		// top: [
-		// 	{ styleName: "border-top-right-radus", val: 0 },
-		// 	{ styleName: "border-top-left-radus", val: 0 },
-		// ],
-		bottom: [
-			{ styleName: "bottom", val: 0 },
-			{ styleName: "border-bottom-right-radius", val: 0 },
-			{ styleName: "border-bottom-left-radius", val: 0 },
-		],
-	};
-	const font = {
-		gilroy: [{ styleName: "font-family", val: "gilroy" }],
-		cocogoose: [{ styleName: "font-family", val: "cocogoose" }],
-		tcm: [{ styleName: "font-family", val: "tcm" }],
-		basics: [{ styleName: "font-family", val: "basics-serif" }],
-	};
-	const styleCatagories = [horizPos, verticalPos, font];
+	
 
 	// Button toggling on and off styling
 
@@ -93,8 +63,8 @@ export async function run(memberlist:Member[]) {
 		text.innerHTML = member.firstname;
 
 		// Randomize mix and match text styles
-		styleCatagories.forEach((styleCatagory) => {
-			const styleOptions = Object.values(styleCatagory);
+		randomizedStyleCategories.forEach((styleCategory) => {
+			const styleOptions = Object.values(styleCategory);
 			if (styleOptions.length == 0) {
 				return;
 			}
@@ -127,6 +97,7 @@ export async function run(memberlist:Member[]) {
 		document.location.assign(cluckBasepath + "/grid/login");
 	}
 	await run(await (await fetch(cluckApiUrl + "/members")).json());
+	registerGestures()
 	addEventListener("resize", redrawRows);
 })();
 
