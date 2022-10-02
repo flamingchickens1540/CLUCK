@@ -38,6 +38,7 @@ function decodeAuth(apiKey:string) {
 }
 function isValidAuth(apiKey:string):boolean {
     const [id, key] = decodeAuth(apiKey)
+    if (id == null || key == null) {return false}
     if (cluck_api_keys[id] == key) { return true }
     return false
 }
