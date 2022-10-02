@@ -29,6 +29,9 @@ if (fs.existsSync(failedFilePath)) { failed = JSON.parse(fs.readFileSync(failedF
 configureDrive()
 
 function decodeAuth(apiKey:string) {
+    if (apiKey == null) {
+        return [null,null]
+    }
     const id = Buffer.from(apiKey.split(":")[0], 'base64').toString('ascii')
     const key = Buffer.from(apiKey.split(":")[1], 'base64').toString('ascii')
     return [id, key]
