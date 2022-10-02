@@ -11,7 +11,7 @@
     "build": "node build.js && chmod g+w dist/app.cjs dist/app.cjs.map",
     "serve:dev": "NODE_ENV=development npm run build && node --enable-source-maps dist/app.cjs",
     "serve:prod": "NODE_ENV=production npm run build && node --enable-source-maps dist/app.cjs",
-    "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src www",
+    "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src",
     "deploy": "ssh $DEPLOY_HOST $DEPLOY_SCRIPT"
   },
   "keywords": [],
