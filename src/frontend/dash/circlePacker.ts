@@ -106,16 +106,16 @@ function placeCircle(circle) {
 // assumes unplacedCircles is EMPTY
 // and placedCircles is FILLED
 export function placeCircles(circles: MemberCircle[]) {
-
     // normalize
     const max = Math.max(...circles.map(circle => circle.r))
     circles.forEach(circle => { circle.r /= max })
-
-    if (circles.length == 0) { return }
-    circles.sort((a, b) => (b.r - a.r));
     placedCircles = []
+    if (circles.length == 0) { return placedCircles}
+    circles.sort((a, b) => (b.r - a.r));
+    
     const unplacedCircles = circles
     const circle = unplacedCircles.shift()
+    
     circle.x = 0; circle.y = 0;
     minY = minX = -(maxX = maxY = circle.r) // HAHA THIS IS SO COOL
     placedCircles.push(circle)
