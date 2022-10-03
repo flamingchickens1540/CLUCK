@@ -2,7 +2,7 @@
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { slack_token } from "../../secrets/consts";
-import { memberListFilePath, photosFilePath, cluckBasepath } from "../consts";
+import { getResourceURL, memberListFilePath, photosFilePath } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
@@ -76,9 +76,9 @@ export const collect = async () => {
             const name = member.name;
             let image:string;
             if (member.goodPhoto) {
-                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? `${cluckBasepath}/static/img/default_member.jpg`
+                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? getResourceURL("/static/img/default_member.jpg", true)
             } else {
-                image = photos[tokenizeName(name)] ?? `${cluckBasepath}/static/img/default_member.jpg`
+                image = photos[tokenizeName(name)] ?? getResourceURL("/static/img/default_member.jpg", true)
             }
             members.push({
                 // if person is not in slack, generate default Member object
@@ -88,6 +88,15 @@ export const collect = async () => {
                 certs: member.certs.map((cert) => certs[cert])
             })
         })
+<<<<<<< HEAD
+=======
+        members.push({
+            name: 'Clay SMP',
+            firstname: 'Clay',
+            img: getResourceURL("/static/img/clay.png", true),
+            certs: []
+        })
+>>>>>>> 05fa9d7474e417edc1193491095ecd870fec48a4
 
         // Sort members alphabetically by name
         members.sort(function (a, b) {

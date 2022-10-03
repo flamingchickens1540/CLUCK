@@ -1,4 +1,4 @@
-import { cluckBasepath } from "../../consts"
+import { getResourceURL } from "../../consts"
 
 type DelphiInfo = {
     body: string
@@ -23,7 +23,7 @@ function getInfo(siteHTML) {
 }
 
 export async function refreshDelphi() {
-    const html = await (await fetch(cluckBasepath + '/dash/delphi')).text()
+    const html = await (await fetch(getResourceURL('/dash/delphi'))).text()
     const info = getInfo(html)
     document.getElementById('delphiTitle').innerHTML = info.title + info.topics
     document.getElementById('delphiBody').innerHTML = info.body;

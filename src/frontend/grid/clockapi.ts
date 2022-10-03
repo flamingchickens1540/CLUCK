@@ -1,6 +1,6 @@
 /* exported clock cluckedIn ping refreshMemberList getApiKey checkAuth*/
 
-import { cluckApiUrl } from "../../consts";
+import { getApiEndpoint } from "../../consts";
 import { getClockEndpoint } from "./style";
 import type { LoggedIn, Member } from "../../types";
 
@@ -25,7 +25,7 @@ export async function clock(name, clockingIn) {
         loggingin: clockingIn,
         api_key: getApiKey()
     }
-    return await fetch(cluckApiUrl+getClockEndpoint(), {
+    return await fetch(getApiEndpoint(getClockEndpoint()), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -36,7 +36,7 @@ export async function clock(name, clockingIn) {
 }
 
 export const cluckedIn = async ():Promise<LoggedIn> => {
-    const res = await fetch(cluckApiUrl + "/loggedin")
+    const res = await fetch(getApiEndpoint("loggedin"))
     if (!res.ok) {
         throw new Error("Could not get logged in")
     }
@@ -45,14 +45,14 @@ export const cluckedIn = async ():Promise<LoggedIn> => {
 }
 export const ping = async () => {
     try {
-        await fetch(cluckApiUrl + "/ping")
+        await fetch(getApiEndpoint("ping"))
     } catch (e) {
         return false;
     }
     return true;
 }
 export const refreshMemberList = async ():Promise<Member[]> => {
-    const res = await fetch(cluckApiUrl+"/members/refresh")
+    const res = await fetch(getApiEndpoint("members/refresh"))
     if (!res.ok) {
         throw new Error("Could not get members list")
     }
@@ -64,7 +64,7 @@ export const checkAuth = async (key = getApiKey()):Promise<boolean> => {
         window.skipAuth = true;
         return true;
     }
-    const res = await fetch(cluckApiUrl+"/auth", {
+    const res = await fetch(getApiEndpoint("/auth"), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
