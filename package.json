@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "browser": {
+    "path": "path-browserify"
+  },
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/eslint-parser": "^7.18.9",
@@ -41,6 +44,7 @@
     "jest": "^28.0.1",
     "node-fetch": "^3.2.10",
     "p-queue": "^7.3.0",
+    "path-browserify": "^1.0.1",
     "sanitize-html": "^2.7.1",
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1"

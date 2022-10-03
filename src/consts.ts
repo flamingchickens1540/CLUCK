@@ -1,5 +1,5 @@
 import { basepath, baseorigin } from "../secrets/consts";
-
+import path from "path"
 // Spreadsheet
 export const logSheetName = "Log"
 export const loggedinSheetName = "Logged In"
@@ -19,7 +19,7 @@ export const loggedInFilePath   = dataDirectory+'/loggedin.json'
 export const failedFilePath     = dataDirectory+'/failed.json'
 export const photosFilePath     = dataDirectory+'/photos.json'
 
-export const baseurl = `${baseorigin}${basepath}`
+export const baseurl = path.join(baseorigin,basepath)
 export const cluckBaseurl = baseurl.replace(/\/+$/, "")
-export const cluckBasepath = ("/"+basepath).replace(/\/+/g, '/').replace(/\/+$/, "")
-export const cluckApiUrl = ("/"+basepath+"/api").replace(/\/+/g, '/').replace(/\/+$/, "")
+export const cluckBasepath = path.join("/",basepath)
+export const cluckApiUrl = path.join("/",basepath,"/api")
