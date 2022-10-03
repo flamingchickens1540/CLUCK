@@ -8,7 +8,7 @@ const mosesPatterns = moses.model.MosesPatterns.create();
 
 // choose patterns from the collection
 // var patterns = [mosesPatterns.V, mosesPatterns.CIRCLE, mosesPatterns.DASH, mosesPatterns.SQUARE, mosesPatterns.SEVEN, mosesPatterns.Z];
-const patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE, mosesPatterns.V];
+const patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE, mosesPatterns.V, mosesPatterns.Z];
 
 // create a sampler
 const div = document.body;
@@ -36,6 +36,13 @@ export function registerGestures() {
             case mosesPatterns.V.name:
                openFullscreen();
                redrawRows();
+               break;
+            case mosesPatterns.Z.name:
+               window.location.assign(
+                  window.location.pathname.includes('ofdeath') ? 
+                  '/grid' :
+                  '/grid/ofdeath'
+               )
                break;
          }
          
