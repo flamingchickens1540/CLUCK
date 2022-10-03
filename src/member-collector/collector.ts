@@ -88,17 +88,11 @@ export const collect = async () => {
                 certs: member.certs.map((cert) => certs[cert])
             })
         })
-        members.push({
-            name: 'Clay SMP',
-            firstname: 'Clay',
-            img: `${cluckBasepath}/static/img/clay.png`,
-            certs: []
-        })
 
         // Sort members alphabetically by name
         members.sort(function (a, b) {
-            const aname = a.name.includes("Cynthia Yang") ? "Chloe Jahncke2" : a.name;
-            const bname = b.name.includes("Cynthia Yang") ? "Chloe Jahncke2" :b.name;
+            const aname = a.name;
+            const bname = b.name;
             if (aname < bname) {
                 return -1;
             }
@@ -108,6 +102,22 @@ export const collect = async () => {
             return 0;
         })
         
+        // move chloe and cynthia next to eachother
+        let chloeIndex:number = members.findIndex(member=>member.name.includes("Chloe"));
+        let cynthiaIndex:number = members.findIndex(member=>member.name.includes("Cynthia"));
+        let cynthia = members[cynthiaIndex]
+        members.splice(cynthiaIndex,1)
+        members.splice(chloeIndex+1,0,cynthia)
+        
+        // add dream in between chloe and cynthia
+        members.splice(chloeIndex+1,0,{
+            name: 'Clay SMP',
+            firstname: 'Clay',
+            img: `${cluckBasepath}/static/img/clay.png`,
+            certs: []
+        })
+
+
         writeFileSync(memberListFilePath, JSON.stringify(members, null, 4))
         updateProfilePictures()
     } finally {
