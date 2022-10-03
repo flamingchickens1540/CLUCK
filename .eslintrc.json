@@ -1,11 +1,10 @@
 {
 	"extends": ["eslint:recommended"],
-	"ignorePatterns": ["www/grid/script/moses.js"],
+	"ignorePatterns": ["**/moses.js","dist/**"],
 	"overrides": [
-        
 		{
 			// Typescript files
-			"files": ["**/*.ts", "secrets/*.js", "jest.config.js"],
+			"files": ["src/**/*.ts", "secrets/*.js", "jest.config.js"],
 			"parserOptions": {
 				"ecmaVersion": "latest",
 				"sourceType": "module"
@@ -57,33 +56,36 @@
 			"extends": ["plugin:@typescript-eslint/recommended"]
 		},
 		{
-			// Javascript files
-			"files": "www/**/*.js",
-			"parser": "@babel/eslint-parser",
-
+			// Typescript files
+			"files": ["src/frontend/dash/*.ts"],
+			"parser": "@typescript-eslint/parser",
+			"plugins": ["@typescript-eslint"],
+			"extends": ["plugin:@typescript-eslint/recommended"],
 			"parserOptions": {
 				"ecmaVersion": "latest",
-				"sourceType": "script"
+				"sourceType": "module"
 			},
 			"env": {
 				"es2021": true,
 				"browser": true
-			},
-			"rules": {
-				"no-constant-condition": ["error", { "checkLoops": false }]
-			},
-			"globals": {
-				"basepath": "readonly",
-				"baseurl": "readonly",
-				"api_url": "readonly"
 			}
 		},
-        {
+		{
 			// Secrets files
 			"files": ["secrets/*.js"],
-            "rules": {
-                "@typescript-eslint/naming-convention":"off"
-            }
-        }
+			"rules": {
+				"@typescript-eslint/naming-convention": "off"
+			}
+		},
+		{
+			"files": ["build.js"],
+			"parserOptions": {
+				"ecmaVersion": "latest",
+				"sourceType": "module"
+			},
+			"env": {
+				"node": true
+			}
+		}
 	]
 }
