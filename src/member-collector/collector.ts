@@ -2,7 +2,7 @@
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { slack_token } from "../../secrets/consts";
-import { memberListFilePath, photosFilePath, baseurl } from "../consts";
+import { memberListFilePath, photosFilePath, cluckBasepath } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
@@ -76,9 +76,9 @@ export const collect = async () => {
             const name = member.name;
             let image:string;
             if (member.goodPhoto) {
-                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
+                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? `${cluckBasepath}/static/img/default_member.jpg`
             } else {
-                image = photos[tokenizeName(name)] ?? `${baseurl}/static/img/default_member.jpg`
+                image = photos[tokenizeName(name)] ?? `${cluckBasepath}/static/img/default_member.jpg`
             }
             members.push({
                 // if person is not in slack, generate default Member object
@@ -91,7 +91,7 @@ export const collect = async () => {
         members.push({
             name: 'Clay SMP',
             firstname: 'Clay',
-            img: `${baseurl}/static/img/clay.png`,
+            img: `${cluckBasepath}/static/img/clay.png`,
             certs: []
         })
 

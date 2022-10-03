@@ -1,5 +1,4 @@
 // USES MOSES LIBRARY: https://github.com/ifrost/moses
-import { refreshMemberList } from "./clockapi";
 import { openFullscreen } from "../util";
 import { redrawRows, refreshMemberListAndRerun } from ".";
 declare const moses:any
