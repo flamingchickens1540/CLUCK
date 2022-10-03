@@ -1,4 +1,4 @@
-import type { HTMLMemberButtonElement } from "."
+import type { HTMLMemberButtonElement } from "../../types"
 
 type GridStyle = "void" | "normal"
 const gridstyle = document.querySelector('meta[name="gridstyle"]')?.getAttribute("content") ?? "normal" as GridStyle

@@ -1,5 +1,5 @@
 import { cluckApiUrl, cluckBasepath, cluckBaseurl } from "../../consts";
-import type { LoggedIn, Member } from "../../types";
+import type { LoggedIn, Member, HTMLMemberButtonElement } from "../../types";
 import { openFullscreen } from "../util";
 import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
 import { registerGestures } from "./gestures";
@@ -10,10 +10,6 @@ declare global {
     interface Window { 
 		skipAuth:boolean;
 	}
-}
-
-export type HTMLMemberButtonElement = HTMLElement & {
-	loggedIn:boolean;
 }
 
 
