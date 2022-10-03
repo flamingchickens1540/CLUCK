@@ -16,19 +16,19 @@ async function refreshDelphi() {
     let info = getInfo(html);
     document.getElementById('delphiTitle').innerHTML = info.title + info.topics;
     document.getElementById('delphiBody').innerHTML = info.body;
-    let n= 2;
-    if(ret.topics.height< document.getElementById('delphiBody').height){
-        while(ret.topics.height < document.getElementById('delphiBody').height){
-            let comment = doc.querySelector(`#post_${n} > div`);
-            if(ret.topics.height+=comment<= document.getElementById('delphiBody').height){
-                ret.topics += comment;
+    let n = 2;
+    let potenHeight = info.topics.appendChild(comment).height;
+    if(info.topics.height< document.getElementById('delphiBody').height){
+        while(info.topics.height < document.getElementById('delphiBody').height){
+            let comment = doc.querySelector(`#post_${n} > div`).innerHTML;
+            if(potenHeight <= document.getElementById('delphiBody').height){
+                document.getElementById('delphiBody').appendChild(comment);
             n++;
             }else{
                 break;
             }
             
         }
-    document.getElementById('delphiBody').innerHTML = info.body + ret.topics;
     }
     resetScroll();
 }
