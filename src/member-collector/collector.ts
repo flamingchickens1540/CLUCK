@@ -1,8 +1,8 @@
 
 import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
-import { baseurl, slack_token } from "../../secrets/consts";
-import { memberListFilePath, photosFilePath } from "../consts";
+import { slack_token } from "../../secrets/consts";
+import { memberListFilePath, photosFilePath, baseurl } from "../consts";
 import { Member } from "../types";
 import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
@@ -88,7 +88,13 @@ export const collect = async () => {
                 certs: member.certs.map((cert) => certs[cert])
             })
         })
-        
+        members.push({
+            name: 'Clay SMP',
+            firstname: 'Clay',
+            img: `${baseurl}/static/img/clay.png`,
+            certs: []
+        })
+
         // Sort members alphabetically by name
         members.sort(function (a, b) {
             const aname = a.name.includes("Cynthia Yang") ? "Chloe Jahncke2" : a.name;

@@ -5,5 +5,5 @@ export const cluck_api_keys = {
     "supertestingkey": "cabbage"
 }
 export const server_port = 2022
-export const basepath = '';
-export const baseurl = `http://1.2.3.4:3000${basepath}`;
+export const basepath = '/cluck';
+export const baseorigin = `http://1.2.3.4:3000`;
