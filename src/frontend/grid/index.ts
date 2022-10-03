@@ -163,5 +163,9 @@ export function redrawRows() {
 	document.documentElement.style.setProperty("--height", nrows);
 }
 
-setInterval(refreshMemberList, 60 * 60 * 1000);
+export function refreshMemberListAndRerun() {
+	return refreshMemberList().then(memberList=>run(memberList))
+}
+
+setInterval(refreshMemberListAndRerun, 60 * 60 * 1000);
 setInterval(refreshLoggedIn, 5 * 1000);

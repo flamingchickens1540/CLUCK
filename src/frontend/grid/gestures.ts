@@ -1,7 +1,7 @@
 // USES MOSES LIBRARY: https://github.com/ifrost/moses
 import { refreshMemberList } from "./clockapi";
 import { openFullscreen } from "../util";
-import { redrawRows } from ".";
+import { redrawRows, refreshMemberListAndRerun } from ".";
 declare const moses:any
 // create collection of predefined patterns
 const mosesPatterns = moses.model.MosesPatterns.create();
@@ -28,10 +28,10 @@ export function registerGestures() {
       if(data.bestMatch.value > .4) {
          switch (data.bestMatch.pattern.name) {
             case mosesPatterns.CIRCLE.name:
-            await refreshMemberList();
+            refreshMemberListAndRerun()
             break;
             case mosesPatterns.SQUARE.name:
-            await refreshMemberList();
+            await refreshMemberListAndRerun()
             break;
             case mosesPatterns.V.name:
             openFullscreen();

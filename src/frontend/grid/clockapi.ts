@@ -1,9 +1,8 @@
 /* exported clock cluckedIn ping refreshMemberList getApiKey checkAuth*/
 
 import { cluckApiUrl } from "../../consts";
-import { run } from ".";
 import { getClockEndpoint } from "./style";
-import type { LoggedIn } from "../../types";
+import type { LoggedIn, Member } from "../../types";
 
 window.skipAuth = false;
 
@@ -52,11 +51,13 @@ export const ping = async () => {
     }
     return true;
 }
-export const refreshMemberList = async () => {
+export const refreshMemberList = async ():Promise<Member[]> => {
     const res = await fetch(cluckApiUrl+"/members/refresh")
-    if (res.ok) {
-        await run(await res.json())
+    if (!res.ok) {
+        throw new Error("Could not get members list")
     }
+    const json = await res.json()
+    return json;
 }
 export const checkAuth = async (key = getApiKey()):Promise<boolean> => {
     if (key == "skip") {
