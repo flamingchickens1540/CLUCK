@@ -18,13 +18,8 @@ export const loggedInFilePath   = dataDirectory+'/loggedin.json'
 export const failedFilePath     = dataDirectory+'/failed.json'
 export const photosFilePath     = dataDirectory+'/photos.json'
 
-<<<<<<< HEAD
-const cluckBaseurl = new URL(basepath, baseorigin).href
-const cluckApiUrl = new URL("/api/", cluckBaseurl+"/").href
-=======
 const cluckBaseurl = new URL(basepath+"/", baseorigin).href
 const cluckApiUrl = new URL("api/", cluckBaseurl).href
->>>>>>> 1c339d141b4ed3e92867f61820d22625a0ea721c
 
 export function getApiEndpoint(endpoint, absolute = false) {
     endpoint = endpoint.replace(/^\//, "")
