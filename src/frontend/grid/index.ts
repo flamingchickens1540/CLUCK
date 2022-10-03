@@ -1,9 +1,11 @@
 import { cluckApiUrl, cluckBasepath, cluckBaseurl } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
+import { openFullscreen } from "../util";
 import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
 import { registerGestures } from "./gestures";
 import { getButtonState, randomizedStyleCategories } from "./style";
 
+window["openFullscreen"] = openFullscreen
 declare global {
     interface Window { 
 		skipAuth:boolean;

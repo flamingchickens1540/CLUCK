@@ -3,9 +3,12 @@ import type { LoggedIn, Member } from "../../types";
 import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
 import { redrawCircles } from "./renderCircles";
 import { refreshDelphi } from "./chiefdelphi"
+import { openFullscreen } from "../util";
 
 let members: Member[]
 let loggedInCache: LoggedIn;
+
+window["openFullscreen"] = openFullscreen
 
 refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
