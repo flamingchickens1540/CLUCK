@@ -39,8 +39,8 @@ export function registerGestures() {
             case mosesPatterns.Z.name:
                window.location.assign(
                   window.location.pathname.includes('ofdeath') ? 
-                  '/grid' :
-                  '/grid/ofdeath'
+                  '../grid' :
+                  './ofdeath'
                )
                break;
          }
