@@ -1,4 +1,4 @@
-import { cluckBasepath } from "../../consts";
+import { getResourceURL } from "../../consts";
 import { checkAuth } from "./clockapi";
 
 (async()=>{
@@ -12,7 +12,7 @@ import { checkAuth } from "./clockapi";
         return window.btoa(id)+":"+window.btoa(key)
     }
     function redirect() {
-        document.location.assign(cluckBasepath+"/grid/")
+        document.location.assign(getResourceURL("grid/"))
     }
     const id = document.getElementById('id') as HTMLInputElement;
     const pass = document.getElementById('password') as HTMLInputElement;

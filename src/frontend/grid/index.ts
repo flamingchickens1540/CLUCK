@@ -1,4 +1,4 @@
-import { cluckApiUrl, cluckBasepath, cluckBaseurl } from "../../consts";
+import { getApiEndpoint, getResourceURL } from "../../consts";
 import type { LoggedIn, Member, HTMLMemberButtonElement } from "../../types";
 import { openFullscreen } from "../util";
 import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
@@ -78,7 +78,7 @@ export async function run(memberlist:Member[]) {
 		if (!member.img) {
 			memberButton.style.setProperty(
 				"background-image",
-				`url(${cluckBaseurl}/assets/img/defaultpicture.jpg)`
+				`url(${getResourceURL("/assets/img/defaultpicture.jpg")})`
 			);
 		}
 		memberButton.className = "button-in";
@@ -92,9 +92,9 @@ export async function run(memberlist:Member[]) {
 (async () => {
 	const authed = await checkAuth();
 	if (!authed) {
-		document.location.assign(cluckBasepath + "/grid/login");
+		document.location.assign(getResourceURL("/grid/login"));
 	}
-	await run(await (await fetch(cluckApiUrl + "/members")).json());
+	await run(await (await fetch(getApiEndpoint("members"))).json());
 	registerGestures()
 	addEventListener("resize", redrawRows);
 })();

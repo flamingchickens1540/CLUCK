@@ -1,4 +1,4 @@
-import { cluckApiUrl } from "../../consts";
+import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
 import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
 import { redrawCircles } from "./renderCircles";
@@ -40,7 +40,7 @@ function regenCircles(loggedin: LoggedIn) {
 }
 
 function update() {
-    fetch(cluckApiUrl + '/loggedin').then(res => res.json().then(loggedin => {
+    fetch(getApiEndpoint('loggedin')).then(res => res.json().then(loggedin => {
         // return if there's no change
         if (JSON.stringify(loggedInCache) == JSON.stringify(loggedin)) { return }
         loggedInCache = loggedin
@@ -49,7 +49,7 @@ function update() {
 }
 
 async function start() {
-    members = await (await fetch(cluckApiUrl + '/members')).json()
+    members = await (await fetch(getApiEndpoint("members"))).json()
     loggedInCache = {}
 
     update()
