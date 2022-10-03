@@ -88,15 +88,6 @@ export const collect = async () => {
                 certs: member.certs.map((cert) => certs[cert])
             })
         })
-<<<<<<< HEAD
-=======
-        members.push({
-            name: 'Clay SMP',
-            firstname: 'Clay',
-            img: getResourceURL("/static/img/clay.png", true),
-            certs: []
-        })
->>>>>>> 05fa9d7474e417edc1193491095ecd870fec48a4
 
         // Sort members alphabetically by name
         members.sort(function (a, b) {
@@ -122,10 +113,9 @@ export const collect = async () => {
         members.splice(chloeIndex+1,0,{
             name: 'Clay SMP',
             firstname: 'Clay',
-            img: `${cluckBasepath}/static/img/clay.png`,
+            img: getResourceURL("/static/img/clay.png", true),
             certs: []
         })
-
 
         writeFileSync(memberListFilePath, JSON.stringify(members, null, 4))
         updateProfilePictures()
