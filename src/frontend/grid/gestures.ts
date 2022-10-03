@@ -28,15 +28,15 @@ export function registerGestures() {
       if(data.bestMatch.value > .4) {
          switch (data.bestMatch.pattern.name) {
             case mosesPatterns.CIRCLE.name:
-            refreshMemberListAndRerun()
-            break;
+               refreshMemberListAndRerun()
+               break;
             case mosesPatterns.SQUARE.name:
-            await refreshMemberListAndRerun()
-            break;
+               await refreshMemberListAndRerun()
+               break;
             case mosesPatterns.V.name:
-            openFullscreen();
-            redrawRows();
-            break;
+               openFullscreen();
+               redrawRows();
+               break;
          }
          
       }
