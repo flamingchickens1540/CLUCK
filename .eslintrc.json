@@ -21,7 +21,9 @@
 					"warn",
 					{ "allow": ["arrowFunctions"] }
 				],
+				
 				"@typescript-eslint/no-explicit-any": "off",
+				"prefer-const":"warn",
 				"@typescript-eslint/naming-convention": [
 					"warn",
 					{
@@ -57,16 +59,8 @@
 		},
 		{
 			// Typescript files
-			"files": ["src/frontend/dash/*.ts"],
-			"parser": "@typescript-eslint/parser",
-			"plugins": ["@typescript-eslint"],
-			"extends": ["plugin:@typescript-eslint/recommended"],
-			"parserOptions": {
-				"ecmaVersion": "latest",
-				"sourceType": "module"
-			},
+			"files": ["src/frontend/**/*.ts"],
 			"env": {
-				"es2021": true,
 				"browser": true
 			}
 		},
