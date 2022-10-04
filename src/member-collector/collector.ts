@@ -68,7 +68,7 @@ export const collect = async () => {
         })
         // Run spreadsheet collection in parallel with slack collection
         const spreadsheetMember = await getMemberInfo()
-
+        
         // For each spreadsheet user, add slack data
         members = []
         const certs = await getCertifications()
@@ -88,35 +88,26 @@ export const collect = async () => {
                 certs: member.certs.map((cert) => certs[cert])
             })
         })
-
+        
         // Sort members alphabetically by name
-        members.sort(function (a, b) {
-            const aname = a.name;
-            const bname = b.name;
-            if (aname < bname) {
-                return -1;
-            }
-            if (aname > bname) {
-                return 1;
-            }
-            return 0;
-        })
-        
-        // move chloe and cynthia next to eachother
-        let chloeIndex:number = members.findIndex(member=>member.name.includes("Chloe"));
-        let cynthiaIndex:number = members.findIndex(member=>member.name.includes("Cynthia"));
-        let cynthia = members[cynthiaIndex]
-        members.splice(cynthiaIndex,1)
-        members.splice(chloeIndex+1,0,cynthia)
-        
-        // add dream in between chloe and cynthia
-        members.splice(chloeIndex+1,0,{
+        const sortNames:{[key:string]:string} = {
+            "Cynthia Yang": "Chloe Jahncke1"
+        }
+        members.push({
             name: 'Clay SMP',
             firstname: 'Clay',
             img: getResourceURL("/static/img/clay.png", true),
             certs: []
         })
-
+        
+        members.sort(function (a, b) {
+            const aname = sortNames[a.name] ?? a.name;
+            const bname = sortNames[b.name] ?? b.name;
+            return aname.localeCompare(bname, "en-us", {
+                sensitivity:"base"
+            })
+        })
+        
         writeFileSync(memberListFilePath, JSON.stringify(members, null, 4))
         updateProfilePictures()
     } finally {
