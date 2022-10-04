@@ -23,28 +23,32 @@ export function registerGestures() {
    });
    // display the result
    recogniser.on('recognised', async function(data) {
-      
+      window.gestureDetected = true;
       if(data.bestMatch.value > .4) {
          switch (data.bestMatch.pattern.name) {
             case mosesPatterns.CIRCLE.name:
                refreshMemberListAndRerun()
                break;
             case mosesPatterns.SQUARE.name:
-               await refreshMemberListAndRerun()
+               refreshMemberListAndRerun()
                break;
             case mosesPatterns.V.name:
                openFullscreen();
                redrawRows();
                break;
             case mosesPatterns.Z.name:
+               if (!confirm("Are you sure you want to switch dashboards?")) {break;}
                window.location.assign(
                   window.location.pathname.includes('ofdeath') ? 
                   '../grid' :
                   './ofdeath'
                )
                break;
+            
          }
-         
+         setTimeout(() => {window.gestureDetected = false}, 50)   
+      } else {
+         window.gestureDetected = false;
       }
    });
    

@@ -9,6 +9,7 @@ window["openFullscreen"] = openFullscreen
 declare global {
     interface Window { 
 		skipAuth:boolean;
+		gestureDetected:boolean;
 	}
 }
 
@@ -34,6 +35,8 @@ export async function run(memberlist:Member[]) {
 		// Set click toggle
 		if (!window.skipAuth) {
 			memberButton.onclick = async (click) => {
+				console.log("clicked")
+				if (window.gestureDetected) {return;}
 				// fullscreen()
 				let button = click.target as HTMLMemberButtonElement;
 				if (button.classList.contains("button-text")) {
