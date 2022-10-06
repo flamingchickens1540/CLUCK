@@ -198,3 +198,8 @@ pre {
     height:40vh;
 	background-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
 }
+
+.post_comment {
+    padding: 10px;
+    background-color: rgba(175, 175, 175, 0.1);
+}

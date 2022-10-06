@@ -1,23 +1,51 @@
 import { getResourceURL } from "../../consts"
+import collect from "../../member-collector/collector"
 
 type DelphiInfo = {
-    body: string
-    title: string
+    body: HTMLElement
+    title: HTMLElement
     topics: string
-}
+};
 function getInfo(siteHTML) {
     const ret: DelphiInfo = {
-        body: "",
-        title: "",
-        topics: ""
-    }
+        body: null,
+        title: null,
+        topics: "",
+    };
 
     const doc = document.createElement('html');
-    doc.innerHTML = siteHTML
+    doc.innerHTML = siteHTML;
 
-    ret.body = doc.querySelector('.cooked, .post').innerHTML
-    ret.title = doc.querySelector('#topic-title').children[0].children[0].innerHTML
-    ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>'
+    ret.body = doc.querySelector('.cooked, .post');
+    ret.title = doc.querySelector('#topic-title').children[0].children[0] as HTMLElement;
+    ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
+
+    let n = 3;
+    if(ret.body.clientHeight < document.getElementById('html').clientHeight) {
+        while(ret.body.clientHeight <= document.getElementById('html').clientHeight){
+            let comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
+            
+            // console.log(comment)
+            if(comment == null) {
+                break;
+            }
+            comment.classList.add("post_comment")
+            n++;
+            //let potenHeight = ret.body.appendChild(comment).clientHeight;
+            //if(potenHeight <= document.getElementById('delphiBody').clientHeight){
+                ret.body.appendChild(document.createElement("br"));
+                ret.body.appendChild(document.createElement("br"));
+                comment.style.fontStyle = "italic";
+                comment.style.fontSize = '24px';
+                ret.body.appendChild(comment);
+                console.log("body", ret.body);
+            
+            //else{
+            //    break;
+            //}
+            
+        }
+    }
 
     return ret;
 }
@@ -25,8 +53,10 @@ function getInfo(siteHTML) {
 export async function refreshDelphi() {
     const html = await (await fetch(getResourceURL('/dash/delphi'))).text()
     const info = getInfo(html)
-    document.getElementById('delphiTitle').innerHTML = info.title + info.topics
-    document.getElementById('delphiBody').innerHTML = info.body;
+    document.getElementById('delphiTitle').innerHTML = info.title.innerHTML + info.topics
+    document.getElementById('delphiBody').innerHTML = info.body.innerHTML;
+    
+    
     resetScroll()
 }
 
