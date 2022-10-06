@@ -21,31 +21,26 @@ function getInfo(siteHTML) {
     ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
 
     let n = 3;
-    if(ret.body.clientHeight < document.getElementById('html').clientHeight) {
-        while(ret.body.clientHeight <= document.getElementById('html').clientHeight){
+    let comment_num = 3;
+        while(ret.body.scrollHeight <=  document.getElementById('html').clientHeight){
             let comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
-            
+            if(n>comment_num+3){
+                break;
+            }
             // console.log(comment)
             if(comment == null) {
                 break;
             }
             comment.classList.add("post_comment")
             n++;
-            //let potenHeight = ret.body.appendChild(comment).clientHeight;
-            //if(potenHeight <= document.getElementById('delphiBody').clientHeight){
                 ret.body.appendChild(document.createElement("br"));
                 ret.body.appendChild(document.createElement("br"));
                 comment.style.fontStyle = "italic";
                 comment.style.fontSize = '24px';
                 ret.body.appendChild(comment);
                 console.log("body", ret.body);
-            
-            //else{
-            //    break;
-            //}
-            
-        }
-    }
+            }
+    
 
     return ret;
 }
