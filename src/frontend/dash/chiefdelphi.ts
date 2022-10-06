@@ -22,11 +22,8 @@ function getInfo(siteHTML) {
 
     let n = 3;
     let comment_num = 3;
-        while(ret.body.scrollHeight <=  document.getElementById('html').clientHeight){
+        while(n<comment_num+3){
             let comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
-            if(n>comment_num+3){
-                break;
-            }
             // console.log(comment)
             if(comment == null) {
                 break;
