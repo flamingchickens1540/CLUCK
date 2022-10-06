@@ -3,9 +3,9 @@
 import { CronJob } from 'cron';
 import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
-import { basepath, baseurl, server_port } from '../secrets/consts.js';
+import { basepath, server_port } from '../secrets/consts.js';
 import { router as apiRouter } from './api/index.js';
-import { dataDirectory } from './consts';
+import { dataDirectory, getResourceURL } from './consts';
 import { collect } from './member-collector/collector';
 import { router as memberRouter} from './member-collector/router';
 import { router as frontendRouter } from './router';
@@ -52,4 +52,4 @@ app.use(function(req, res) {
     }
 })
 
-app.listen(server_port, () => { console.log(`listening: ${baseurl}`) });
+app.listen(server_port, () => { console.log(`listening: ${getResourceURL("", true)}`) });

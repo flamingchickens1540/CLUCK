@@ -25,3 +25,7 @@ export type Certification = {
     id: string;
     name: string;
 }
+
+export type HTMLMemberButtonElement = HTMLElement & {
+	loggedIn:boolean;
+}

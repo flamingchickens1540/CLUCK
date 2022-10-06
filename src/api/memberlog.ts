@@ -11,13 +11,13 @@ type MemberLogEntry = {
 }
 let memberlog:MemberLogEntry[] = []
 
-export async function logMember(name:string, loggingin:boolean, logged_in:LoggedIn) {
+export async function logMember(name:string, loggingIn:boolean, loggedIn:LoggedIn) {
     try {
-        await updateLoggedIn(logged_in)
+        await updateLoggedIn(loggedIn)
     } catch (e) {
         console.error(e)
     }
-    memberlog.push({ name, loggingin, time: Date.now()})
+    memberlog.push({ name, loggingin: loggingIn, time: Date.now()})
 }
 
 export function saveMemberLog() {
@@ -29,4 +29,4 @@ export function saveMemberLog() {
 }
 
 export function getMemberlog() {return memberlog}
-export function setMemberlog(new_log) {memberlog = new_log}
+export function setMemberlog(log) {memberlog = log}

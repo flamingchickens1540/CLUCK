@@ -7,15 +7,19 @@
   "scripts": {
     "serve": "node dist/app.cjs",
     "test": "jest",
-    "lint": "eslint --ext .ts,.js src www",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/app.cjs --platform=node --sourcemap --log-level=warning && chmod g+w dist/app.cjs dist/app.cjs.map",
-    "serve:dev": "npm run build && node --enable-source-maps dist/app.cjs",
-    "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src www",
+    "lint": "eslint --ext .ts,.js src",
+    "build": "node build.js && chmod g+w dist/app.cjs dist/app.cjs.map",
+    "serve:dev": "NODE_ENV=development npm run build && node --enable-source-maps dist/app.cjs",
+    "serve:prod": "NODE_ENV=production npm run build && node --enable-source-maps dist/app.cjs",
+    "actions:lint": "eslint --ext .ts,.js --output-file eslint_report.json --format json src",
     "deploy": "ssh $DEPLOY_HOST $DEPLOY_SCRIPT"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "browser": {
+    "path": "path-browserify"
+  },
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/eslint-parser": "^7.18.9",
@@ -34,11 +38,14 @@
     "cron": "^2.1.0",
     "esbuild": "^0.15.6",
     "eslint": "^8.23.0",
+    "eslint-plugin-typescript-compat": "^0.3.1",
     "express": "^4.18.1",
     "google-spreadsheet": "^3.3.0",
     "jest": "^28.0.1",
     "node-fetch": "^3.2.10",
     "p-queue": "^7.3.0",
+    "path-browserify": "^1.0.1",
+    "pre-commit": "^1.2.2",
     "sanitize-html": "^2.7.1",
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1"
@@ -51,5 +58,8 @@
     "google-spreadsheet",
     "node-fetch",
     "sanitize-html"
-  ]
+  ],
+  "pre-commit": {
+    "run": ["lint"]
+  }
 }

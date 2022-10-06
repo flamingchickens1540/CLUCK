@@ -17,6 +17,7 @@
 }
 html {
     overflow:hidden;
+    touch-action: none;
 }
 body {
     background-image: url("../static/img/bg-grid.png");

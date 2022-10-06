@@ -1,20 +1,20 @@
 // import type GoogleSpreadsheetWorksheet from 'google-spreadsheet/lib/GoogleSpreadsheetWorksheet';
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet, GoogleSpreadsheetRow } from "google-spreadsheet";
-import { loggedin_sheet_name, log_sheet_name, certs_sheet_name, avatars_sheet_name, cert_names_sheet_name } from '../consts';
+import { loggedinSheetName, logSheetName, certsSheetName, avatarsSheetName, certNamesSheetName } from '../consts';
 import google_client_secret from "../../secrets/client_secret.json"
 import type { Certification, FailedEntry, LoggedIn, SpreadsheetMemberInfo } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 import { hours_spreadsheet_id } from '../../secrets/consts';
 import { getMembers } from '../member-collector/collector';
 
-let google_drive_authed = false
+let googleDriveAuthed = false
 const authMutex = new Mutex()
 
 let timesheet: GoogleSpreadsheetWorksheet
-let loggedin_sheet: GoogleSpreadsheetWorksheet
-let avatars_sheet: GoogleSpreadsheetWorksheet
-let certs_sheet: GoogleSpreadsheetWorksheet
-let certs_names_sheet: GoogleSpreadsheetWorksheet
+let loggedinSheet: GoogleSpreadsheetWorksheet
+let avatarsSheet: GoogleSpreadsheetWorksheet
+let certsSheet: GoogleSpreadsheetWorksheet
+let certNamesSheet: GoogleSpreadsheetWorksheet
 
 const timsheetMutex = new Mutex()
 const loggedInMutex = new Mutex()
@@ -34,28 +34,28 @@ export async function configureDrive(doc?: GoogleSpreadsheet) {
         return
     }
     await authMutex.runExclusive(async () => {
-        if(google_drive_authed) {return}
+        if(googleDriveAuthed) {return}
         doc = doc ?? await getSpreadsheet()
-        timesheet = doc.sheetsByTitle[log_sheet_name]
-        loggedin_sheet = doc.sheetsByTitle[loggedin_sheet_name]
-        avatars_sheet = doc.sheetsByTitle[avatars_sheet_name]
-        certs_sheet = doc.sheetsByTitle[certs_sheet_name]
-        certs_names_sheet = doc.sheetsByTitle[cert_names_sheet_name]
-        google_drive_authed = true
+        timesheet = doc.sheetsByTitle[logSheetName]
+        loggedinSheet = doc.sheetsByTitle[loggedinSheetName]
+        avatarsSheet = doc.sheetsByTitle[avatarsSheetName]
+        certsSheet = doc.sheetsByTitle[certsSheetName]
+        certNamesSheet = doc.sheetsByTitle[certNamesSheetName]
+        googleDriveAuthed = true
     })
-    return [timesheet, loggedin_sheet, certs_sheet]
+    return [timesheet, loggedinSheet, certsSheet]
 }
 
 async function ensureAuthed() {
-    if(google_drive_authed) {return}
+    if(googleDriveAuthed) {return}
     await configureDrive()
 }
 
 export async function getCertifications():Promise<{[key: string]:Certification}> {
     await ensureAuthed();
 
-    await certs_names_sheet.loadCells()
-    const rows:GoogleSpreadsheetRow[] = await certs_names_sheet.getRows()
+    await certNamesSheet.loadCells()
+    const rows:GoogleSpreadsheetRow[] = await certNamesSheet.getRows()
     const output:{[key: string]:Certification} = {}
     rows.forEach((row) => {
         output[row.ID] = {
@@ -70,8 +70,8 @@ export async function getCertifications():Promise<{[key: string]:Certification}>
 export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
     await ensureAuthed()
     
-    await certs_sheet.loadCells()
-    const rows:GoogleSpreadsheetRow[] = await certs_sheet.getRows()
+    await certsSheet.loadCells()
+    const rows:GoogleSpreadsheetRow[] = await certsSheet.getRows()
     
     const members:SpreadsheetMemberInfo[] = []
     rows.forEach(row=>{
@@ -136,14 +136,14 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
     try {
         await loggedInMutex.runExclusive(async () => {
             // Update sheet
-            await loggedin_sheet.loadCells()
-            await loggedin_sheet.resize({ rowCount: 1, columnCount: 2 }) // clear rows
+            await loggedinSheet.loadCells()
+            await loggedinSheet.resize({ rowCount: 1, columnCount: 2 }) // clear rows
             if (rows.length > 0) {
-                await loggedin_sheet.addRows(rows)
+                await loggedinSheet.addRows(rows)
             } else {
-                await loggedin_sheet.resize({ rowCount: 2, columnCount: 2 }) // so that the loggedin checkboxes reset
+                await loggedinSheet.resize({ rowCount: 2, columnCount: 2 }) // so that the loggedin checkboxes reset
             }
-            await loggedin_sheet.saveUpdatedCells()
+            await loggedinSheet.saveUpdatedCells()
         })
     } catch (e) {
         // If the update was canceled, ignore the error
@@ -166,12 +166,12 @@ export async function updateProfilePictures() {
     try {
         await avatarsMutex.runExclusive(async () => {
             // Update sheet
-            await avatars_sheet.loadCells()
-            await avatars_sheet.resize({ rowCount: 1, columnCount: 2 })
+            await avatarsSheet.loadCells()
+            await avatarsSheet.resize({ rowCount: 1, columnCount: 2 })
             if (rows.length > 0) {
-                await avatars_sheet.addRows(rows)
+                await avatarsSheet.addRows(rows)
             }
-            await avatars_sheet.saveUpdatedCells()
+            await avatarsSheet.saveUpdatedCells()
         })
     } catch (e) {
         // If the update was canceled, ignore the error
