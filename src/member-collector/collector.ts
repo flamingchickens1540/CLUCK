@@ -94,9 +94,9 @@ export const collect = async () => {
             "Cynthia Yang": "Chloe Jahncke1"
         }
         members.push({
-            name: 'Clay SMP',
-            firstname: 'Clay',
-            img: getResourceURL("/static/img/clay.png", true),
+            name: 'Mini Jeffrey',
+            firstname: 'Mini Jeffrey',
+            img: photos[tokenizeName("Ari Wilda")],
             certs: []
         })
         
