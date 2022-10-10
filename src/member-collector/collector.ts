@@ -91,7 +91,7 @@ export const collect = async () => {
         
         // Sort members alphabetically by name
         const sortNames:{[key:string]:string} = {
-            "Cynthia Yang": "Chloe Jahncke1"
+            "Cynthia": "Chloe"
         }
         members.push({
             name: 'Mini Jeffrey',
@@ -101,8 +101,8 @@ export const collect = async () => {
         })
         
         members.sort(function (a, b) {
-            const aname = sortNames[a.name] ?? a.name;
-            const bname = sortNames[b.name] ?? b.name;
+            const aname = sortNames[a.firstname] ?? a.firstname;
+            const bname = sortNames[b.firstname] ?? b.firstname;
             return aname.localeCompare(bname, "en-us", {
                 sensitivity:"base"
             })
