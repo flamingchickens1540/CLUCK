@@ -1,5 +1,5 @@
 import { getResourceURL } from "../../consts"
-import collect from "../../member-collector/collector"
+
 
 type DelphiInfo = {
     body: HTMLElement
@@ -21,9 +21,9 @@ function getInfo(siteHTML) {
     ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
 
     let n = 3;
-    let comment_num = 3;
-        while(n<comment_num+3){
-            let comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
+    const commentNum = 3;
+        while(n<commentNum+3){
+            const comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
             // console.log(comment)
             if(comment == null) {
                 break;
