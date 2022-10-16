@@ -37,8 +37,6 @@ function getInfo(siteHTML) {
                 ret.body.appendChild(comment);
                 console.log("body", ret.body);
             }
-    
-
     return ret;
 }
 
@@ -52,7 +50,9 @@ export async function refreshDelphi() {
     resetScroll()
 }
 
-
+export function setVisibility(visible : boolean) {
+    delphiBody.style.display = visible ? "" : "none";
+}
 
 
 function setBottomFade() {
