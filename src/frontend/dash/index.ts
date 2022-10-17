@@ -23,8 +23,8 @@ function regenCircles(loggedin: LoggedIn) {
         tries++;
         const circles = []
         const now = Date.now()
-        let loggedInEntries = Object.entries(loggedin)
-        if(loggedInEntries.length > 25)
+        const loggedInEntries = Object.entries(loggedin)
+        if(loggedInEntries.length > 15)
             setVisibility(false);
         else
             setVisibility(true);

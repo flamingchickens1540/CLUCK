@@ -51,7 +51,7 @@ export async function refreshDelphi() {
 }
 
 export function setVisibility(visible : boolean) {
-    delphiBody.style.display = visible ? "" : "none";
+    document.getElementById('delphi').style.display = visible ? "" : "none"
 }
 
 
