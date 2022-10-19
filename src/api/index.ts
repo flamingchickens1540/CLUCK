@@ -162,6 +162,7 @@ export async function sendSlackMessage(fullname: string, text: string) {
 }
 
 export async function refreshSlackMemberlist() {
+    console.log("Refreshing slack members")
     const users = await client.users.list()
     if (users.members == null) { console.warn("Could not load memberlist"); return}
     memberlist = users.members

@@ -7,7 +7,7 @@ const mosesPatterns = moses.model.MosesPatterns.create();
 
 // choose patterns from the collection
 // var patterns = [mosesPatterns.V, mosesPatterns.CIRCLE, mosesPatterns.DASH, mosesPatterns.SQUARE, mosesPatterns.SEVEN, mosesPatterns.Z];
-const patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE, mosesPatterns.V, mosesPatterns.Z];
+const patterns = [mosesPatterns.CIRCLE, mosesPatterns.SQUARE, mosesPatterns.V];
 
 // create a sampler
 const div = document.body;
@@ -36,15 +36,6 @@ export function registerGestures() {
                openFullscreen();
                redrawRows();
                break;
-            case mosesPatterns.Z.name:
-               if (!confirm("Are you sure you want to switch dashboards?")) {break;}
-               window.location.assign(
-                  window.location.pathname.includes('ofdeath') ? 
-                  '../grid' :
-                  './ofdeath'
-               )
-               break;
-            
          }
          setTimeout(() => {window.gestureDetected = false}, 50)   
       } else {
