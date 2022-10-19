@@ -50,15 +50,14 @@ router.use(cors())
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 router.use((req, res, next) => {
-    if (!["/ping", "/loggedin"].includes(req.url)) {
-        
+    if (req.method != "GET") {
         const body = Object.fromEntries(Object.entries(req.body))
         let authString = "none"
         if(body["api_key"] != null) {
             body["api_key"] = isValidAuth(req.body.api_key) ? "VALID_API_KEY" : "INVALID_API_KEY"
             authString = decodeAuth(req.body.api_key)[0]
         }
-        console.log(req.method, req.url, "("+authString+")", JSON.stringify(body))
+        console.log(new Date().toLocaleString(), req.method, req.url, "("+authString+")", JSON.stringify(body))
     }
     next()
 })
