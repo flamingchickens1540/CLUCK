@@ -57,7 +57,7 @@ router.use((req, res, next) => {
             body["api_key"] = isValidAuth(req.body.api_key) ? "VALID_API_KEY" : "INVALID_API_KEY"
             authString = decodeAuth(req.body.api_key)[0]
         }
-        console.log(new Date().toLocaleString(), req.method, req.url, "("+authString+")", JSON.stringify(body))
+        console.log(req.method, req.url, "("+authString+")", "["+new Date().toLocaleString()+"]", JSON.stringify(body))
     }
     next()
 })
