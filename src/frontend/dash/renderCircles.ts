@@ -8,8 +8,8 @@ const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93
 function renderCircle(circle: MemberCircle) {
     const { maxX, maxY, minX, minY } = getBounds()
 
-    const widthMultiplier = window.outerWidth * 0.4750078125 / membersDiv.clientWidth
-    const heightMultiplier = window.outerHeight * 0.7710505952380952 / membersDiv.clientHeight
+    const widthMultiplier = window.outerWidth * 0.5150078125 / membersDiv.clientWidth
+    const heightMultiplier = window.outerHeight * 0.8110505952380952 / membersDiv.clientHeight
 
     const maxLength = Math.max((maxX - minX) * widthMultiplier, (maxY - minY) *  heightMultiplier)
     const multiplier = 1 / maxLength * 48
