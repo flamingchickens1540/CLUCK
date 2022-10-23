@@ -50,7 +50,7 @@ export async function refreshDelphi() {
     resetScroll()
 }
 
-export function setVisibility(visible : boolean) {
+export function setDelphiVisibility(visible : boolean) {
     document.getElementById('delphi').style.display = visible ? "" : "none"
 }
 

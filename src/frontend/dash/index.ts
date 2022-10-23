@@ -2,7 +2,7 @@ import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
 import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
 import { redrawCircles } from "./renderCircles";
-import { refreshDelphi, setVisibility } from "./chiefdelphi"
+import { refreshDelphi } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
 let members: Member[]
@@ -24,10 +24,6 @@ function regenCircles(loggedin: LoggedIn) {
         const circles = []
         const now = Date.now()
         const loggedInEntries = Object.entries(loggedin)
-        if(loggedInEntries.length > 15)
-            setVisibility(false);
-        else
-            setVisibility(true);
         loggedInEntries.forEach(ent => {
             const member = members.find(o => o.name == ent[0])
             circles.push(new MemberCircle(
