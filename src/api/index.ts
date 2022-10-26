@@ -1,7 +1,7 @@
 import type { Member } from '@slack/web-api/dist/response/UsersListResponse'
 import type { FailedEntry, LoggedIn } from '../types'
 
-import { WebClient } from "@slack/web-api"
+import { WebClient, WebClientEvent } from "@slack/web-api"
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import { CronJob } from 'cron'
@@ -16,6 +16,10 @@ import { addHoursSafe, configureDrive, updateLoggedIn } from "./spreadsheet"
 
 let memberlist: Member[]
 export const client: WebClient = new WebClient(slack_token)
+
+client.on(WebClientEvent.RATE_LIMITED, (numSeconds) => {
+    console.debug(`A rate-limiting error occurred and the app is going to retry in ${numSeconds} seconds.`);
+});
 
 let loggedIn: LoggedIn = {}
 if (fs.existsSync(loggedInFilePath)) { loggedIn = JSON.parse(fs.readFileSync(loggedInFilePath, "utf-8")) }
