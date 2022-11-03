@@ -1,3 +1,4 @@
+import { setDelphiVisibility } from "./chiefdelphi";
 // note: circle radii are normalized on render
 const STEP_DISTANCE = .02
 const MARGIN = .14
@@ -107,8 +108,12 @@ function placeCircle(circle) {
 // and placedCircles is FILLED
 export function placeCircles(circles: MemberCircle[]) {
     // normalize
+    setDelphiVisibility(true);
     const max = Math.max(...circles.map(circle => circle.r))
-    circles.forEach(circle => { circle.r /= max })
+    circles.forEach(circle => {
+        if((circle.r /= max) < 0.80)
+            setDelphiVisibility(false);
+    })
     placedCircles = []
     if (circles.length == 0) { return placedCircles}
     circles.sort((a, b) => (b.r - a.r));
