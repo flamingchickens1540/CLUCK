@@ -23,8 +23,7 @@ function regenCircles(loggedin: LoggedIn) {
         tries++;
         const circles = []
         const now = Date.now()
-        const loggedInEntries = Object.entries(loggedin)
-        loggedInEntries.forEach(ent => {
+        Object.entries(loggedin).forEach(ent => {
             const member = members.find(o => o.name == ent[0])
             circles.push(new MemberCircle(
                 (now - ent[1]) / 1000 / 60 / 60,
