@@ -5,18 +5,18 @@ const membersDiv = document.getElementById('members')
 
 const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93,34,.5)', 'rgba(108,157,204,.5)']
 function renderCircle(circle: MemberCircle) {
-    let vwMult;
-    console.log(membersDiv.clientWidth/window.innerWidth)
+    let vwMult = -5;
+
     const { maxX, maxY, minX, minY } = getBounds()
     let maxLength;
     if(maxX - minX > maxY - minY) {
         maxLength = maxX - minX
-        vwMult = membersDiv.clientWidth/window.innerWidth;
+        vwMult += membersDiv.clientWidth/window.innerWidth * 100;
     } else {
         maxLength = maxY - minY
-        vwMult = membersDiv.clientHeight/window.innerWidth;
+        vwMult += membersDiv.clientHeight/window.innerWidth * 100;
     }
-    const multiplier = 1 / maxLength * vwMult * 100
+    const multiplier = 1 / maxLength * vwMult
     const xOffset = (maxLength - (maxX - minX)) / 2 // center shape on x axis
 
     const elem = document.createElement('member')
