@@ -60,6 +60,11 @@
     "sanitize-html"
   ],
   "pre-commit": {
-    "run": ["lint"]
+    "run": [
+      "lint"
+    ]
+  },
+  "dependencies": {
+    "package.json": "^2.0.1"
   }
 }
