@@ -5,9 +5,18 @@ const membersDiv = document.getElementById('members')
 
 const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93,34,.5)', 'rgba(108,157,204,.5)']
 function renderCircle(circle: MemberCircle) {
+    let vwMult;
+    console.log(membersDiv.clientWidth/window.innerWidth)
     const { maxX, maxY, minX, minY } = getBounds()
-    const maxLength = Math.max(maxX - minX, maxY - minY)
-    const multiplier = 1 / maxLength * 48
+    let maxLength;
+    if(maxX - minX > maxY - minY) {
+        maxLength = maxX - minX
+        vwMult = membersDiv.clientWidth/window.innerWidth;
+    } else {
+        maxLength = maxY - minY
+        vwMult = membersDiv.clientHeight/window.innerWidth;
+    }
+    const multiplier = 1 / maxLength * vwMult * 100
     const xOffset = (maxLength - (maxX - minX)) / 2 // center shape on x axis
 
     const elem = document.createElement('member')
@@ -34,7 +43,13 @@ function renderCircle(circle: MemberCircle) {
 
 export function redrawCircles(circles) {
     membersDiv.innerHTML = ''
+    
     circles.forEach(renderCircle)
+}
+
+export function getRatio() {
+    console.log(membersDiv.clientWidth/membersDiv.clientHeight)
+    return membersDiv.clientWidth/membersDiv.clientHeight;
 }
 
 

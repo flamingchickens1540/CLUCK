@@ -1,8 +1,8 @@
 import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
-import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
-import { redrawCircles } from "./renderCircles";
-import { refreshDelphi } from "./chiefdelphi"
+import { getBounds, MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
+import { redrawCircles, getRatio } from "./renderCircles";
+import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
 let members: Member[]
@@ -14,30 +14,39 @@ refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
 function regenCircles(loggedin: LoggedIn) {
-    const desiredRatio = 1; // y / x
-    const ratioError = .1;
-    let tries = 0;
-    let { maxX, maxY, minX, minY } = getBounds()
     let placedCircles: MemberCircle[] = [];
-    do {
-        tries++;
-        const circles = []
-        const now = Date.now()
-        const loggedInEntries = Object.entries(loggedin)
-        loggedInEntries.forEach(ent => {
-            const member = members.find(o => o.name == ent[0])
-            circles.push(new MemberCircle(
-                (now - ent[1]) / 1000 / 60 / 60,
-                member.firstname,
-                member.img
-            ))
-        });
-        placedCircles = placeCircles(circles);
 
-        ({ maxX, maxY, minX, minY } = getBounds());
+    const circles = []
+    const now = Date.now()
+    const loggedInEntries = Object.entries(loggedin)
+    loggedInEntries.forEach(ent => {
+        const member = members.find(o => o.name == ent[0])
+        circles.push(new MemberCircle(
+            (now - ent[1]) / 1000 / 60 / 60,
+            member.firstname,
+            member.img
+        ))
+    });
 
-    } while (tries < 1000 && ((maxY - minY) / (maxX - minX) < (desiredRatio - ratioError / desiredRatio) || (maxY - minY) / (maxX - minX) > (desiredRatio + ratioError / desiredRatio))) // test to make sure the dimentions are chill
+    setDelphiVisibility(getNameDensity(circles) > 1 ? false : true)
+
+    setAspectRatio(getRatio());
+    placedCircles = placeCircles(circles);
+
     redrawCircles(placedCircles)
+}
+
+const densityMultiplier = 0.1;
+// Estimates name density
+function getNameDensity(circles : MemberCircle[]) {
+    let nameSize = 0;
+    let circleSizeSum = 0;
+    for(const circle of circles) {
+        nameSize += circle.name.length * densityMultiplier + 2;
+        circleSizeSum += circle.r;
+    }
+
+    return densityMultiplier * nameSize / circleSizeSum * circles.length;
 }
 
 function update() {

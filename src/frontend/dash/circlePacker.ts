@@ -1,11 +1,17 @@
 // note: circle radii are normalized on render
 const MARGIN = .7
+let aspectRatio = 1 // 2:1
 
 let placedCircles: MemberCircle[] = []
-let maxX = 0;
-let minX = 0;
-let maxY = 0;
-let minY = 0;
+let maxX;
+let minX;
+let maxY;
+let minY;
+
+let targetMaxX;
+let targetMaxY;
+let targetMinX;
+let targetMinY;
 
 export function getBounds() {
     return {
@@ -20,7 +26,7 @@ export class MemberCircle {
     x: number;
     y: number;
     r: number;
-    touching: MemberCircle[] = [];
+    // touching: MemberCircle[] = [];
     name: string;
     imgurl: string;
     constructor(hours, name, imgurl) {
@@ -28,6 +34,10 @@ export class MemberCircle {
         this.imgurl = imgurl;
         this.r = (Math.sqrt(hours + .2)) * 10;
     }
+}
+
+export function setAspectRatio(ratio : number) {
+    aspectRatio = ratio;
 }
 
 function getDistanceFrom(circle1, x, y) {
@@ -43,7 +53,7 @@ function placeCircle(circle) {
     if(placedCircles.length == 1) {
         // circle.touching[circle.touching.length] = placedCircles[0].r, but stupider
 
-        const distance = Math.pow(MARGIN + (placedCircles[0].touching[placedCircles[0].touching.length] = circle).r + circle.r, 2);
+        const distance = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
 
         const rand = Math.random();
 
@@ -83,10 +93,9 @@ function placeCircle(circle) {
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
                 circle.y = circleY;
-                circle1.touching[circle1.touching.length] = circle;
-                if(maxX > circle.x && maxY > circle.y && minX < circle.x && minY < circle.y)
+                // circle1.touching[circle1.touching.length] = circle;
+                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r)
                     return;
-                continue;
             }
 
             // console.log(a)
@@ -101,10 +110,8 @@ function placeCircle(circle) {
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
                 circle.y = circleY;
-                circle1.touching[circle1.touching.length] = circle;
-                if(maxX > circle.x && maxY > circle.y && minX < circle.x && minY < circle.y)
+                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r)
                     return;
-                // continue;
             }
         }
     }
@@ -112,7 +119,6 @@ function placeCircle(circle) {
 
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
-        console.log(getDistanceFrom(circle1, x, y));
         if(getDistanceFrom(circle1, x, y) + 0.1 < circle.r + circle1.r + MARGIN)
             return false;
     }
@@ -133,6 +139,10 @@ export function placeCircles(circles: MemberCircle[]) {
     minY = 0;
     maxX = 0;
     maxY = 0;
+    targetMaxX = 0;
+    targetMaxY = 0;
+    targetMinX = 0;
+    targetMinY = 0;
     // normalize
     placedCircles = [];
     const unplacedCircles = circles.sort((a, b) => b.r - a.r);
@@ -148,11 +158,18 @@ export function placeCircles(circles: MemberCircle[]) {
         // console.log(circle.x)
         // console.log(circle.y)
         // console.log(circle.r)
-        maxX = Math.max(maxX, circle.x + circle.r)
-        maxY = Math.max(maxY, circle.y + circle.r)
-        minX = Math.min(minX, circle.x - circle.r)
-        minY = Math.min(minY, circle.y - circle.r)
+        let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r)
+        let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r)
+        let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r)
+        let targetMinY1 = minY = Math.min(minY, circle.y - circle.r)
+
+        targetMaxX = Math.max(targetMaxX1, targetMaxY1*aspectRatio);
+        targetMaxY = Math.max(targetMaxY1, targetMaxX1/aspectRatio);
+        targetMinX = Math.min(targetMinX1, targetMinY1*aspectRatio);
+        targetMinY = Math.min(targetMinY1, targetMinX1/aspectRatio);
     }
+
+    
 
     return placedCircles;
 }
