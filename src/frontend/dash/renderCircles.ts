@@ -5,7 +5,7 @@ const membersDiv = document.getElementById('members')
 
 const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93,34,.5)', 'rgba(108,157,204,.5)']
 function renderCircle(circle: MemberCircle) {
-    let vwMult = -5;
+    let vwMult = -4;
 
     const { maxX, maxY, minX, minY } = getBounds()
     let maxLength;
