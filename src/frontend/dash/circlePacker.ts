@@ -1,5 +1,5 @@
 // note: circle radii are normalized on render
-const MARGIN = .7
+const MARGIN = .14
 let aspectRatio = 1 // 2:1
 
 let placedCircles: MemberCircle[] = []
