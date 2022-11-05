@@ -35,6 +35,7 @@ function getDistanceFrom(circle1, x, y) {
 }
 
 function placeCircle(circle) {
+    // TODO: remove from placeCircle and onto placeCircles
     if(!placedCircles.length) {
         circle.x = circle.y = 0;
         return;
@@ -60,7 +61,7 @@ function placeCircle(circle) {
             const radius2 = circle2.r + circle.r + MARGIN;
 
             // a : distance from fulcrum
-            const a = (Math.pow(radius1, 2) - Math.pow(radius2, 2) + Math.pow(distanceFrom, 2))/(2*distanceFrom);
+            const a = (radius1*radius1 - radius2*radius2 + distanceFrom*distanceFrom)/(2*distanceFrom);
 
             // dx : delta X
             const dx = circle1.x-circle2.x;
@@ -75,8 +76,8 @@ function placeCircle(circle) {
             let posX = circle1.x - multiplier * dx;
             let posY = circle1.y - multiplier * dy;
 
-            let circleX = posX + Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
-            let circleY = posY + p * Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
+            let circleX = posX + Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            let circleY = posY + p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
@@ -91,8 +92,8 @@ function placeCircle(circle) {
             // console.log(radius2)
 
             // improvments?
-            circleX = posX - Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
-            circleY = posY - p * Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
+            circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;

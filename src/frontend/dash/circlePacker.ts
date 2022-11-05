@@ -35,12 +35,14 @@ function getDistanceFrom(circle1, x, y) {
 }
 
 function placeCircle(circle) {
+    // TODO: remove from placeCircle and onto placeCircles
     if(!placedCircles.length) {
         circle.x = circle.y = 0;
         return;
     }
     if(placedCircles.length == 1) {
         // circle.touching[circle.touching.length] = placedCircles[0].r, but stupider
+
         const distance = Math.pow(MARGIN + (placedCircles[0].touching[placedCircles[0].touching.length] = circle).r + circle.r, 2);
 
         const rand = Math.random();
@@ -60,7 +62,7 @@ function placeCircle(circle) {
             const radius2 = circle2.r + circle.r + MARGIN;
 
             // a : distance from fulcrum
-            const a = (Math.pow(radius1, 2) - Math.pow(radius2, 2) + Math.pow(distanceFrom, 2))/(2*distanceFrom);
+            const a = (radius1*radius1 - radius2*radius2 + distanceFrom*distanceFrom)/(2*distanceFrom);
 
             // dx : delta X
             const dx = circle1.x-circle2.x;
@@ -75,14 +77,16 @@ function placeCircle(circle) {
             let posX = circle1.x - multiplier * dx;
             let posY = circle1.y - multiplier * dy;
 
-            let circleX = posX + Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
-            let circleY = posY + p * Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
+            let circleX = posX + Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            let circleY = posY + p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
                 circle.y = circleY;
                 circle1.touching[circle1.touching.length] = circle;
-                return;
+                if(maxX > circle.x && maxY > circle.y && minX < circle.x && minY < circle.y)
+                    return;
+                continue;
             }
 
             // console.log(a)
@@ -91,14 +95,16 @@ function placeCircle(circle) {
             // console.log(radius2)
 
             // improvments?
-            circleX = posX - Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
-            circleY = posY - p * Math.sqrt(Math.pow(radius1, 2) - Math.pow(a, 2))/Math.sqrt(1 + Math.pow(p, 2));
+            circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
                 circle.y = circleY;
                 circle1.touching[circle1.touching.length] = circle;
-                return;
+                if(maxX > circle.x && maxY > circle.y && minX < circle.x && minY < circle.y)
+                    return;
+                // continue;
             }
         }
     }
@@ -113,6 +119,13 @@ function isVacant(circle, x, y) {
     return true;
 }
 
+// const sizeMin = 1;
+// const sizeMax = 30;
+
+// function clampSize(value) {
+//     return Math.max(sizeMin, Math.min(sizeMax, value));
+// }
+
 // assumes unplacedCircles is EMPTY
 // and placedCircles is FILLED
 export function placeCircles(circles: MemberCircle[]) {
@@ -124,8 +137,12 @@ export function placeCircles(circles: MemberCircle[]) {
     placedCircles = [];
     const unplacedCircles = circles.sort((a, b) => b.r - a.r);
 
+    let sizeSum = 0;
+
     for(let circle = unplacedCircles.shift(); circle; circle = unplacedCircles.shift()) {
         // circle.x = circle.y = 0;
+        // circle.r = clampSize(circle.r);
+        circle.r = (sizeSum += circle.r)/(placedCircles.length+1);
         placeCircle(circle);
         placedCircles[placedCircles.length] = circle;
         // console.log(circle.x)
@@ -136,9 +153,7 @@ export function placeCircles(circles: MemberCircle[]) {
         minX = Math.min(minX, circle.x - circle.r)
         minY = Math.min(minY, circle.y - circle.r)
     }
-    console.log(placedCircles);
 
-    console.log(getBounds());
     return placedCircles;
 }
 
