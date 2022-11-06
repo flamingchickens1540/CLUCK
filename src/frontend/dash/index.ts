@@ -5,7 +5,7 @@ import { redrawCircles, getRatio } from "./renderCircles";
 import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
-let members: Member[]
+let members: CluckMember[]
 let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen

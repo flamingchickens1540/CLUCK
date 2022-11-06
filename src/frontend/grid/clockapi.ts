@@ -2,7 +2,7 @@
 
 import { getApiEndpoint } from "../../consts";
 import { getClockEndpoint } from "./style";
-import type { LoggedIn, Member } from "../../types";
+import type { LoggedIn, CluckMember } from "../../types";
 
 window.skipAuth = false;
 
@@ -51,7 +51,7 @@ export const ping = async () => {
     }
     return true;
 }
-export const refreshMemberList = async ():Promise<Member[]> => {
+export const refreshMemberList = async ():Promise<CluckMember[]> => {
     const res = await fetch(getApiEndpoint("members/refresh"))
     if (!res.ok) {
         throw new Error("Could not get members list")
