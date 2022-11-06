@@ -27,7 +27,7 @@ function regenCircles(loggedin: LoggedIn) {
         ))
     }
 
-    setDelphiVisibility(getNameDensity(circles) > 1 ? false : true)
+    setDelphiVisibility(getNameDensity(circles) < 1)
 
     setAspectRatio(getRatio());
     placedCircles = placeCircles(circles);
