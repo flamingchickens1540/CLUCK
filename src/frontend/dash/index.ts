@@ -1,6 +1,6 @@
 import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, Member } from "../../types";
-import { getBounds, MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
+import { MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
 import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
@@ -18,15 +18,14 @@ function regenCircles(loggedin: LoggedIn) {
 
     const circles = []
     const now = Date.now()
-    const loggedInEntries = Object.entries(loggedin)
-    loggedInEntries.forEach(ent => {
-        const member = members.find(o => o.name == ent[0])
+    for(const ent in loggedin) {
+        const member = members.find(o => o.name == ent)
         circles.push(new MemberCircle(
-            (now - ent[1]) / 1000 / 60 / 60,
+            (now - loggedin[ent]) / 360000, // 1000 / 60 / 60
             member.firstname,
             member.img
         ))
-    });
+    }
 
     setDelphiVisibility(getNameDensity(circles) > 1 ? false : true)
 
@@ -36,7 +35,7 @@ function regenCircles(loggedin: LoggedIn) {
     redrawCircles(placedCircles)
 }
 
-const densityMultiplier = 0.1;
+const densityMultiplier = 0.8;
 // Estimates name density
 function getNameDensity(circles : MemberCircle[]) {
     let nameSize = 0;

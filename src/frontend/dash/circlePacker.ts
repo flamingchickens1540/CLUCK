@@ -1,6 +1,7 @@
 // note: circle radii are normalized on render
 const MARGIN = .14
 let aspectRatio = 1 // 2:1
+let deltaAvg = 0.95; // How much effect the avgeraging has on the circles
 
 let placedCircles: MemberCircle[] = []
 let maxX;
@@ -152,7 +153,7 @@ export function placeCircles(circles: MemberCircle[]) {
     for(let circle = unplacedCircles.shift(); circle; circle = unplacedCircles.shift()) {
         // circle.x = circle.y = 0;
         // circle.r = clampSize(circle.r);
-        circle.r = (sizeSum += circle.r)/(placedCircles.length+1);
+        circle.r -= (circle.r - (sizeSum += circle.r)/(placedCircles.length+1)) * deltaAvg;
         placeCircle(circle);
         placedCircles[placedCircles.length] = circle;
         // console.log(circle.x)
