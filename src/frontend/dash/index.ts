@@ -35,17 +35,17 @@ function regenCircles(loggedin: LoggedIn) {
     redrawCircles(placedCircles)
 }
 
-const densityMultiplier = 0.8;
+const densityMultiplier = 0.1;
 // Estimates name density
 function getNameDensity(circles : MemberCircle[]) {
     let nameSize = 0;
     let circleSizeSum = 0;
     for(const circle of circles) {
         nameSize += circle.name.length * densityMultiplier + 2;
-        circleSizeSum += circle.r;
+        circleSizeSum += Math.pow(circle.r, 2);
     }
 
-    return densityMultiplier * nameSize / circleSizeSum * circles.length;
+    return densityMultiplier * nameSize / Math.sqrt(circleSizeSum / circles.length);
 }
 
 function update() {
