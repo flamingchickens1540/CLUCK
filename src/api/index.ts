@@ -1,4 +1,4 @@
-import type { Member } from '@slack/web-api/dist/response/UsersListResponse'
+
 import type { FailedEntry, LoggedIn } from '../types'
 
 import { WebClient, WebClientEvent } from "@slack/web-api"
@@ -7,14 +7,15 @@ import cors from 'cors'
 import { CronJob } from 'cron'
 import { Router } from 'express'
 import fs from 'fs'
-import { slack_token, cluck_api_keys } from '../../secrets/consts'
+import { cluck_api_keys, slack_token } from '../../secrets/consts'
 import { failedFilePath, loggedInFilePath } from '../consts'
+import collect, { getSlackMembers } from '../member-collector/collector'
 import { logMember, saveMemberLog } from "./memberlog"
 import { addHoursSafe, configureDrive, updateLoggedIn } from "./spreadsheet"
 
 
 
-let memberlist: Member[]
+
 export const client: WebClient = new WebClient(slack_token)
 
 client.on(WebClientEvent.RATE_LIMITED, (numSeconds) => {
@@ -66,7 +67,7 @@ router.use((req, res, next) => {
     next()
 })
 
-refreshSlackMemberlist()
+
 // INIT API ROUTES
 router.post('/clock', (req, res) => {
     
@@ -154,22 +155,16 @@ export async function sendSlackMessage(fullname: string, text: string) {
         console.warn("Slack Client not loaded yet")
         return
     }
-    if (memberlist == null) {
-        await refreshSlackMemberlist()
+    if (getSlackMembers().length == 0) {
+        await collect()
     }
-    const user = memberlist.find(userobj => userobj.real_name?.toLowerCase().includes(fullname.toLowerCase()) ?? false)
+    const user = getSlackMembers().find(userobj => userobj.real_name?.toLowerCase().includes(fullname.toLowerCase()) ?? false)
     if (user == null || user.id == null) { throw Error("Could not send message to " + fullname) }
     console.log(`Sending message to ${user.name} (${user.id})`)
     return await client.chat.postMessage({ channel: user.id, text: text })
     
 }
 
-export async function refreshSlackMemberlist() {
-    console.log("Refreshing slack members")
-    const users = await client.users.list()
-    if (users.members == null) { console.warn("Could not load memberlist"); return}
-    memberlist = users.members
-}
 // Periodically save
 const cronSave = () => {
     try {
@@ -225,15 +220,6 @@ new CronJob({
     timeZone: 'America/Los_Angeles',
     runOnInit: false,
     onTick: cronSignout
-})
-
-// refresh memberlist every day
-new CronJob({
-    cronTime: '0 0 * * *',
-    start: true,
-    timeZone: 'America/Los_Angeles',
-    runOnInit: false,
-    onTick: refreshSlackMemberlist
 })
 
 export const cronJobs = {

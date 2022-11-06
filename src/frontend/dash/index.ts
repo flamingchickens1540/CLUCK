@@ -1,11 +1,11 @@
 import { getApiEndpoint } from "../../consts";
-import type { LoggedIn, Member } from "../../types";
+import type { LoggedIn, CluckMember } from "../../types";
 import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
 import { redrawCircles } from "./renderCircles";
 import { refreshDelphi } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
-let members: Member[]
+let members: CluckMember[]
 let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen

@@ -8,7 +8,7 @@ export type LoggedIn = {
     [key:string]:number
 }
 
-export type Member = {
+export type CluckMember = {
     name: string;
     firstname: string;
     img: string;

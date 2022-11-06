@@ -5,7 +5,7 @@ import google_client_secret from "../../secrets/client_secret.json"
 import type { Certification, FailedEntry, LoggedIn, SpreadsheetMemberInfo } from '../types';
 import { E_CANCELED, Mutex } from 'async-mutex'
 import { hours_spreadsheet_id } from '../../secrets/consts';
-import { getMembers } from '../member-collector/collector';
+import { getCluckMembers } from '../member-collector/collector';
 
 let googleDriveAuthed = false
 const authMutex = new Mutex()
@@ -157,7 +157,7 @@ export async function updateLoggedIn(loggedIn: LoggedIn) {
 export async function updateProfilePictures() {
     await ensureAuthed()
     
-    const rows = getMembers().map(entry => {
+    const rows = getCluckMembers().map(entry => {
         return [entry.name, entry.img]
     })
     
