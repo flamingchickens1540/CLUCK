@@ -1,6 +1,7 @@
 // note: circle radii are normalized on render
-const MARGIN = .14
-let aspectRatio = 1 // 2:1
+//const MARGIN = .14
+const MARGIN = .2;
+let aspectRatio = 1; // 2:1
 let deltaAvg = 0.95; // How much effect the avgeraging has on the circles
 
 let placedCircles: MemberCircle[] = []
@@ -47,12 +48,16 @@ function getDistanceFrom(circle1, x, y) {
 
 function placeCircle(circle) {
     // TODO: remove from placeCircle and onto placeCircles
+    /*
     if(!placedCircles.length) {
         circle.x = circle.y = 0;
         return;
     }
+    */
+
     if(placedCircles.length == 1) {
         // circle.touching[circle.touching.length] = placedCircles[0].r, but stupider
+        //^^^what's the deal with the length being an index here?^^^
 
         const distance = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
 
@@ -62,7 +67,7 @@ function placeCircle(circle) {
         circle.y = Math.round(Math.random()) ? Math.sqrt((1 - rand) * distance) : -Math.sqrt((1 - rand) * distance);
         return;
     }
-
+    //what is this iterating through?
     for(let index1 = 0; index1 != placedCircles.length; index1++) {
         const circle1 = placedCircles[index1];
         for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
@@ -82,7 +87,7 @@ function placeCircle(circle) {
             // p : slope for perpendicular bisector of circle1 and circle2
             const p = -dx/dy;
 
-            // 
+            //
             const multiplier = a/distanceFrom;
 
             let posX = circle1.x - multiplier * dx;
@@ -95,8 +100,10 @@ function placeCircle(circle) {
                 circle.x = circleX;
                 circle.y = circleY;
                 // circle1.touching[circle1.touching.length] = circle;
-                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r)
+                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r){
                     return;
+                }
+                    
             }
 
             // console.log(a)
@@ -104,7 +111,7 @@ function placeCircle(circle) {
             // console.log(radius1)
             // console.log(radius2)
 
-            // improvments?
+            // improvements?
             circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
             circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
@@ -121,8 +128,9 @@ function placeCircle(circle) {
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
         // I'm afraid of inccuracies
-        if(getDistanceFrom(circle1, x, y) + 0.00001 < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.00001 <= circle.r + circle1.r + MARGIN)
             return false;
+            
     }
     return true;
 }
@@ -157,13 +165,13 @@ export function placeCircles(circles: MemberCircle[]) {
         circle.r -= (circle.r - (sizeSum += circle.r)/(placedCircles.length+1)) * deltaAvg;
         placeCircle(circle);
         placedCircles[placedCircles.length] = circle;
-        // console.log(circle.x)
-        // console.log(circle.y)
-        // console.log(circle.r)
-        let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r)
-        let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r)
-        let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r)
-        let targetMinY1 = minY = Math.min(minY, circle.y - circle.r)
+        // console.log(circle.x);
+        // console.log(circle.y);
+        // console.log(circle.r);
+        let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
+        let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
+        let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r);
+        let targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
 
         targetMaxX = Math.max(targetMaxX1, targetMaxY1*aspectRatio);
         targetMaxY = Math.max(targetMaxY1, targetMaxX1/aspectRatio);
