@@ -66,7 +66,7 @@ function placeCircle(circle) {
         circle.y = Math.round(Math.random()) ? Math.sqrt((1 - rand) * distance) : -Math.sqrt((1 - rand) * distance);
         return;
     }
-    
+    //what is this iterating through?
     for(let index1 = 0; index1 != placedCircles.length; index1++) {
         const circle1 = placedCircles[index1];
         for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
@@ -128,7 +128,7 @@ function placeCircle(circle) {
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
         // I'm afraid of inccuracies
-        if(getDistanceFrom(circle1, x, y) + 0.00001 < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.00001 <= circle.r + circle1.r + MARGIN)
             return false;
             
     }
