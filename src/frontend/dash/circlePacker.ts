@@ -128,7 +128,7 @@ function placeCircle(circle) {
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
         // I'm afraid of inccuracies
-        if(getDistanceFrom(circle1, x, y) < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.00001 < circle.r + circle1.r + MARGIN)
             return false;
             
     }
