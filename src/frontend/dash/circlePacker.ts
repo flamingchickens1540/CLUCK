@@ -1,6 +1,6 @@
 // note: circle radii are normalized on render
 //const MARGIN = .14
-const MARGIN = .2;
+const MARGIN = 3;
 let aspectRatio = 1; // 2:1
 let deltaAvg = 0.95; // How much effect the avgeraging has on the circles
 
@@ -48,12 +48,11 @@ function getDistanceFrom(circle1, x, y) {
 
 function placeCircle(circle) {
     // TODO: remove from placeCircle and onto placeCircles
-    /*
+    
     if(!placedCircles.length) {
         circle.x = circle.y = 0;
         return;
     }
-    */
 
     if(placedCircles.length == 1) {
         // circle.touching[circle.touching.length] = placedCircles[0].r, but stupider
@@ -129,7 +128,7 @@ function placeCircle(circle) {
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
         // I'm afraid of inccuracies
-        if(getDistanceFrom(circle1, x, y) < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.00001 < circle.r + circle1.r + MARGIN)
             return false;
             
     }
