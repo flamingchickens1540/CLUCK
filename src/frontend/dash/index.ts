@@ -4,14 +4,17 @@ import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
 import { redrawCircles } from "./renderCircles";
 import { refreshDelphi } from "./chiefdelphi"
 import { openFullscreen } from "../util";
+import { timeLoggedIn } from "../grid/index"
 
-let members: Member[]
+let members: Member[];
 let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen
 
 refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
+
+
 
 function regenCircles(loggedin: LoggedIn) {
     const desiredRatio = 1; // y / x
@@ -22,11 +25,11 @@ function regenCircles(loggedin: LoggedIn) {
     do {
         tries++;
         const circles = []
-        const now = Date.now()
+        const now = Date.now();
         Object.entries(loggedin).forEach(ent => {
             const member = members.find(o => o.name == ent[0])
             circles.push(new MemberCircle(
-                (now - ent[1]) / 1000 / 60 / 60,
+                (timeLoggedIn + (now - ent[1])) / 1000 / 60 / 60,
                 member.firstname,
                 member.img
             ))

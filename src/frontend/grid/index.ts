@@ -44,7 +44,7 @@ export async function run(memberlist:Member[]) {
 				}
 
 				// Toggle logged in
-				button.loggedIn =  !button.loggedIn
+				button.loggedIn = !button.loggedIn
 				// Update style
 				getButtonState(button.loggedIn).forEach((styleSpec) => {
 					button.style.setProperty(styleSpec.styleName, styleSpec.val);
@@ -102,8 +102,11 @@ export async function run(memberlist:Member[]) {
 	addEventListener("resize", redrawRows);
 })();
 
+export let timeLoggedIn;
+
 async function refreshLoggedIn() {
 	let membersIn:LoggedIn;
+	timeLoggedIn = Date.now();
 	const noconnect = document.getElementById("noconnect");
 	try {
 		membersIn = await cluckedIn();

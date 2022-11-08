@@ -2,6 +2,8 @@
 const STEP_DISTANCE = .02
 const MARGIN = .14
 
+import {timeLoggedIn} from "../grid/index"
+
 let placedCircles: MemberCircle[] = []
 let maxX = 0;
 let minX = 0;
@@ -32,7 +34,7 @@ export class MemberCircle {
 
 function distance(a, b) {
     return Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2))
-}
+} 
 function isColliding(a, b, margin) {
     if (!margin) { margin = 0 }
     return distance(a, b) < a.r + b.r + margin
