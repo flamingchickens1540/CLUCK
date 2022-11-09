@@ -1,6 +1,6 @@
 // note: circle radii are normalized on render
 //const MARGIN = .14
-const MARGIN = 3;
+const MARGIN = 1.3;
 let aspectRatio = 1; // 2:1
 let deltaAvg = 0.95; // How much effect the avgeraging has on the circles
 
