@@ -1,8 +1,14 @@
 // note: circle radii are normalized on render
 //const MARGIN = .14
+
+/*
+    Margin : spacing between the circles
+    Aspect ratio : the target width-length proportions to pack the circles in
+    delta average : how much will the averaging circle size system affect the size
+*/
 const MARGIN = 1.3;
-let aspectRatio = 1; // 2:1
-let deltaAvg = 0.95; // How much effect the avgeraging has on the circles
+let aspectRatio = 1;
+let deltaAvg = 0.95;
 
 let placedCircles: MemberCircle[] = []
 let maxX;
@@ -47,7 +53,6 @@ function getDistanceFrom(circle1, x, y) {
 }
 
 function placeCircle(circle) {
-    // TODO: remove from placeCircle and onto placeCircles
     
     if(!placedCircles.length) {
         circle.x = circle.y = 0;
