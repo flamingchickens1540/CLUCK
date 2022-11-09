@@ -1,5 +1,5 @@
 import { getApiEndpoint } from "../../consts";
-import type { LoggedIn, Member } from "../../types";
+import type { LoggedIn, CluckMember } from "../../types";
 import { MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
 import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
