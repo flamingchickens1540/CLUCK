@@ -34,19 +34,19 @@ function regenCircles(loggedin: LoggedIn) {
     redrawCircles(placedCircles)
 }
 
-const densityMultiplier = 0.006;
+const nameDensityMultiplier = 0.006;
 // Estimates name density
 function getNameDensity(circles : MemberCircle[]) {
     let nameSize = 0;
     let circleSizeSum = 0;
     let circleSizeSumSqr = 0;
     for(const circle of circles) {
-        nameSize += circle.name.length * densityMultiplier + 2;
+        nameSize += circle.name.length * nameDensityMultiplier + 2;
         circleSizeSumSqr += Math.pow(circle.r, 2);
         circleSizeSum += circle.r;
     }
 
-    return densityMultiplier * nameSize / Math.sqrt(circleSizeSumSqr / circleSizeSum / circles.length);
+    return nameDensityMultiplier * nameSize / Math.sqrt(circleSizeSumSqr / circleSizeSum / circles.length);
 }
 
 function update() {

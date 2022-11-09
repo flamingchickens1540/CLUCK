@@ -4,7 +4,12 @@
 /*
     Margin : spacing between the circles
     Aspect ratio : the target width-length proportions to pack the circles in
-    delta average : how much will the averaging circle size system affect the size
+    delta average : acts like a middle layer to size averaging and takes the change in 
+    size (averagedSize - oldSize) and multiplies it by delta average and adds it to old size 
+    to get newSize 
+
+    Size averaging : change the size of a circle to the average of itself and all previous
+    smaller circles to make them approach a similar sizes.
 */
 const MARGIN = 1.3;
 let aspectRatio = 1;
@@ -34,7 +39,6 @@ export class MemberCircle {
     x: number;
     y: number;
     r: number;
-    // touching: MemberCircle[] = [];
     name: string;
     imgurl: string;
     constructor(hours, name, imgurl) {
@@ -60,9 +64,6 @@ function placeCircle(circle) {
     }
 
     if(placedCircles.length == 1) {
-        // circle.touching[circle.touching.length] = placedCircles[0].r, but stupider
-        //^^^what's the deal with the length being an index here?^^^ -- thing[thing.length] is append to the last index
-
         const distance = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
 
         const rand = Math.random();
@@ -103,19 +104,11 @@ function placeCircle(circle) {
             if(isVacant(circle, circleX, circleY)) {
                 circle.x = circleX;
                 circle.y = circleY;
-                // circle1.touching[circle1.touching.length] = circle;
                 if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r){
                     return;
                 }
                     
             }
-
-            // console.log(a)
-            // console.log(p)
-            // console.log(radius1)
-            // console.log(radius2)
-
-            // improvements?
             circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
             circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
@@ -132,8 +125,7 @@ function placeCircle(circle) {
 
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
-        // I'm afraid of inccuracies
-        if(getDistanceFrom(circle1, x, y) + 0.00001 < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) < circle.r + circle1.r + MARGIN)
             return false;
             
     }
