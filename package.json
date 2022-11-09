@@ -60,6 +60,8 @@
     "sanitize-html"
   ],
   "pre-commit": {
-    "run": ["lint"]
-  }
+    "run": [
+      "lint"
+    ]
+    }
 }
