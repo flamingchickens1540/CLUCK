@@ -31,7 +31,6 @@ function regenCircles(loggedin: LoggedIn) {
 
     setAspectRatio(getRatio());
     placedCircles = placeCircles(circles);
-
     redrawCircles(placedCircles)
 }
 

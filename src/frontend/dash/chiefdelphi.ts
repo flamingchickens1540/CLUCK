@@ -35,6 +35,8 @@ function getInfo(siteHTML) {
                 ret.body.appendChild(comment);
                 console.log("body", ret.body);
             }
+    
+
     return ret;
 }
 
