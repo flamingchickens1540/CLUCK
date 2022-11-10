@@ -1,14 +1,32 @@
 // note: circle radii are normalized on render
-const STEP_DISTANCE = .02
-const MARGIN = .14
+//const MARGIN = .14
 
-import {timeLoggedIn} from "../grid/index"
+/*
+    Margin : spacing between the circles
+    Aspect ratio : the target width-length proportions to pack the circles in
+    delta average : acts like a middle layer to size averaging and takes the change in 
+    size (averagedSize - oldSize) and multiplies it by delta average and adds it to old size 
+    to get newSize 
+
+    Size averaging : change the size of a circle to the average of itself and all previous
+    smaller circles to make them approach a similar sizes.
+*/
+const MARGIN = 1.3;
+let aspectRatio = 1;
+let deltaAvg = 0.95;
+
+import {timeLoggedIn} from "../grid/index";
 
 let placedCircles: MemberCircle[] = []
-let maxX = 0;
-let minX = 0;
-let maxY = 0;
-let minY = 0;
+let maxX;
+let minX;
+let maxY;
+let minY;
+
+let targetMaxX;
+let targetMaxY;
+let targetMinX;
+let targetMinY;
 
 export function getBounds() {
     return {
@@ -32,101 +50,132 @@ export class MemberCircle {
     }
 }
 
-function distance(a, b) {
-    return Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2))
-} 
-function isColliding(a, b, margin) {
-    if (!margin) { margin = 0 }
-    return distance(a, b) < a.r + b.r + margin
-}
-function getCollided(circle, margin) {
-    for (const placedCircle of placedCircles) {
-        if (isColliding(circle, placedCircle, margin)) { return placedCircle }
-    }
-    return null;
+export function setAspectRatio(ratio : number) {
+    aspectRatio = ratio;
 }
 
-function placeCircleFromPoint(circle, pointX, pointY, angle, distance) {
-    circle.x = pointX + distance * Math.cos(angle) //rads
-    circle.y = pointY + distance * Math.sin(angle)
+function getDistanceFrom(circle1, x, y) {
+    return Math.sqrt(Math.pow(circle1.x - x, 2) + Math.pow(circle1.y - y, 2));
 }
-function getAngleFromAToB(a, b) {
-    // dot = a.x*b.x + a.y*b.y      
-    // det = a.x*b.y - a.y*b.x    
-    // return Math.atan2(det, dot) 
-    return 2 * Math.atan((b.y - a.y) / ((b.x - a.x) + Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y))))
-}
+
 function placeCircle(circle) {
-    // random starting position
-    const angle = Math.random() * 2 * Math.PI - Math.PI
-    let d = Math.max(maxX, Math.max(Math.abs(minX), Math.max(maxY, Math.abs(minY)))) + circle.r
-    placeCircleFromPoint(circle, 0, 0, angle, d)
-
-    // move inwards until touching
-    let collided = null
-    while (d > 0 && !collided) {
-        collided = getCollided(circle, MARGIN);
-        if (collided || d <= 0) { break }
-        d -= STEP_DISTANCE;
-        placeCircleFromPoint(circle, 0, 0, angle, d)
-        // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
-        // await sleep(10) /// REDRAWWWWW
+    
+    if(!placedCircles.length) {
+        circle.x = circle.y = 0;
+        return;
     }
 
-    // rotate around collided circle
-    let STEP_ANGLE = (STEP_DISTANCE / collided.r) * Math.PI * 2
-    STEP_ANGLE = STEP_ANGLE * (Math.random() < 0.5 ? 1 : -1) // randomize direction | -1/1 credit https://stackoverflow.com/questions/29109456/how-to-get-random-1-or-1-in-canvas-javascript
-    let A = getAngleFromAToB(collided, circle)
-    let a;
-    for (a = A; a < A + Math.PI * 2 && a > A - Math.PI * 2; a += STEP_ANGLE) {
-        placeCircleFromPoint(circle, collided.x, collided.y, a, collided.r + circle.r + MARGIN + .1)
-        if (getCollided(circle, MARGIN)) { console.log(circle); break }
-        // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
-        // await sleep(10) /// REDRAWWWWW
+    if(placedCircles.length == 1) {
+        const distance = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
+
+        const rand = Math.random();
+
+        circle.x = Math.round(Math.random()) ? Math.sqrt(rand * distance) : -Math.sqrt(rand * distance);
+        circle.y = Math.round(Math.random()) ? Math.sqrt((1 - rand) * distance) : -Math.sqrt((1 - rand) * distance);
+        return;
     }
-    // rotate out of collided circle
-    for (A = a; Math.abs(A - a) < Math.abs(STEP_ANGLE); a -= (STEP_ANGLE / 5)) {
-        console.log('doing')
-        placeCircleFromPoint(circle, collided.x, collided.y, a, collided.r + circle.r + MARGIN + .1)
-        if (!getCollided(circle, MARGIN)) { break }
+    
+    for(let index1 = 0; index1 != placedCircles.length; index1++) {
+        const circle1 = placedCircles[index1];
+        for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
+            const circle2 = placedCircles[index2];
+            const distanceFrom = circle1.r + circle2.r + MARGIN; 
 
-        // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
-        // await sleep(10) /// REDRAWWWWW
+            const radius1 = circle1.r + circle.r + MARGIN;
+            const radius2 = circle2.r + circle.r + MARGIN;
+
+            // a : distance from fulcrum
+            const a = (radius1*radius1 - radius2*radius2 + distanceFrom*distanceFrom)/(2*distanceFrom);
+
+            // dx : delta X
+            const dx = circle1.x-circle2.x;
+            const dy = circle1.y-circle2.y;
+
+            // p : slope for perpendicular bisector of circle1 and circle2
+            const p = -dx/dy;
+
+            //
+            const multiplier = a/distanceFrom;
+
+            let posX = circle1.x - multiplier * dx;
+            let posY = circle1.y - multiplier * dy;
+
+            let circleX = posX + Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            let circleY = posY + p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+
+            if(isVacant(circle, circleX, circleY)) {
+                circle.x = circleX;
+                circle.y = circleY;
+                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r){
+                    return;
+                }
+                    
+            }
+            circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+            circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
+
+            if(isVacant(circle, circleX, circleY)) {
+                circle.x = circleX;
+                circle.y = circleY;
+                if(targetMaxX > circle.x + circle.r && targetMaxY > circle.y + circle.r  && targetMinX < circle.x - circle.r && targetMinY < circle.y - circle.r) {
+                    return;
+                }
+            }
+        }
     }
-
-    // recalc bounds
-    maxX = Math.max(maxX, circle.x + circle.r);
-    maxY = Math.max(maxY, circle.y + circle.r);
-    minX = Math.min(minX, circle.x - circle.r);
-    minY = Math.min(minY, circle.y - circle.r);
-
-    // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
-    // await sleep(10) /// REDRAWWWWW
 }
 
+function isVacant(circle, x, y) {
+    for(let circle1 of placedCircles) {
+        if(getDistanceFrom(circle1, x, y) + 0.0001< circle.r + circle1.r + MARGIN)
+            return false;
+            
+    }
+    return true;
+}
+
+// const sizeMin = 1;
+// const sizeMax = 30;
+
+// function clampSize(value) {
+//     return Math.max(sizeMin, Math.min(sizeMax, value));
+// }
 
 // assumes unplacedCircles is EMPTY
 // and placedCircles is FILLED
 export function placeCircles(circles: MemberCircle[]) {
+    minX = 0;
+    minY = 0;
+    maxX = 0;
+    maxY = 0;
+    targetMaxX = 0;
+    targetMaxY = 0;
+    targetMinX = 0;
+    targetMinY = 0;
     // normalize
-    const max = Math.max(...circles.map(circle => circle.r));
-    circles.forEach(circle => { circle.r /= max });
     placedCircles = [];
-    if (circles.length == 0) { return placedCircles; }
-    circles.sort((a, b) => (b.r - a.r));
-    
-    const unplacedCircles = circles
-    const circle = unplacedCircles.shift();
-    
-    circle.x = 0; circle.y = 0;
-    minY = minX = -(maxX = maxY = circle.r); // HAHA THIS IS SO COOL
-    placedCircles.push(circle);
+    const unplacedCircles = circles.sort((a, b) => b.r - a.r);
 
-    while (unplacedCircles.length != 0) {
-        const circle = unplacedCircles.shift()
-        placeCircle(circle)
-        placedCircles.push(circle)
+    let sizeSum = 0;
+
+    for(let circle = unplacedCircles.shift(); circle; circle = unplacedCircles.shift()) {
+        // circle.x = circle.y = 0;
+        // circle.r = clampSize(circle.r);
+        circle.r -= (circle.r - (sizeSum += circle.r)/(placedCircles.length+1)) * deltaAvg;
+        placeCircle(circle);
+        placedCircles[placedCircles.length] = circle;
+        // console.log(circle.x);
+        // console.log(circle.y);
+        // console.log(circle.r);
+        let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
+        let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
+        let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r);
+        let targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
+
     }
-    return placedCircles
+
+    
+
+    return placedCircles;
 }
 

@@ -1,6 +1,7 @@
 import { getResourceURL } from "../../consts";
 
 
+
 type DelphiInfo = {
     body: HTMLElement
     title: HTMLElement

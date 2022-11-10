@@ -4,6 +4,6 @@ export const cluck_api_keys = {
     "lab": "broccoli",
     "supertestingkey": "cabbage"
 }
-export const server_port = 2022
+export const server_port = 3000
 export const basepath = '/cluck';
 export const baseorigin = 'http://1.2.3.4:3000';

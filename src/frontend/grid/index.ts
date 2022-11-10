@@ -1,5 +1,5 @@
 import { getApiEndpoint, getResourceURL } from "../../consts";
-import type { LoggedIn, Member, HTMLMemberButtonElement } from "../../types";
+import type { LoggedIn, CluckMember, HTMLMemberButtonElement } from "../../types";
 import { openFullscreen } from "../util";
 import { checkAuth, clock, cluckedIn, refreshMemberList } from "./clockapi";
 import { registerGestures } from "./gestures";
@@ -15,8 +15,8 @@ declare global {
 
 
 
-let members:Member[];
-export async function run(memberlist:Member[]) {
+let members:CluckMember[];
+export async function run(memberlist:CluckMember[]) {
 	// Fetch Members
 	members = memberlist;
 	redrawRows();

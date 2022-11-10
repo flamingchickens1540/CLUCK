@@ -3,9 +3,10 @@ import { WebClient } from "@slack/web-api";
 import { writeFileSync } from 'fs';
 import { slack_token } from "../../secrets/consts";
 import { getResourceURL, memberListFilePath, photosFilePath } from "../consts";
-import { Member } from "../types";
+import { CluckMember } from "../types";
 import { configureDrive, getCertifications, getMemberInfo, updateProfilePictures } from "../api/spreadsheet";
 import fs from 'fs'
+import { Member } from "@slack/web-api/dist/response/UsersListResponse";
 
 function waitFor(conditionFunction) {
     const poll = resolve => {
@@ -16,7 +17,8 @@ function waitFor(conditionFunction) {
 }
 
 
-let members:Member[] = []
+let members:CluckMember[] = []
+let slackMembers:Member[] = []
 let collecting = false
 
 const photos: {[key:string]:string} = {}
@@ -46,27 +48,24 @@ export const collect = async () => {
         await configureDrive()
         
         // Load slack users in the students group
-        const userlist = await client.users.list()
-        let slackUsers = userlist.members ?? []
-        slackUsers = slackUsers.filter(elem => !elem.deleted )
+        console.log("Refreshing slack members")
+        slackMembers = (await client.users.list()).members ?? []
         
-        
-        // Load Names from Spreadsheet
-        
+
         
         // Build members catalogue
-        const slackMembers:Member[] = []
-        slackUsers.forEach((user) => {
+        const slackMemberData:CluckMember[] = []
+        slackMembers.filter((elem) => !elem.deleted).forEach((user) => {
             if (user == null || user.real_name == null) return
             const name = user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             const displayName = user.profile.display_name_normalized.length > 0 ? user.profile.display_name_normalized : name
-            slackMembers[tokenizeName(user.real_name)] = {
+            slackMemberData[tokenizeName(user.real_name)] = {
                 name: name,
                 firstname: (displayName).split(" ")[0],
                 img: user.profile.image_original
             }
         })
-        // Run spreadsheet collection in parallel with slack collection
+        // List spreadsheet users
         const spreadsheetMember = await getMemberInfo()
         
         // For each spreadsheet user, add slack data
@@ -76,14 +75,14 @@ export const collect = async () => {
             const name = member.name;
             let image:string;
             if (member.goodPhoto) {
-                image = slackMembers[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? getResourceURL("/static/img/default_member.jpg", true)
+                image = slackMemberData[tokenizeName(name)]?.img ?? photos[tokenizeName(name)] ?? getResourceURL("/static/img/default_member.jpg", true)
             } else {
                 image = photos[tokenizeName(name)] ?? getResourceURL("/static/img/default_member.jpg", true)
             }
             members.push({
                 // if person is not in slack, generate default Member object
                 name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
-                firstname: slackMembers[tokenizeName(name)]?.firstname ?? name.split(" ")[0],
+                firstname: slackMemberData[tokenizeName(name)]?.firstname ?? name.split(" ")[0],
                 img: image,
                 certs: member.certs.map((cert) => certs[cert])
             })
@@ -115,8 +114,11 @@ export const collect = async () => {
     }
 }
 
-export function getMembers():Member[] {
+export function getCluckMembers():CluckMember[] {
     return members
+}
+export function getSlackMembers():Member[] {
+    return slackMembers
 }
 
 

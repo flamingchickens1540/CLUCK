@@ -1,12 +1,12 @@
 import { getApiEndpoint } from "../../consts";
-import type { LoggedIn, Member } from "../../types";
-import { getBounds, MemberCircle, placeCircles } from "./circlePacker";
-import { redrawCircles } from "./renderCircles";
-import { refreshDelphi } from "./chiefdelphi"
+import type { LoggedIn, CluckMember } from "../../types";
+import { MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
+import { redrawCircles, getRatio } from "./renderCircles";
+import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 import { timeLoggedIn } from "../grid/index"
 
-let members: Member[];
+let members: CluckMember[]
 let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen
@@ -17,29 +17,38 @@ setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
 
 function regenCircles(loggedin: LoggedIn) {
-    const desiredRatio = 1; // y / x
-    const ratioError = .1;
-    let tries = 0;
-    let { maxX, maxY, minX, minY } = getBounds()
     let placedCircles: MemberCircle[] = [];
-    do {
-        tries++;
-        const circles = []
-        const now = Date.now();
-        Object.entries(loggedin).forEach(ent => {
-            const member = members.find(o => o.name == ent[0])
-            circles.push(new MemberCircle(
-                (timeLoggedIn + (now - ent[1])) / 1000 / 60 / 60,
-                member.firstname,
-                member.img
-            ))
-        });
-        placedCircles = placeCircles(circles);
+    const circles = [];
+    const now = Date.now()
+    for(const ent in loggedin) {
+        const member = members.find(o => o.name == ent)
+        circles.push(new MemberCircle(
+            (now - loggedin[ent]) / 360000, // 1000 / 60 / 60
+            member.firstname,
+            member.img
+        ))
+    }
 
-        ({ maxX, maxY, minX, minY } = getBounds());
+    setDelphiVisibility(getNameDensity(circles) < 1)
 
-    } while (tries < 1000 && ((maxY - minY) / (maxX - minX) < (desiredRatio - ratioError / desiredRatio) || (maxY - minY) / (maxX - minX) > (desiredRatio + ratioError / desiredRatio))) // test to make sure the dimentions are chill
+    setAspectRatio(getRatio());
+    placedCircles = placeCircles(circles);
     redrawCircles(placedCircles)
+}
+
+const nameDensityMultiplier = 0.006;
+// Estimates name density
+function getNameDensity(circles : MemberCircle[]) {
+    let nameSize = 0;
+    let circleSizeSum = 0;
+    let circleSizeSumSqr = 0;
+    for(const circle of circles) {
+        nameSize += circle.name.length * nameDensityMultiplier + 2;
+        circleSizeSumSqr += Math.pow(circle.r, 2);
+        circleSizeSum += circle.r;
+    }
+
+    return nameDensityMultiplier * nameSize / Math.sqrt(circleSizeSumSqr / circleSizeSum / circles.length);
 }
 
 function update() {
