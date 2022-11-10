@@ -95,10 +95,10 @@ function placeCircle(circle) {
     }
 
     // recalc bounds
-    maxX = Math.max(maxX, circle.x + circle.r)
-    maxY = Math.max(maxY, circle.y + circle.r)
-    minX = Math.min(minX, circle.x - circle.r)
-    minY = Math.min(minY, circle.y - circle.r)
+    maxX = Math.max(maxX, circle.x + circle.r);
+    maxY = Math.max(maxY, circle.y + circle.r);
+    minX = Math.min(minX, circle.x - circle.r);
+    minY = Math.min(minY, circle.y - circle.r);
 
     // redrawCircles(placedCircles.concat([circle])) // REDRAWWWWW = = = == = = = == = == = = = == 
     // await sleep(10) /// REDRAWWWWW
@@ -109,18 +109,18 @@ function placeCircle(circle) {
 // and placedCircles is FILLED
 export function placeCircles(circles: MemberCircle[]) {
     // normalize
-    const max = Math.max(...circles.map(circle => circle.r))
-    circles.forEach(circle => { circle.r /= max })
-    placedCircles = []
-    if (circles.length == 0) { return placedCircles}
+    const max = Math.max(...circles.map(circle => circle.r));
+    circles.forEach(circle => { circle.r /= max });
+    placedCircles = [];
+    if (circles.length == 0) { return placedCircles; }
     circles.sort((a, b) => (b.r - a.r));
     
     const unplacedCircles = circles
-    const circle = unplacedCircles.shift()
+    const circle = unplacedCircles.shift();
     
     circle.x = 0; circle.y = 0;
-    minY = minX = -(maxX = maxY = circle.r) // HAHA THIS IS SO COOL
-    placedCircles.push(circle)
+    minY = minX = -(maxX = maxY = circle.r); // HAHA THIS IS SO COOL
+    placedCircles.push(circle);
 
     while (unplacedCircles.length != 0) {
         const circle = unplacedCircles.shift()
