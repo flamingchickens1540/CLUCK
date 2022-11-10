@@ -1,6 +1,4 @@
 // note: circle radii are normalized on render
-//const MARGIN = .14
-
 /*
     Margin : spacing between the circles
     Aspect ratio : the target width-length proportions to pack the circles in

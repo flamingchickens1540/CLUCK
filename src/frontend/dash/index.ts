@@ -9,6 +9,9 @@ import { timeLoggedIn } from "../grid/index"
 let members: CluckMember[]
 let loggedInCache: LoggedIn;
 
+//The population density of circles at which Chief Delphi disappears
+const maxDensity = 1.25;
+
 window["openFullscreen"] = openFullscreen
 
 refreshDelphi()
@@ -29,7 +32,7 @@ function regenCircles(loggedin: LoggedIn) {
         ))
     }
 
-    setDelphiVisibility(getNameDensity(circles) < 1)
+    setDelphiVisibility(getNameDensity(circles) < maxDensity);
 
     setAspectRatio(getRatio());
     placedCircles = placeCircles(circles);
