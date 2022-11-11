@@ -11,13 +11,7 @@ function renderCircle(circle: MemberCircle) {
     let lengthYX = (maxY - minY) * widthMult;
     let lengthX = maxX - minX;
 
-    let multiplier;
-
-    if(lengthYX > lengthX) {
-        console.log("hi")
-        multiplier = membersDiv.clientWidth/window.innerWidth/(lengthYX) * 100;
-    } else 
-        multiplier = membersDiv.clientWidth/window.innerWidth/(maxX - minX) * 100;
+    let multiplier = lengthYX > lengthX ? membersDiv.clientWidth/window.innerWidth/(lengthYX) * 100 : membersDiv.clientWidth/window.innerWidth/(maxX - minX) * 100;
     
     const elem = document.createElement('member')
     elem.className = 'memberCircle'
