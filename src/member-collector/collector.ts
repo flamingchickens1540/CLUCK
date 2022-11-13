@@ -48,7 +48,6 @@ export const collect = async () => {
         await configureDrive()
         
         // Load slack users in the students group
-        console.log("Refreshing slack members")
         slackMembers = (await client.users.list()).members ?? []
         
 
