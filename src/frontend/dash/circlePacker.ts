@@ -77,14 +77,12 @@ function placeCircle(circle) {
         return;
     }
 
-    let inboundXMax;
-    let inboundYMax;
-    let inboundXMin;
-    let inboundYMin;
+    let maxOutbound;
     
     for(let index1 = 0; index1 != placedCircles.length; index1++) {
         const circle1 = placedCircles[index1];
         for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
+
             const circle2 = placedCircles[index2];
             const distanceFrom = circle1.r + circle2.r + MARGIN; 
 
@@ -110,38 +108,39 @@ function placeCircle(circle) {
             let circleX = posX + Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
             let circleY = posY + p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
-            let newInboundXMax = circleX + circle.r - targetMaxX * aspectRatio;
-            let newInboundYMax = circleY + circle.r - targetMaxY;
-            let newInboundXMin = -circleX + circle.r + targetMinX * aspectRatio;
-            let newInboundYMin = -circleY + circle.r + targetMinY;
+            let newMaxOutbound = Math.max(
+                circleX + circle.r * aspectRatio - targetMaxX,
+                circleY + circle.r - targetMaxY,
+                -circleX + circle.r * aspectRatio + targetMinX,
+                -circleY + circle.r + targetMinY
+            );
 
-            if(!(newInboundXMax > inboundXMax || newInboundYMax > inboundYMax || newInboundXMin > inboundXMin || newInboundYMin > inboundYMin)) {
+            if(!(newMaxOutbound > maxOutbound)) {
                 if(isVacant(circle, circleX, circleY)) {
-                    inboundXMax = newInboundXMax;
-                    inboundYMax = newInboundYMax;
-                    inboundXMin = newInboundXMin;
-                    inboundYMin = newInboundYMin;
                     circle.x = circleX;
                     circle.y = circleY;
+                    if(newMaxOutbound < 0)
+                        return;
+                    maxOutbound = newMaxOutbound;
                 }
             }
 
             circleX = posX - Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
             circleY = posY - p * Math.sqrt(radius1*radius1 - a*a)/Math.sqrt(1 + p*p);
 
-            newInboundXMax = circleX + circle.r - targetMaxX * aspectRatio;
-            newInboundYMax = circleY + circle.r - targetMaxY;
-            newInboundXMin = -circleX + circle.r + targetMinX * aspectRatio;
-            newInboundYMin = -circleY + circle.r + targetMinY;
-
-            if(!(newInboundXMax > inboundXMax || newInboundYMax > inboundYMax || newInboundXMin > inboundXMin || newInboundYMin > inboundYMin)) {
+            newMaxOutbound = Math.max(
+                circleX + circle.r * aspectRatio - targetMaxX,
+                circleY + circle.r - targetMaxY,
+                -circleX + circle.r * aspectRatio + targetMinX,
+                -circleY + circle.r + targetMinY
+            );
+            if(!(newMaxOutbound > maxOutbound)) {
                 if(isVacant(circle, circleX, circleY)) {
-                    inboundXMax = newInboundXMax;
-                    inboundYMax = newInboundYMax;
-                    inboundXMin = newInboundXMin;
-                    inboundYMin = newInboundYMin;
                     circle.x = circleX;
                     circle.y = circleY;
+                    if(newMaxOutbound < 0)
+                        return;
+                    maxOutbound = newMaxOutbound;
                 }
             }
         }
@@ -150,7 +149,7 @@ function placeCircle(circle) {
 
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
-        if(getDistanceFrom(circle1, x, y) + 0.0001< circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.0001 < circle.r + circle1.r + MARGIN)
             return false;
     }
     return true;
