@@ -63,8 +63,7 @@ function placeCircle(circle) {
     }
 
     if(placedCircles.length == 1) {
-        const distanceSqr = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
-        circle.y = Math.sqrt(distanceSqr)
+        circle.y = MARGIN + placedCircles[0].r + circle.r;
         circle.x = 0;
         return;
     }
