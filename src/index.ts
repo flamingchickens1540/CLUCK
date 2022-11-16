@@ -26,13 +26,7 @@ if (!existsSync(dataDirectory)) {
 
 // Init Express App
 const app = express()
-// app.use("/", proxy("baseurl", {
-//     proxyReqPathResolver: (req) => {
-//         console.log(req.path)
-//         console.log(url.parse(baseurl+req.url).path)
-//         return url.parse(baseurl+req.url).path
-//     }
-// }))
+
 app.use("/api", apiRouter)
 app.use("/api", memberRouter)
 app.use("/", frontendRouter)

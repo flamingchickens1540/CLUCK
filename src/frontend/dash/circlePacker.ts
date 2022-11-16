@@ -64,18 +64,29 @@ function placeCircle(circle) {
 
     if(placedCircles.length == 1) {
         const distanceSqr = Math.pow(MARGIN + placedCircles[0].r + circle.r, 2);
-        /*
-        const rand = Math.random();
-
-        circle.x = Math.round(Math.random()) ? Math.sqrt(rand * distanceSqr) : -Math.sqrt(rand * distanceSqr);
-        circle.y = Math.round(Math.random()) ? Math.sqrt((1 - rand) * distanceSqr) : -Math.sqrt((1 - rand) * distanceSqr);
-        */
-
-        
         circle.y = Math.sqrt(distanceSqr)
         circle.x = 0;
         return;
     }
+    
+    for(let index1 = 0; index1 != placedCircles.length; index1++) {
+        const circle1 = placedCircles[index1];
+        for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
+            const circle2 = placedCircles[index2];
+            const distanceFrom = circle1.r + circle2.r + MARGIN; 
+
+            const radius1 = circle1.r + circle.r + MARGIN;
+            const radius2 = circle2.r + circle.r + MARGIN;
+
+            // a : distance from fulcrum
+            const a = (radius1*radius1 - radius2*radius2 + distanceFrom*distanceFrom)/(2*distanceFrom);
+
+            // dx : delta X
+            const dx = circle1.x-circle2.x;
+            const dy = circle1.y-circle2.y;
+
+            // p : slope for perpendicular bisector of circle1 and circle2
+            const p = -dx/dy;
 
     let maxOutbound;
     
@@ -154,7 +165,6 @@ function isVacant(circle, x, y) {
     }
     return true;
 }
-
 // const sizeMin = 1;
 // const sizeMax = 30;
 

@@ -80,11 +80,10 @@ router.post('/clock', (req, res) => {
     } else {
         // Log Out
         if (loggedIn[name]) { // Test to make sure person is logged in
-            res.status(202).end();
-            console.log(`Logging out ${name}`);
-            addHoursSafe(name, failed, loggedIn[name]);
-            delete loggedIn[name];
-            logMember(name, false, loggedIn);
+            res.status(202).end()
+            addHoursSafe(name, failed, loggedIn[name])
+            delete loggedIn[name]
+            logMember(name, false, loggedIn)
         } else { res.end() }
     }
 })
@@ -155,9 +154,7 @@ export async function sendSlackMessage(fullname: string, text: string) {
     }
     const user = getSlackMembers().find(userobj => userobj.real_name?.toLowerCase().includes(fullname.toLowerCase()) ?? false)
     if (user == null || user.id == null) { throw Error("Could not send message to " + fullname) }
-    console.log(`Sending message to ${user.name} (${user.id})`);
-    return await client.chat.postMessage({ channel: user.id, text: text });
-    
+    return await client.chat.postMessage({ channel: user.id, text: text })
 }
 
 // Periodically save
@@ -196,9 +193,8 @@ new CronJob({
 
 // sign out at midnight
 const cronSignout = () => {
-    const messageUsers = Object.keys(loggedIn);
-    loggedIn = {};
-    console.log('Logging out users');
+    const messageUsers = Object.keys(loggedIn)
+    loggedIn = {}
     updateLoggedIn(loggedIn)
     messageUsers.forEach(async (memberName) => {
         try {
