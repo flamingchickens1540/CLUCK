@@ -28,7 +28,7 @@ function getInfo(siteHTML) {
             }
             const posterName = (doc.querySelector(`#main-outlet > div:nth-child(${n}) .creator > span > span`) as HTMLElement)?.innerHTML ?? ''
             let commentTime = doc.querySelector(`#main-outlet > div:nth-child(${n}) .post-time`)?.innerHTML.trim() ?? ''
-            commentTime = commentTime.replace(/\d\d\d\d\,\ /,'')
+            commentTime = commentTime.replace(/\d\d\d\d, /,'')
 
             ret.body.appendChild(document.createElement("br"));
 
@@ -123,4 +123,4 @@ function autoScroll() {
         }
     }
 }
-// setInterval(autoScroll, 10);
+setInterval(autoScroll, 10);
