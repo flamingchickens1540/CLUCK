@@ -11,7 +11,7 @@
     Size averaging : change the size of a circle to the average of itself and all previous
     smaller circles to make them approach a similar sizes.
 */
-const MARGIN = 1.3;
+let MARGIN = 1.3;
 let aspectRatio = 1;
 let deltaAvg = 0.95;
 
@@ -168,6 +168,7 @@ export function placeCircles(circles: MemberCircle[]) {
     const unplacedCircles = circles.sort((a, b) => b.r - a.r);
 
     let sizeSum = 0;
+    MARGIN = 0.7 * Math.sqrt(circles.length)
 
     for(let circle = unplacedCircles.shift(); circle; circle = unplacedCircles.shift()) {
         // circle.x = circle.y = 0;
