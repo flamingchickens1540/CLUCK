@@ -13,8 +13,6 @@ let MARGIN = 1.3;
 let aspectRatio = 1;
 let deltaAvg = 0.95;
 
-import {timeLoggedIn} from "../grid/index";
-
 let placedCircles: MemberCircle[] = []
 let maxX;
 let minX;
@@ -170,6 +168,11 @@ export function placeCircles(circles: MemberCircle[]) {
         let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
         let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r);
         let targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
+
+        targetMaxX = Math.max(targetMaxX1, targetMaxY1*aspectRatio);
+        targetMaxY = Math.max(targetMaxY1, targetMaxX1/aspectRatio);
+        targetMinX = Math.min(targetMinX1, targetMinY1*aspectRatio);
+        targetMinY = Math.min(targetMinY1, targetMinX1/aspectRatio);
 
     }
 

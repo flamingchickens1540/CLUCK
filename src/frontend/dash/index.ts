@@ -4,13 +4,9 @@ import { MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
 import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
-import { timeLoggedIn } from "../grid/index"
 
 let members: CluckMember[]
 let loggedInCache: LoggedIn;
-
-//The population density of circles at which Chief Delphi disappears
-const maxDensity = 1.25;
 
 window["openFullscreen"] = openFullscreen
 
@@ -21,7 +17,7 @@ setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
 function regenCircles(loggedin: LoggedIn) {
     let placedCircles: MemberCircle[] = [];
-    const circles = [];
+    let circles = [];
     const now = Date.now()
     for(const ent in loggedin) {
         const member = members.find(o => o.name == ent)

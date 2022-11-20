@@ -102,11 +102,9 @@ export async function run(memberlist:CluckMember[]) {
 	addEventListener("resize", redrawRows);
 })();
 
-export let timeLoggedIn;
 
 async function refreshLoggedIn() {
 	let membersIn:LoggedIn;
-	timeLoggedIn = Date.now();
 	const noconnect = document.getElementById("noconnect");
 	try {
 		membersIn = await cluckedIn();
