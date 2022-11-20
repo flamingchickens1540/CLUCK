@@ -1,13 +1,13 @@
 import { getResourceURL } from "../../consts";
 
-
-
 type DelphiInfo = {
     body: HTMLElement
     title: HTMLElement
     topics: string
 };
+//Gets post, comments, and poster info from ChiefDelphi
 function getInfo(siteHTML) {
+
     const ret: DelphiInfo = {
         body: null,
         title: null,
@@ -16,51 +16,52 @@ function getInfo(siteHTML) {
 
     const doc = document.createElement('html');
     doc.innerHTML = siteHTML;
-
+    //Queries the post's content, topic(s), and title
     ret.body = doc.querySelector('.cooked, .post');
     ret.title = doc.querySelector('#topic-title').children[0].children[0] as HTMLElement;
     ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
-
+    //Queries the top three comments
     const commentNum = 3;
         for(let n = 3; n<commentNum+3;n++){
+            //Creates comment element out of the current comment
             const comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
             if(comment == null) {
                 break;
             }
+            //Queries the poster's name and time of post
             const posterName = (doc.querySelector(`#main-outlet > div:nth-child(${n}) .creator > span > span`) as HTMLElement)?.innerHTML ?? ''
             let commentTime = doc.querySelector(`#main-outlet > div:nth-child(${n}) .post-time`)?.innerHTML.trim() ?? ''
             commentTime = commentTime.replace(/\d\d\d\d, /,'')
-
+            //Creates a break to space things out
             ret.body.appendChild(document.createElement("br"));
 
             let breakElem = document.createElement("hr")
             breakElem.className = 'comment_break'
             ret.body.appendChild(breakElem);
-
+            //adds them to the comment element
             let postTimeElem = document.createElement("span")
             postTimeElem.className = 'comment_time'
             postTimeElem.innerText = commentTime
             comment.insertBefore(postTimeElem,comment.firstElementChild);
-
+            //adds the posters name the the comment element
             let posterNameElem = document.createElement("span")
             posterNameElem.className = 'commenter_name'
             posterNameElem.innerText = posterName + ':'
             comment.insertBefore(posterNameElem,comment.firstElementChild);
-
+            //Creates and queries for an element for the posters pfp, then adds it to the comment
             const avatar = document.createElement('img')
             avatar.style.height='3.3vh'
             avatar.style.paddingRight='1vh'
             avatar.style.verticalAlign='middle'
             avatar.src = `https://www.chiefdelphi.com/user_avatar/www.chiefdelphi.com/${posterName}/90/169322_2.png`
             comment.insertBefore(avatar,comment.firstElementChild);
-
+            //Adds CSS to the comment and appends it to the body
             comment.classList.add("post_comment");
                 ret.body.appendChild(document.createElement("br"));
                 ret.body.appendChild(document.createElement("br"));
                 comment.style.fontStyle = "italic";
                 comment.style.fontSize = '24px';
                 ret.body.appendChild(comment);
-                console.log("body", ret.body);
             }
     return ret;
 }
@@ -74,7 +75,7 @@ export async function refreshDelphi() {
     
     resetScroll()
 }
-
+//Makes Chief Delphi disappear
 export function setDelphiVisibility(visible : boolean) {
     document.getElementById('delphi').style.display = visible ? "" : "none";
 }
@@ -88,7 +89,7 @@ function setBottomFade() {
 setBottomFade();
 addEventListener('resize', setBottomFade);
 
-
+//Holds the data in what state the chief delphi element is in
 const autoScrollState = {
     down: true,
     timeStarted: Date.now(),
@@ -97,10 +98,12 @@ const autoScrollState = {
     topWait: 5,
     bottomWait: 6,
 }
+//Saves when the posts started scrolling, starts scrolling them down
 function resetScroll() {
     autoScrollState.timeStarted = Date.now();
     autoScrollState.down = true;
 }
+//Makes the posts automatically scroll up and down
 const delphiBody = document.getElementById('delphiBody');
 function autoScroll() {
     const element = delphiBody;
