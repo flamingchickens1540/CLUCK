@@ -5,20 +5,23 @@ type DelphiInfo = {
     body: HTMLElement
     title: HTMLElement
     topics: string
+    url:string
 };
 function getInfo(siteHTML) {
     const ret: DelphiInfo = {
         body: null,
         title: null,
         topics: "",
+        url: ""
     };
 
     const doc = document.createElement('html');
     doc.innerHTML = siteHTML;
 
     ret.body = doc.querySelector('.cooked, .post');
-    ret.title = doc.querySelector('#topic-title').children[0].children[0] as HTMLElement;
+    ret.title = doc.querySelector('#topic-title').children[0] as HTMLElement;
     ret.topics = '<div class="topics">' + doc.querySelector('.topic-category').innerHTML + '</div>';
+    ret.url = doc.querySelector('myurl').innerHTML;
 
     const commentNum = 3;
         for(let n = 3; n<commentNum+3;n++){
@@ -66,6 +69,7 @@ export async function refreshDelphi() {
     const html = await (await fetch(getResourceURL('/dash/delphi'))).text();
     const info = getInfo(html);
     document.getElementById('delphiTitle').innerHTML = info.title.innerHTML + info.topics;
+    (document.getElementById('delphiTitle').parentElement as HTMLLinkElement).href = info.url
     document.getElementById('delphiBody').innerHTML = info.body.innerHTML;
     
     

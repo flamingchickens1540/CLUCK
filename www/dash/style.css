@@ -83,6 +83,9 @@ h1 {
     /* font-family: sans-serif; */
 }
 
+a:has(#delphiTitle):hover #delphiTitle>span {
+    text-decoration: underline;
+}
 h3{
     margin:0;
     background-color: rgba(175, 175, 175, 0.134);

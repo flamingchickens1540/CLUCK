@@ -21,7 +21,7 @@ router.get('/dash/delphi', async (req, res) => {
     try {
         const id = json.topic_list.topics[delphiPost].id
         const link = 'https://www.chiefdelphi.com/t/' + id
-        const html = await (await fetch(link)).text()
+        const html = await (await fetch(link)).text() + `<myurl>${link}</myurl>`
         res.send(sanitizeHtml(html, {
             allowedClasses: {
                 "*": ["*"]
@@ -30,7 +30,7 @@ router.get('/dash/delphi', async (req, res) => {
                 "*":  ["id", "class", "style" ],
                 ...sanitizeHtml.defaults.allowedAttributes
             },
-            allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'myurl' ]),
             transformTags: {
                 'a': "span",
                 "img":function(tagName, attribs) {
