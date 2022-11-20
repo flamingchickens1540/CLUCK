@@ -13,10 +13,11 @@ window["openFullscreen"] = openFullscreen
 refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
+
+
 function regenCircles(loggedin: LoggedIn) {
     let placedCircles: MemberCircle[] = [];
-
-    const circles = []
+    let circles = [];
     const now = Date.now()
     for(const ent in loggedin) {
         const member = members.find(o => o.name == ent)

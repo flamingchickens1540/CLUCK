@@ -1,6 +1,4 @@
 // note: circle radii are normalized on render
-//const MARGIN = .14
-
 /*
     Margin : spacing between the circles
     Aspect ratio : the target width-length proportions to pack the circles in
@@ -175,6 +173,7 @@ export function placeCircles(circles: MemberCircle[]) {
         targetMaxY = Math.max(targetMaxY1, targetMaxX1/aspectRatio);
         targetMinX = Math.min(targetMinX1, targetMinY1*aspectRatio);
         targetMinY = Math.min(targetMinY1, targetMinX1/aspectRatio);
+
     }
 
     

@@ -44,7 +44,7 @@ export async function run(memberlist:CluckMember[]) {
 				}
 
 				// Toggle logged in
-				button.loggedIn =  !button.loggedIn
+				button.loggedIn = !button.loggedIn
 				// Update style
 				getButtonState(button.loggedIn).forEach((styleSpec) => {
 					button.style.setProperty(styleSpec.styleName, styleSpec.val);
@@ -101,6 +101,7 @@ export async function run(memberlist:CluckMember[]) {
 	registerGestures()
 	addEventListener("resize", redrawRows);
 })();
+
 
 async function refreshLoggedIn() {
 	let membersIn:LoggedIn;
