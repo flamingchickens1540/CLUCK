@@ -69,7 +69,7 @@ export async function refreshDelphi() {
     const html = await (await fetch(getResourceURL('/dash/delphi'))).text();
     const info = getInfo(html);
     document.getElementById('delphiTitle').innerHTML = info.title.innerHTML + info.topics;
-    (document.getElementById('delphiTitle').parentElement as HTMLLinkElement).href = info.url
+    (document.getElementById('delphiTitle').parentElement as HTMLLinkElement).onclick = ()=>{window.open(info.url,'_blank')}
     document.getElementById('delphiBody').innerHTML = info.body.innerHTML;
     
     
