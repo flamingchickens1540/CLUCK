@@ -77,6 +77,9 @@ function placeCircle(circle) {
             const circle2 = placedCircles[index2];
             const distanceFrom = circle1.r + circle2.r + MARGIN; 
 
+            if(getDistanceFrom(circle1, circle2.x, circle2.y) - distanceFrom > 0.0001)
+                continue;
+
             const radius1 = circle1.r + circle.r + MARGIN;
             const radius2 = circle2.r + circle.r + MARGIN;
 
