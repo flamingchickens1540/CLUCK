@@ -23,18 +23,40 @@ function getInfo(siteHTML) {
     const commentNum = 3;
         for(let n = 3; n<commentNum+3;n++){
             const comment = doc.querySelector(`#main-outlet > div:nth-child(${n}) > .post`) as HTMLElement;
-            // console.log(comment)
             if(comment == null) {
                 break;
             }
+            const posterName = (doc.querySelector(`#main-outlet > div:nth-child(${n}) .creator > span > span`) as HTMLElement)?.innerHTML ?? ''
+            let commentTime = doc.querySelector(`#main-outlet > div:nth-child(${n}) .post-time`)?.innerHTML.trim() ?? ''
+            commentTime = commentTime.replace(/\d\d\d\d, /,'')
+
+            ret.body.appendChild(document.createElement("br"));
+
+            let breakElem = document.createElement("hr")
+            breakElem.className = 'comment_break'
+            ret.body.appendChild(breakElem);
+
+            let postTimeElem = document.createElement("span")
+            postTimeElem.className = 'comment_time'
+            postTimeElem.innerText = commentTime
+            comment.insertBefore(postTimeElem,comment.firstElementChild);
+
+            let posterNameElem = document.createElement("span")
+            posterNameElem.className = 'commenter_name'
+            posterNameElem.innerText = posterName + ':'
+            comment.insertBefore(posterNameElem,comment.firstElementChild);
+
+            const avatar = document.createElement('img')
+            avatar.style.height='3.3vh'
+            avatar.style.paddingRight='1vh'
+            avatar.style.verticalAlign='middle'
+            avatar.src = `https://www.chiefdelphi.com/user_avatar/www.chiefdelphi.com/${posterName}/90/169322_2.png`
+            comment.insertBefore(avatar,comment.firstElementChild);
+
             comment.classList.add("post_comment");
-                ret.body.appendChild(document.createElement("br"));
-                ret.body.appendChild(document.createElement("br"));
-                comment.style.fontStyle = "italic";
-                comment.style.fontSize = '24px';
-                ret.body.appendChild(comment);
-                console.log("body", ret.body);
-            }
+            ret.body.appendChild(comment);
+
+        }
     
 
     return ret;
