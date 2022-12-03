@@ -11,7 +11,6 @@
     Size averaging : change the size of a circle to the average of itself and all previous
     smaller circles to make them approach a similar sizes.
 */
-let MARGIN = 1.3;
 let aspectRatio = 1;
 let deltaAvg = 0.95;
 
@@ -63,7 +62,7 @@ function placeCircle(circle) {
     }
 
     if(placedCircles.length == 1) {
-        circle.y = MARGIN + placedCircles[0].r + circle.r;
+        circle.y = placedCircles[0].r + circle.r;
         circle.x = 0;
         return;
     }
@@ -75,13 +74,13 @@ function placeCircle(circle) {
         for(let index2 = index1+1; index2 != placedCircles.length; index2++) {
 
             const circle2 = placedCircles[index2];
-            const distanceFrom = circle1.r + circle2.r + MARGIN; 
+            const distanceFrom = circle1.r + circle2.r; 
 
             if(getDistanceFrom(circle1, circle2.x, circle2.y) - distanceFrom > 0.0001)
                 continue;
 
-            const radius1 = circle1.r + circle.r + MARGIN;
-            const radius2 = circle2.r + circle.r + MARGIN;
+            const radius1 = circle1.r + circle.r;
+            const radius2 = circle2.r + circle.r;
 
             // a : distance from fulcrum
             const a = (radius1*radius1 - radius2*radius2 + distanceFrom*distanceFrom)/(2*distanceFrom);
@@ -143,7 +142,7 @@ function placeCircle(circle) {
 
 function isVacant(circle, x, y) {
     for(let circle1 of placedCircles) {
-        if(getDistanceFrom(circle1, x, y) + 0.0001 < circle.r + circle1.r + MARGIN)
+        if(getDistanceFrom(circle1, x, y) + 0.0001 < circle.r + circle1.r)
             return false;
     }
     return true;
@@ -171,7 +170,6 @@ export function placeCircles(circles: MemberCircle[]) {
     const unplacedCircles = circles.sort((a, b) => b.r - a.r);
 
     let sizeSum = 0;
-    MARGIN = 0.7 * Math.sqrt(circles.length)
 
     for(let circle = unplacedCircles.shift(); circle; circle = unplacedCircles.shift()) {
         // circle.x = circle.y = 0;
@@ -184,7 +182,7 @@ export function placeCircles(circles: MemberCircle[]) {
         // console.log(circle.r);
         let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
         let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
-        let targetMinX1 =  minX = Math.min(minX, circle.x - circle.r);
+        let targetMinX1 = minX = Math.min(minX, circle.x - circle.r);
         let targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
 
         targetMaxX = Math.max(targetMaxX1, targetMaxY1*aspectRatio);
