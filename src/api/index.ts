@@ -155,7 +155,6 @@ export async function sendSlackMessage(fullname: string, text: string) {
     const user = getSlackMembers().find(userobj => userobj.real_name?.toLowerCase().includes(fullname.toLowerCase()) ?? false)
     if (user == null || user.id == null) { throw Error("Could not send message to " + fullname) }
     return await client.chat.postMessage({ channel: user.id, text: text })
-    
 }
 
 // Periodically save
