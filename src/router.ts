@@ -17,8 +17,9 @@ router.use("/dash/", express.static("./www/dash", {redirect: false}))
 router.use('/dash/', express.static("./dist/dash", {redirect:false}))
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
-    const json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json() as any
+    
     try {
+        const json = await (await fetch('https://www.chiefdelphi.com/latest.json?no_definitions=true&page=0')).json() as any
         const id = json.topic_list.topics[delphiPost].id
         const link = 'https://www.chiefdelphi.com/t/' + id
         const html = await (await fetch(link)).text() + `<myurl>${link}</myurl>`
