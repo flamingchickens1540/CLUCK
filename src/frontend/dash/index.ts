@@ -13,7 +13,9 @@ window["openFullscreen"] = openFullscreen
 refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
-function regenCircles(loggedin: LoggedIn) {
+function regenCircles(loggedin?: LoggedIn) {
+    if(loggedin===undefined) {loggedin = loggedInCache}
+
     let placedCircles: Circle[] = [];
 
     const circles = []
@@ -83,7 +85,7 @@ async function start() {
     setInterval(() => {
         update()
     }, 1000 * 3);
-
+    window.addEventListener('resize',()=>{regenCircles()})
 }
 
 start()
