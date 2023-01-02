@@ -64,6 +64,9 @@ html{
     /* background-color: blue; */
     overflow:hidden;
 }
+#members{
+    overflow: visible !important;
+}
 
 h1 {
     color: aliceblue;
@@ -223,4 +226,60 @@ pre {
 .comment_break{
     line-height: 20px;
     /* color: rgba(255, 255, 255, 0.63); */
+}
+
+
+
+
+
+@font-face {
+    font-family: fishface;
+    src: url('../static/font/fishface.ttf');
+}
+
+.time{
+    color:rgb(255, 234, 170);
+    display: flex;
+    flex-shrink: 100;
+    min-height: 0;
+    padding-top:0.15em;
+
+    font-family: fishface;
+    /* font-size: 80px; */
+    align-items: center;
+    justify-content: center;
+
+    /* filter: drop-shadow(4px 8px 0px #741e1e); */
+
+}
+.hours{
+    font-size: 50%;
+    /* font-size: 6vw; */
+}
+.minutes{
+    /* font-size: 70px; */
+}
+.colon{
+    display:flex;
+    align-self:center;
+    align-self:flex-end;
+}
+.numbers{
+    align-items: flex-start;
+    display: flex;
+    flex-flow: column;
+}
+
+.clockCircle{
+    position:relative;
+    display: flex;
+    /* background-color: rgba(255, 255, 255, 0.184); */
+    border-radius: 100%;
+    backdrop-filter: blur(3vw);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+.clockCircleAlone{
+    backdrop-filter: none !important;
 }

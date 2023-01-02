@@ -14,7 +14,7 @@
 let aspectRatio = 1;
 let deltaAvg = 0.95;
 
-let placedCircles: MemberCircle[] = []
+let placedCircles: Circle[] = []
 let maxX;
 let minX;
 let maxY;
@@ -34,17 +34,25 @@ export function getBounds() {
     }
 }
 
-export class MemberCircle {
+export class Circle {
     x: number;
     y: number;
     r: number;
+    constructor(r) {
+        this.r = r;
+    }
+}
+export class MemberCircle extends Circle {
     name: string;
     imgurl: string;
     constructor(hours, name, imgurl) {
+        super((Math.sqrt(hours + .2)) * 10);
         this.name = name;
         this.imgurl = imgurl;
-        this.r = (Math.sqrt(hours + .2)) * 10;
     }
+}
+export class ClockCircle extends Circle{
+
 }
 
 export function setAspectRatio(ratio : number) {
@@ -156,7 +164,7 @@ function isVacant(circle, x, y) {
 
 // assumes unplacedCircles is EMPTY
 // and placedCircles is FILLED
-export function placeCircles(circles: MemberCircle[]) {
+export function placeCircles(circles: Circle[]) {
     minX = 0;
     minY = 0;
     maxX = 0;
@@ -168,6 +176,7 @@ export function placeCircles(circles: MemberCircle[]) {
     // normalize
     placedCircles = [];
     const unplacedCircles = circles.sort((a, b) => b.r - a.r);
+    // circles.splice(Math.floor(circles.length/2),0,circles.splice(circles.findIndex(circle=>circle instanceof ClockCircle),1)[0])
 
     let sizeSum = 0;
 

@@ -1,5 +1,5 @@
-import { getBounds } from "./circlePacker"
-import type { MemberCircle } from "./circlePacker"
+import { Circle, ClockCircle, getBounds } from "./circlePacker"
+import { MemberCircle } from "./circlePacker"
 
 const membersDiv = document.getElementById('members');
 
@@ -44,10 +44,68 @@ function renderCircle(circle: MemberCircle) {
     elem.appendChild(name)
 }
 
-export function redrawCircles(circles) {
+setInterval(()=>{
+    let now = new Date()
+    document.querySelector('#hoursCircleText').innerHTML = 
+    '' + now.getHours() % 12 + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
+    ,
+    1000
+})
+function renderClock(circle: ClockCircle, alone?:boolean) {
+    const { maxX, maxY, minX, minY } = getBounds()
+    const widthMult = membersDiv.clientWidth/membersDiv.clientHeight;
+
+    const lengthYX = (maxY - minY) * widthMult;
+    const lengthX = maxX - minX;
+
+    const vwWidth = membersDiv.clientWidth/window.innerWidth * 100;
+
+    const multiplier = vwWidth/(lengthYX > lengthX ? lengthYX : lengthX);
+    
+    const offsetX = (vwWidth - lengthX * multiplier)/2;
+    const offsetY = (vwWidth - lengthYX * multiplier)/2;
+
+    const elem = document.createElement('member')
+
+    const radius = circle.r * 2 * multiplier - MARGIN;
+
+    elem.className = 'clockCircle'
+    elem.innerHTML = 
+    `<div class="time">
+        <div class="colon">
+            
+        </div>
+        <div class="numbers">
+            <div class="hours" id="hoursCircleText">
+            11:35
+            </div>
+         
+        </div>
+    </div>`
+//     <div class="minutes">
+// </div>
+    elem.style.width = elem.style.height = radius + "vw";
+    elem.style.left = (circle.x - minX) * multiplier + offsetX - radius/2 + "vw";
+    elem.style.top = (circle.y - minY) * multiplier + offsetY - radius/2 + "vw";
+    elem.style.fontSize = radius + "vw"
+    if(alone){elem.classList.add('clockCircleAlone')}
+
+    // elem.style.backgroundImage = `url(${circle.imgurl})`
+    // elem.innerHTML = 'hi'
+    membersDiv.appendChild(elem)
+
+}
+
+export function redrawCircles(circles:Circle[]) {
     membersDiv.innerHTML = ''
     
-    circles.forEach(renderCircle)
+    circles.forEach((circle:Circle)=>{
+        if(circle instanceof MemberCircle) {
+            renderCircle(circle as MemberCircle);
+        } else if (circle instanceof ClockCircle) {
+            renderClock(circle as ClockCircle,circles.length==1);
+        }
+    })
 }
 
 export function getRatio() {

@@ -1,6 +1,6 @@
 import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, CluckMember } from "../../types";
-import { MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
+import { Circle, ClockCircle, MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
 import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
@@ -14,7 +14,7 @@ refreshDelphi()
 setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
 
 function regenCircles(loggedin: LoggedIn) {
-    let placedCircles: MemberCircle[] = [];
+    let placedCircles: Circle[] = [];
 
     const circles = []
     const now = Date.now()
@@ -26,6 +26,9 @@ function regenCircles(loggedin: LoggedIn) {
             member.img
         ))
     }
+
+    circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
+    console.log(circles)
 
     setDelphiVisibility(circles.length < 23)  // <-- setDelphiVisibility(getNameDensity(circles) < 1)
 
@@ -60,7 +63,7 @@ function update() {
 
 async function start() {
     members = await (await fetch(getApiEndpoint("members"))).json()
-    loggedInCache = {}
+    loggedInCache = null
 
     update()
 
