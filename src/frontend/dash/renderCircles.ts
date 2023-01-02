@@ -94,8 +94,8 @@ function formatClock() {
     let now = new Date()
     let timetext = document.querySelector('#hoursCircleText')
     timetext.innerHTML = 
-    '' + (now.getHours()) % 12 + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
-    if(('' + (now.getHours()) % 12).length == 2) {
+    '' + (((now.getHours()-1) % 12)+1) + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
+    if(('' + (((now.getHours()-1) % 12)+1)).length == 2) {
         timetext.classList.add('timeSmallerText')
     } else {
         timetext.classList.remove('timeSmallerText')
