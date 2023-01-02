@@ -238,22 +238,26 @@ pre {
 }
 
 .time{
+    font-size: 35%;
     color:rgb(255, 234, 170);
     display: flex;
     flex-shrink: 100;
     min-height: 0;
-    padding-top:0.15em;
+    padding-top:0.3em;
 
     font-family: fishface;
     /* font-size: 80px; */
     align-items: center;
     justify-content: center;
 
-    /* filter: drop-shadow(4px 8px 0px #741e1e); */
+    filter: drop-shadow(8px 16px 0px #741e1e);
 
 }
+.timeSmallerText{
+    font-size: 86% !important;
+}
 .hours{
-    font-size: 50%;
+    /* font-size: 50%; */
     /* font-size: 6vw; */
 }
 .minutes{
@@ -275,10 +279,9 @@ pre {
     display: flex;
     /* background-color: rgba(255, 255, 255, 0.184); */
     border-radius: 100%;
-    backdrop-filter: blur(3vw);
+    backdrop-filter: blur(2vw);
     justify-content: center;
     align-items: center;
-    z-index: 100;
 }
 .clockCircleAlone{
     backdrop-filter: none !important;

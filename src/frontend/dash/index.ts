@@ -27,7 +27,17 @@ function regenCircles(loggedin: LoggedIn) {
         ))
     }
 
-    circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
+    // calc clock circle size
+    let rad = 1;
+    if(circles.length > 0) {
+        const average = array => array.reduce((a, b) => a + b) / array.length;
+        let radii = circles.map((circle:Circle)=>circle.r)
+        let avgRad = average(radii)
+        let numRad = radii.length
+        rad = avgRad * ((1 - 1/2.4) + Math.pow(numRad,1/3)/2.4)
+    }
+    circles.push(new ClockCircle(rad));
+    // circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
     console.log(circles)
 
     setDelphiVisibility(circles.length < 23)  // <-- setDelphiVisibility(getNameDensity(circles) < 1)

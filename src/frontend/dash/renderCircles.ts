@@ -44,13 +44,7 @@ function renderCircle(circle: MemberCircle) {
     elem.appendChild(name)
 }
 
-setInterval(()=>{
-    let now = new Date()
-    document.querySelector('#hoursCircleText').innerHTML = 
-    '' + now.getHours() % 12 + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
-    ,
-    1000
-})
+
 function renderClock(circle: ClockCircle, alone?:boolean) {
     const { maxX, maxY, minX, minY } = getBounds()
     const widthMult = membersDiv.clientWidth/membersDiv.clientHeight;
@@ -87,14 +81,27 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
     elem.style.width = elem.style.height = radius + "vw";
     elem.style.left = (circle.x - minX) * multiplier + offsetX - radius/2 + "vw";
     elem.style.top = (circle.y - minY) * multiplier + offsetY - radius/2 + "vw";
-    elem.style.fontSize = radius + "vw"
+    elem.style.fontSize = Math.min(radius) + "vw"
+
     if(alone){elem.classList.add('clockCircleAlone')}
 
     // elem.style.backgroundImage = `url(${circle.imgurl})`
     // elem.innerHTML = 'hi'
     membersDiv.appendChild(elem)
-
+    formatClock()
 }
+function formatClock() {
+    let now = new Date()
+    let timetext = document.querySelector('#hoursCircleText')
+    timetext.innerHTML = 
+    '' + (now.getHours()) % 12 + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
+    if(('' + (now.getHours()) % 12).length == 2) {
+        timetext.classList.add('timeSmallerText')
+    } else {
+        timetext.classList.remove('timeSmallerText')
+    }
+}
+setInterval(formatClock,1000)
 
 export function redrawCircles(circles:Circle[]) {
     membersDiv.innerHTML = ''
