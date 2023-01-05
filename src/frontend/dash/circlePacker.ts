@@ -12,7 +12,7 @@
     smaller circles to make them approach a similar sizes.
 */
 let aspectRatio = 1;
-let deltaAvg = 0.95;
+const deltaAvg = 0.95;
 
 let placedCircles: Circle[] = []
 let maxX;
@@ -149,7 +149,7 @@ function placeCircle(circle) {
 }
 
 function isVacant(circle, x, y) {
-    for(let circle1 of placedCircles) {
+    for(const circle1 of placedCircles) {
         if(getDistanceFrom(circle1, x, y) + 0.0001 < circle.r + circle1.r)
             return false;
     }
@@ -189,10 +189,10 @@ export function placeCircles(circles: Circle[]) {
         // console.log(circle.x);
         // console.log(circle.y);
         // console.log(circle.r);
-        let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
-        let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
-        let targetMinX1 = minX = Math.min(minX, circle.x - circle.r);
-        let targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
+        const targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
+        const targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
+        const targetMinX1 = minX = Math.min(minX, circle.x - circle.r);
+        const targetMinY1 = minY = Math.min(minY, circle.y - circle.r);
 
         targetMaxX = Math.max(targetMaxX1, targetMaxY1*aspectRatio);
         targetMaxY = Math.max(targetMaxY1, targetMaxX1/aspectRatio);
