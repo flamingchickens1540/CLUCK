@@ -81,7 +81,7 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
     elem.style.width = elem.style.height = radius + "vw";
     elem.style.left = (circle.x - minX) * multiplier + offsetX - radius/2 + "vw";
     elem.style.top = (circle.y - minY) * multiplier + offsetY - radius/2 + "vw";
-    elem.style.fontSize = Math.min(radius) + "vw"
+    elem.style.fontSize = radius + "vw"
 
     if(alone){elem.classList.add('clockCircleAlone')}
 
