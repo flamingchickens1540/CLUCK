@@ -1,5 +1,6 @@
 import { Circle, ClockCircle, getBounds } from "./circlePacker"
 import { MemberCircle } from "./circlePacker"
+import {getArrivals, busSigns} from "./trimet"
 
 const membersDiv = document.getElementById('members');
 
@@ -79,16 +80,19 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
     </div>
     <div class="businfo">
     <div class="busstack">
-        <div class="busname">EAST</div>
-        <div class="bustime">5 min</div>
-        <div class="bustime smoler">18 min</div>
-        <div class="bustime smoller">34 min</div>
+        <div class="busname">
+        Gresham
+    <img src="../static/img/trimet-logo.png" class="trimetlogo">
+        </div>
+        <div class="bustime east ">--&nbsp;min</div>
+        <div class="bustime smoler east">--&nbsp;min</div>
+
     </div>
     <div class="busstack weststack">
-        <div class="busname">WEST</div>
-        <div class="bustime">5 min</div>
-        <div class="bustime smoler">18 min</div>
-        <div class="bustime smoller">34 min</div>
+        <div class="busname">Beaverton</div>
+        <div class="bustime west">-- min</div>
+        <div class="bustime smoler west">-- min</div>
+
     </div>
 </div>
 </div>`
@@ -105,6 +109,7 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
     // elem.innerHTML = 'hi'
     membersDiv.appendChild(elem)
     formatClock()
+    setBusInfo()
 }
 function formatClock() {
     let now = new Date()
@@ -117,7 +122,33 @@ function formatClock() {
         timetext.classList.remove('timeSmallerText')
     }
 }
+async function setBusInfo() {
+    let arrivals = await getArrivals()
+    let timeElemsWest = document.querySelectorAll('.bustime.west')
+    let timeElemsEast = document.querySelectorAll('.bustime.east')
+    
+    arrivals[busSigns[0]].forEach((v,i)=>{
+        let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
+        timeElemsEast[i].innerHTML = minutesTill + '&nbsp;min'
+        if(minutesTill <= 5) {
+            timeElemsEast[i].classList.add('soonish')
+        } else {
+            timeElemsEast[i].classList.remove('soonish')
+        }
+    })
+    arrivals[busSigns[1]].forEach((v,i)=>{
+        let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
+        timeElemsWest[i].innerHTML = minutesTill + '&nbsp;min'
+        if(minutesTill <= 5) {
+            timeElemsWest[i].classList.add('soonish')
+        } else {
+            timeElemsWest[i].classList.remove('soonish')
+        }
+    })
+}
+
 setInterval(formatClock,1000)
+setInterval(setBusInfo,1000)
 
 export function redrawCircles(circles:Circle[]) {
     membersDiv.innerHTML = ''
