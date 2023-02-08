@@ -229,7 +229,7 @@ pre {
 }
 
 
-
+/* clock time */
 
 
 @font-face {
@@ -286,3 +286,55 @@ pre {
 .clockCircleAlone{
     backdrop-filter: none !important;
 }
+
+/* bus info */
+
+.timestack{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.businfo{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.2vw;
+}
+.busstack{
+    display: flex;
+    flex-direction: column;
+    align-items:flex-end;
+}
+.weststack{
+    align-items:flex-start;
+}
+.busname{
+    background-color: rgb(50, 101, 255);
+    /* text-decoration: underline; */
+    font-family: sans-serif;
+    color:white;
+    padding:4%;
+    padding-left:20%;
+    padding-right:20%;
+    border-radius: 10px;
+    font-size: 10%;
+    margin-bottom: 2%;
+    filter:drop-shadow(4px 4px 0px rgb(0, 37, 150));
+
+}
+.bustime{
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 14%;
+    /* font-style: italic; */
+    color: rgb(255, 255, 255);
+    filter:drop-shadow(4px 4px 0px rgb(0, 33, 140));
+}  
+.smoler{
+    font-size: 10%;
+} 
+.smoller{
+    font-size: 7%;
+} 

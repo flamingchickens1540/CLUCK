@@ -65,7 +65,8 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
 
     elem.className = 'clockCircle'
     elem.innerHTML = 
-    `<div class="time">
+    `<div class="timestack">
+    <div class="time">
         <div class="colon">
             
         </div>
@@ -75,7 +76,22 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
             </div>
          
         </div>
-    </div>`
+    </div>
+    <div class="businfo">
+    <div class="busstack">
+        <div class="busname">EAST</div>
+        <div class="bustime">5 min</div>
+        <div class="bustime smoler">18 min</div>
+        <div class="bustime smoller">34 min</div>
+    </div>
+    <div class="busstack weststack">
+        <div class="busname">WEST</div>
+        <div class="bustime">5 min</div>
+        <div class="bustime smoler">18 min</div>
+        <div class="bustime smoller">34 min</div>
+    </div>
+</div>
+</div>`
 //     <div class="minutes">
 // </div>
     elem.style.width = elem.style.height = radius + "vw";
