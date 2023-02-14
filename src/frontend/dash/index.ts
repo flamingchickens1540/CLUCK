@@ -18,7 +18,7 @@ function regenCircles(loggedin?: LoggedIn) {
 
     let placedCircles: Circle[] = [];
 
-    const circles = []
+    const circles:Circle[] = []
     const now = Date.now()
     for(const ent in loggedin) {
         const member = members.find(o => o.name == ent)
@@ -29,11 +29,22 @@ function regenCircles(loggedin?: LoggedIn) {
         ))
     }
 
+    // scale circles so that largest circle is at most twice the smallest circle
+    let radii = circles.map((circle:Circle)=>circle.r)
+    let maxR = Math.max(...radii)
+    let minR = Math.min(...radii)
+    let scaleR = minR/(maxR-minR)
+    if(scaleR < 1) { // only scale if youre smooshing the relations
+        circles.forEach(circle=>{
+            circle.r = (circle.r - minR) * scaleR + minR
+        })
+        radii = circles.map((circle:Circle)=>circle.r)
+    }   
+
     // calc clock circle size
     let rad = 1;
     if(circles.length > 0) {
         const average = array => array.reduce((a, b) => a + b) / array.length;
-        let radii = circles.map((circle:Circle)=>circle.r)
         let avgRad = average(radii)
         let numRad = radii.length
         rad = avgRad * ((1 - 1/2.4) + Math.pow(numRad,1/3)/1)
