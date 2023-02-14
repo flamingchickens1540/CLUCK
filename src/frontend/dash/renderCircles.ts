@@ -128,6 +128,7 @@ async function setBusInfo() {
     let timeElemsEast = document.querySelectorAll('.bustime.east')
     
     arrivals[busSigns[0]].forEach((v,i)=>{
+        if(i>=2) {return} // only set first 2 arrivals
         let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
         timeElemsEast[i].innerHTML = minutesTill + '&nbsp;min'
         if(minutesTill <= 5) {
@@ -137,6 +138,7 @@ async function setBusInfo() {
         }
     })
     arrivals[busSigns[1]].forEach((v,i)=>{
+        if(i>=2) {return} // only set first 2 arrivals
         let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
         timeElemsWest[i].innerHTML = minutesTill + '&nbsp;min'
         if(minutesTill <= 5) {
