@@ -26,7 +26,9 @@ async function refetchArrivals() {
 }
 
 export async function getArrivals() {
-    if((Date.now() - lastQueried)>(1000 * ratelimit)) {
+    if(lastQueried == 0) {
+        await refetchArrivals()
+    } else if((Date.now() - lastQueried)>(1000 * ratelimit)) {
         refetchArrivals()
     }
     return cache;
