@@ -17,7 +17,7 @@ async function refetchArrivals() {
     let timesOnly = res.resultSet.arrival.reduce( // credit https://dev.to/_bigblind/quick-tip-transform-an-array-into-an-object-using-reduce-2gh6
         (acc, post) => {
             let {shortSign, estimated, scheduled} = post;
-            // if(!estimated) {estimated = scheduled}
+            if(!estimated) {estimated = scheduled}
             return {...acc, [shortSign]: [...(acc[shortSign] || []), estimated]};
         }, {}
     )
