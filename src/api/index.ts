@@ -1,7 +1,7 @@
 
 import type { FailedEntry, LoggedIn } from '../types'
 
-import { WebClient, WebClientEvent } from "@slack/web-api"
+import { LogLevel, WebClient, WebClientEvent } from "@slack/web-api"
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import { CronJob } from 'cron'
@@ -16,7 +16,23 @@ import { addHoursSafe, configureDrive, updateLoggedIn } from "./spreadsheet"
 
 
 
-export const client: WebClient = new WebClient(slack_token)
+export const client: WebClient = new WebClient(slack_token, {
+    logger: {
+    debug: (...msgs) => {},
+    info: (...msgs) => {},
+    warn: (...msgs:string[]) => { 
+        msgs.forEach((value) => {
+            if (value.toLowerCase().includes("rate limit")) {
+                return;
+            }
+        })
+        console.warn(msgs)
+    },
+    error: console.error,
+    setLevel: () => { },
+    getLevel: () => {return LogLevel.WARN },
+    setName: () => { },
+}})
 
 client.on(WebClientEvent.RATE_LIMITED, (numSeconds) => {
     console.debug(`A rate-limiting error occurred and the app is going to retry in ${numSeconds} seconds.`);
