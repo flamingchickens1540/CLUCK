@@ -308,10 +308,12 @@ pre {
     display: flex;
     flex-direction: column;
     align-items:flex-end;
+    z-index: 1;
+
 }
 .weststack{
     align-items:flex-start;
-    z-index: -1;
+    z-index: 0 !important;
 }
 .busname{
     background-color: rgb(50, 101, 255);
