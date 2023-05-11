@@ -2,7 +2,7 @@ import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, CluckMember } from "../../types";
 import { Circle, ClockCircle, MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
-import { refreshDelphi, setDelphiVisibility } from "./chiefdelphi"
+import { cyclePanel, setPanelVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
 let members: CluckMember[]
@@ -10,8 +10,8 @@ let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen
 
-refreshDelphi()
-setInterval(refreshDelphi, 1000 * 60 * 2) // refresh post every 1 minute
+cyclePanel()
+setInterval(cyclePanel, 1000 * 60 * 2) // chnage panel every 2 minutes
 
 function regenCircles(loggedin?: LoggedIn) {
     if(loggedin===undefined) {loggedin = loggedInCache}
@@ -53,7 +53,7 @@ function regenCircles(loggedin?: LoggedIn) {
     // circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
     console.log(circles)
 
-    setDelphiVisibility(circles.length < 23)  // <-- setDelphiVisibility(getNameDensity(circles) < 1)
+    setPanelVisibility(circles.length < 23)  // <-- setPanelVisibility(getNameDensity(circles) < 1)
 
     setAspectRatio(getRatio());
     placedCircles = placeCircles(circles);

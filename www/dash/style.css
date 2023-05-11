@@ -287,6 +287,26 @@ pre {
     backdrop-filter: none !important;
 }
 
+#delphicontent{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap:20px;
+
+}
+.theimage{
+    display: flex;
+   max-width:90%;
+   max-height:90%;
+   justify-self: center;
+   align-self: center;
+   box-shadow: .2vw .2vw .7vw .4vw rgba(18, 18, 18, 0.7);  
+   
+   border: solid 16px rgba(0, 162, 255, 0.3);
+   rotate: 3deg;
+    /* height:100px; */
+}
+
 /* bus info */
 
 .timestack{

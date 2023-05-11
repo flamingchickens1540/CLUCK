@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import fetch from "node-fetch";
 import sanitizeHtml from 'sanitize-html';
-import { basepath } from "../secrets/consts";
+import { basepath, drive_image_folder_id, drive_api_key } from "../secrets/consts";
 import path from 'path'
 // Dashboard
 
@@ -10,11 +10,24 @@ export const router = Router()
 
 // Dashboard
 let delphiPost = 0;
+let imageI = 0;
 
 
 router.get("/", (req, res) => res.redirect(path.join("/", basepath, "/dash/")))
 router.use("/dash/", express.static("./www/dash", {redirect: false}))
 router.use('/dash/', express.static("./dist/dash", {redirect:false}))
+router.get('/dash/image', async (req, res, next) => {
+    try{
+        let resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}`)
+        let respj: any = await resp.json()
+        let images = respj.files.filter(file=>file.mimeType.includes('image'))
+        imageI++; imageI%=images.length
+        res.send(`https://drive.google.com/uc?id=${images[imageI].id}`)
+    } catch (e) {
+        console.error(e)
+        next(e)
+    }
+})
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
     
