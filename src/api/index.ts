@@ -28,7 +28,14 @@ export const client: WebClient = new WebClient(slack_token, {
         })
         console.warn(msgs)
     },
-    error: console.error,
+    error: (...msgs:string[]) => { 
+        msgs.forEach((value) => {
+            if (value.toLowerCase().includes("rate limit")) {
+                return;
+            }
+        })
+        console.error(msgs)
+    },
     setLevel: () => { },
     getLevel: () => {return LogLevel.WARN },
     setName: () => { },
