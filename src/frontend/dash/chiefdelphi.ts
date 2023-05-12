@@ -77,8 +77,8 @@ export async function cyclePanel() {
     panelTypeI++;
     PANEL_TYPE = panelTypeOrder[panelTypeI%panelTypeOrder.length];
 
-    if(PANEL_TYPE == PanelType.Delphi) {refreshDelphi()}
-    if(PANEL_TYPE == PanelType.Img) {refreshImage()}
+    if(PANEL_TYPE == PanelType.Delphi) {await refreshDelphi()}
+    if(PANEL_TYPE == PanelType.Img) {await refreshImage()}
 
     setPanelType(PANEL_TYPE)
 }
