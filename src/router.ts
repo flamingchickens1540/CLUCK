@@ -18,7 +18,7 @@ router.use("/dash/", express.static("./www/dash", {redirect: false}))
 router.use('/dash/', express.static("./dist/dash", {redirect:false}))
 router.get('/dash/image', async (req, res, next) => {
     try{
-        let resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}`)
+        let resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}&includeItemsFromAllDrives=true&includeTeamDriveItems=true&supportsTeamDrives=true`)
         let respj: any = await resp.json()
         let images = respj.files.filter(file=>file.mimeType.includes('image'))
         imageI++; imageI%=images.length
