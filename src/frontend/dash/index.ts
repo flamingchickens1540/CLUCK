@@ -11,7 +11,7 @@ let loggedInCache: LoggedIn;
 window["openFullscreen"] = openFullscreen
 
 cyclePanel()
-setInterval(cyclePanel, 1000 * 60 * 2) // chnage panel every 2 minutes
+setInterval(cyclePanel, 1000 * 60 * 1) // chnage panel every 1 minutes
 
 function regenCircles(loggedin?: LoggedIn) {
     if(loggedin===undefined) {loggedin = loggedInCache}
