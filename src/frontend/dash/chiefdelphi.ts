@@ -33,12 +33,19 @@ function getInfo(siteHTML) {
 
     const commentNum = 3;
         for(let n = 2; n<commentNum+2;n++){
-            const comment = doc.querySelector(`#post_${n}`) as HTMLElement;
-            if(comment == null) {
+            const commentElem = doc.querySelector(`#post_${n}`) as HTMLElement;
+            const comment = document.createElement(`post`);
+            if(commentElem == null) {
                 break;
             }
-            const posterName = (comment.querySelector(`.creator > span > span`) as HTMLElement)?.innerHTML ?? ''
-            let commentTime = comment.querySelector(`.post-time`)?.innerHTML.trim() ?? ''
+            
+            // comment body
+            let commentBody = commentElem.querySelector('.post')
+            commentBody.classList.add('post_body')
+            comment.append(commentBody)
+
+            const posterName = (commentElem.querySelector(`.creator > span > span`) as HTMLElement)?.innerHTML ?? ''
+            let commentTime = commentElem.querySelector(`.post-time`)?.innerHTML.trim() ?? ''
             commentTime = commentTime.replace(/\d\d\d\d, /,'')
 
             ret.body.appendChild(document.createElement("br"));

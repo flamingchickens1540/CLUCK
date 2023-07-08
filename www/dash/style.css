@@ -212,6 +212,12 @@ pre {
     font-size:3.3vh;
     margin-left:1vw;
 }
+.post_body {
+    padding: 0px;
+    /* background-color: rgba(175, 175, 175, 0.1); */
+    font-size:3.3vh;
+    margin-left: calc(1vw + 10px);
+}
 .commenter_name{
     font-style: italic;
     color:rgba(255, 255, 255, 0.529);
