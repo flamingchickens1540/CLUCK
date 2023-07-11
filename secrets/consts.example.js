@@ -1,5 +1,5 @@
 export const slack_token="xoxb-abcdefg"
-export const hours_spreadsheet_id = 'abcdefg'
+export const hours_spreadsheet_id = 'abcdefg' // AKA GOOGLE_SHEETS_DOCUMENT_ID
 export const drive_api_key = 'abcdefg'
 export const drive_image_folder_id = 'abcdefg'
 export const cluck_api_keys = {
