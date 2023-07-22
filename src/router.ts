@@ -21,7 +21,7 @@ router.get('/dash/image', async (req, res, next) => {
         let resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}&includeItemsFromAllDrives=true&includeTeamDriveItems=true&supportsTeamDrives=true`)
         let respj: any = await resp.json()
         console.log(respj)
-        let images = respj.files.filter(file=>['image/png','image/jpeg'].includes(file.mimeType))
+        let images = respj.files.filter(file=>['image/png','image/jpeg','image/gif'].includes(file.mimeType))
         imageI++; imageI%=images.length
         res.send(`https://drive.google.com/uc?id=${images[imageI].id}`)
     } catch (e) {
