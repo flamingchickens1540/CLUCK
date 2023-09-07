@@ -1,4 +1,3 @@
-
 import type { FailedEntry, LoggedIn } from '../types'
 
 import { LogLevel, WebClient, WebClientEvent } from "@slack/web-api"
@@ -20,7 +19,7 @@ export const client: WebClient = new WebClient(slack_token, {
     logger: {
     debug: (...msgs) => {},
     info: (...msgs) => {},
-    warn: (...msgs:string[]) => { 
+    warn: (...msgs:string[]) => {
         msgs.forEach((value) => {
             if (value.toLowerCase().includes("rate limit")) {
                 return;
@@ -28,7 +27,7 @@ export const client: WebClient = new WebClient(slack_token, {
         })
         console.warn(msgs)
     },
-    error: (...msgs:string[]) => { 
+    error: (...msgs:string[]) => {
         msgs.forEach((value) => {
             if (value.toLowerCase().includes("rate limit")) {
                 return;
@@ -81,20 +80,20 @@ router.use((req, res, next) => {
             body["api_key"] = isValidAuth(req.body.api_key) ? "VALID_API_KEY" : "INVALID_API_KEY";
             authString = decodeAuth(req.body.api_key)[0];
         }
-        console.log(req.method, req.url, "("+authString+")", "["+new Date().toLocaleString()+"]", JSON.stringify(body));
+        console.log(req.method, req.url,'<'+(req.header('X-Forwarded-For') ?? 'unknown')+'>',  "("+authString+")", "["+new Date().toLocaleString()+"]", JSON.stringify(body));
     }
     next();
 })
 
 // INIT API ROUTES
 router.post('/clock', (req, res) => {
-    
+
     // Get and check args
     const { name, loggingin, api_key: apiKey} = req.body;
     // Authenticate
     if(!isValidAuth(apiKey)) {res.status(401).send('Bad Cluck API Key').end(); return; }
     if (typeof name === 'undefined' || typeof loggingin === 'undefined') { res.status(400).send('Must include name string and loggingin boolean in URL query').end(); return; }
-    
+
     if (loggingin) {
         // Log In
         if (!loggedIn[name]) { loggedIn[name] = Date.now() }
@@ -114,24 +113,24 @@ router.post('/clock', (req, res) => {
 router.post('/log', (req, res) => {
     // Authenticate
     if(!isValidAuth(req.body.api_key)) {res.status(401).send('Bad Cluck API Key').end(); return; }
-   
+
     // Get and check args
     const name = req.body.name; // User name to add hours to
     const hours = parseFloat(req.body.hours); // Time to add in hours
     const activity = req.body.activity; // Activity
- 
+
     // Check for existing request arguments
     if (!name) { res.status(400).send('Must include name in body').end(); return; }
     if (!hours) { res.status(400).send('Must include hours in body').end(); return; }
     if (isNaN(hours)) { res.status(400).send('Must include hours as number in body').end(); return; }
     if (!activity) { res.status(400).send('Must include activity in body').end(); return; }
-    
-    
+
+
     const timeOut = Date.now();
     const timeIn = timeOut - (hours * 60 * 60 * 1000);
-    
+
     res.end();
-    // Convert hours to time in and out        
+    // Convert hours to time in and out
     addHoursSafe(name, failed, timeIn, timeOut, activity);
 })
 
@@ -226,7 +225,7 @@ const cronSignout = () => {
             console.error(error);
         }
     })
-    
+
 }
 new CronJob({
     cronTime: '0 0 * * *',
@@ -242,11 +241,11 @@ export const cronJobs = {
     "signout":cronSignout
 }
 
-export function accessFailed(newValue?:FailedEntry[]) { 
+export function accessFailed(newValue?:FailedEntry[]) {
     failed = newValue ?? failed;
     return failed;
 }
-export function accessLoggedIn(newValue?:LoggedIn) { 
+export function accessLoggedIn(newValue?:LoggedIn) {
     loggedIn = newValue ?? loggedIn;
     return loggedIn;
 }
