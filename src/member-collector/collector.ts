@@ -27,6 +27,7 @@ if (fs.existsSync(photosFilePath)) {
     Object.entries(messyPhotos).forEach(([key, value]) => {
         photos[tokenizeName(key)] = value
     })
+    photos[tokenizeName("Kevin Forbes")] = "https://res.cloudinary.com/veracross/image/upload/w_300,h_300,c_limit/v1663014175/catlin/person_photos/xkcfhq8fcqkzeyehyfgu.jpg"
 }
 
 
@@ -87,17 +88,10 @@ export const collect = async () => {
             })
         })
         
-        // Sort members alphabetically by name
+        // Custom sorting values to use
         const sortNames:{[key:string]:string} = {
-            "Cynthia": "Chloe"
-        }
-        members.push({
-            name: 'Mini Jeffrey',
-            firstname: 'Mini Jeffrey',
-            img: photos[tokenizeName("Ari Wilda")],
-            certs: []
-        })
-        
+            // "Cynthia": "Chloe"
+        }        
         members.sort(function (a, b) {
             const aname = sortNames[a.firstname] ?? a.firstname;
             const bname = sortNames[b.firstname] ?? b.firstname;
