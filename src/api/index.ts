@@ -220,7 +220,7 @@ const cronSignout = () => {
     updateLoggedIn(loggedIn)
     messageUsers.forEach(async (memberName) => {
         try {
-            await sendSlackMessage(memberName, `Hey ${memberName.split(' ')[0]}! You signed into the lab today but forgot to sign out, so we didnt log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`);
+            await sendSlackMessage(memberName, `Hey ${memberName.split(' ')[0]}! You signed into the lab today but forgot to sign out, so we didn't log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`);
         } catch (error) {
             console.error(error);
         }
