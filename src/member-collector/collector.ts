@@ -57,7 +57,7 @@ export const collect = async () => {
         const slackMemberData:CluckMember[] = []
         slackMembers.filter((elem) => !elem.deleted).forEach((user) => {
             if (user == null || user.real_name == null) return
-            const name = user.real_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            const name = user.real_name
             const displayName = user.profile.display_name_normalized.length > 0 ? user.profile.display_name_normalized : name
             slackMemberData[tokenizeName(user.real_name)] = {
                 name: name,
@@ -81,7 +81,7 @@ export const collect = async () => {
             }
             members.push({
                 // if person is not in slack, generate default Member object
-                name: name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+                name: name,
                 firstname: slackMemberData[tokenizeName(name)]?.firstname ?? name.split(" ")[0],
                 img: image,
                 certs: member.certs.map((cert) => certs[cert])
