@@ -89,7 +89,7 @@ export async function getMemberInfo():Promise<SpreadsheetMemberInfo[]> {
 
 export async function addHours(name: string, timeIn: number, timeOut: number, activity: string) {
     await ensureAuthed()
-    
+    name = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     timeOut = timeOut ?? Date.now();
     const timeInSec = timeIn / 1000
     const timeOutSec = timeOut / 1000
