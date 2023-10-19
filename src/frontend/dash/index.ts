@@ -2,7 +2,7 @@ import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, CluckMember } from "../../types";
 import { Circle, ClockCircle, MemberCircle, placeCircles, setAspectRatio } from "./circlePacker";
 import { redrawCircles, getRatio } from "./renderCircles";
-import { cyclePanel, setPanelVisibility } from "./chiefdelphi"
+// import { cyclePanel, setPanelVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
 let members: CluckMember[]
@@ -10,8 +10,8 @@ let loggedInCache: LoggedIn;
 
 window["openFullscreen"] = openFullscreen
 
-cyclePanel()
-setInterval(cyclePanel, 1000 * 60 * 1) // chnage panel every 1 minutes
+// cyclePanel()
+// setInterval(cyclePanel, 1000 * 60 * 1) // chnage panel every 1 minutes
 
 function regenCircles(loggedin?: LoggedIn) {
     if(loggedin===undefined) {loggedin = loggedInCache}
@@ -53,7 +53,7 @@ function regenCircles(loggedin?: LoggedIn) {
     // circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
     console.log(circles)
 
-    setPanelVisibility(circles.length < 23)  // <-- setPanelVisibility(getNameDensity(circles) < 1)
+    // setPanelVisibility(circles.length < 23)  // <-- setPanelVisibility(getNameDensity(circles) < 1)
 
     setAspectRatio(getRatio());
     placedCircles = placeCircles(circles);
@@ -86,6 +86,7 @@ function update() {
 
 async function start() {
     members = await (await fetch(getApiEndpoint("members"))).json()
+
     loggedInCache = null
 
     update()
