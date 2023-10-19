@@ -165,7 +165,6 @@ export function redrawCircles(circles:Circle[]) {
 }
 
 export function getRatio() {
-    console.log(membersDiv.clientWidth/membersDiv.clientHeight)
     return membersDiv.clientWidth/membersDiv.clientHeight;
 }
 

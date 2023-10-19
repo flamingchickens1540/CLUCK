@@ -35,7 +35,6 @@ export async function run(memberlist:CluckMember[]) {
 		// Set click toggle
 		if (!window.skipAuth) {
 			memberButton.onclick = async (click) => {
-				console.log("clicked")
 				if (window.gestureDetected) {return;}
 				// fullscreen()
 				let button = click.target as HTMLMemberButtonElement;
