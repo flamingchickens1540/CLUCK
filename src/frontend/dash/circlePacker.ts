@@ -186,9 +186,6 @@ export function placeCircles(circles: Circle[]) {
         circle.r -= (circle.r - (sizeSum += circle.r)/(placedCircles.length+1)) * deltaAvg;
         placeCircle(circle);
         placedCircles[placedCircles.length] = circle;
-        // console.log(circle.x);
-        // console.log(circle.y);
-        // console.log(circle.r);
         let targetMaxX1 = maxX = Math.max(maxX, circle.x + circle.r);
         let targetMaxY1 = maxY = Math.max(maxY, circle.y + circle.r);
         let targetMinX1 = minX = Math.min(minX, circle.x - circle.r);

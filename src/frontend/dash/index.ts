@@ -51,7 +51,6 @@ function regenCircles(loggedin?: LoggedIn) {
     }
     circles.push(new ClockCircle(rad));
     // circles.push(new ClockCircle(circles.length==0 ? 1:0.4*Math.max(...circles.map((circle:Circle)=>circle.r))));
-    console.log(circles)
 
     setPanelVisibility(circles.length < 23)  // <-- setPanelVisibility(getNameDensity(circles) < 1)
 

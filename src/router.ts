@@ -16,17 +16,20 @@ let imageI = 0;
 router.get("/", (req, res) => res.redirect(path.join("/", basepath, "/dash/")))
 router.use("/dash/", express.static("./www/dash", {redirect: false}))
 router.use('/dash/', express.static("./dist/dash", {redirect:false}))
-router.get('/dash/image', async (req, res, next) => {
+router.get('/dash/image', async (req, res) => {
     try{
-        let resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}&includeItemsFromAllDrives=true&includeTeamDriveItems=true&supportsTeamDrives=true`)
-        let respj: any = await resp.json()
-        console.log(respj)
-        let images = respj.files.filter(file=>['image/png','image/jpeg','image/gif'].includes(file.mimeType))
+        const resp = await fetch(`https://www.googleapis.com/drive/v3/files?q='${drive_image_folder_id}'%20in%20parents&key=${drive_api_key}&includeItemsFromAllDrives=true&includeTeamDriveItems=true&supportsTeamDrives=true`)
+        const respj: {
+            kind:string,
+            incompleteSearch:boolean
+            files: {kind:string, driveId:string, mimeType:string, id:string, name:string, teamDriveId:string}[]
+        } = await resp.json() as any
+        const images = respj.files.filter(file=>['image/png','image/jpeg','image/gif'].includes(file.mimeType))
         imageI++; imageI%=images.length
         res.send(`https://drive.google.com/uc?id=${images[imageI].id}`)
     } catch (e) {
         console.error(e)
-        next(e)
+        res.status(500).send("Error loading image")
     }
 })
 router.get('/dash/delphi', async (req, res) => {
@@ -60,7 +63,7 @@ router.get('/dash/delphi', async (req, res) => {
             }
         }))
     } catch (e) {
-        res.status(400).send("Error loading delphi post")
+        res.status(500).send("Error loading delphi post")
     }
 })
 
