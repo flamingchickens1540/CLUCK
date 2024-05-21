@@ -6,7 +6,6 @@ const membersDiv = document.getElementById('members');
 
 const MARGIN = 1;
 
-const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93,34,.5)', 'rgba(108,157,204,.5)']
 function renderCircle(circle: MemberCircle) {
     const { maxX, maxY, minX, minY } = getBounds()
     const widthMult = membersDiv.clientWidth/membersDiv.clientHeight;
@@ -27,8 +26,8 @@ function renderCircle(circle: MemberCircle) {
 
     elem.className = 'memberCircle'
     elem.style.width = elem.style.height = radius + "vw";
-    elem.style.left = (circle.x - minX) * multiplier + offsetX - radius/2 + "vw";
-    elem.style.top = (circle.y - minY) * multiplier + offsetY - radius/2 + "vw";
+    elem.style.left = (circle.position.x - minX) * multiplier + offsetX - radius/2 + "vw";
+    elem.style.top = (circle.position.y - minY) * multiplier + offsetY - radius/2 + "vw";
 
     elem.style.backgroundImage = `url(${circle.imgurl})`
     // elem.innerHTML = 'hi'
@@ -41,7 +40,8 @@ function renderCircle(circle: MemberCircle) {
     const name = document.createElement('name')
     name.innerHTML = circle.name
     name.className = 'bubblename'
-    name.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+    name.style.backgroundColor = circle.bubbleColor;
+    name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
     elem.appendChild(name)
 }
 
@@ -99,8 +99,8 @@ function renderClock(circle: ClockCircle, alone?:boolean) {
 //     <div class="minutes">
 // </div>
     elem.style.width = elem.style.height = radius + "vw";
-    elem.style.left = (circle.x - minX) * multiplier + offsetX - radius/2 + "vw";
-    elem.style.top = (circle.y - minY) * multiplier + offsetY - radius/2 + "vw";
+    elem.style.left = (circle.position.x - minX) * multiplier + offsetX - radius/2 + "vw";
+    elem.style.top = (circle.position.y - minY) * multiplier + offsetY - radius/2 + "vw";
     elem.style.fontSize = Math.min(radius) + "vw"
 
     if(alone){elem.classList.add('clockCircleAlone')}
@@ -159,7 +159,7 @@ export function redrawCircles(circles:Circle[]) {
         if(circle instanceof MemberCircle) {
             renderCircle(circle as MemberCircle);
         } else if (circle instanceof ClockCircle) {
-            renderClock(circle as ClockCircle,circles.length==1);
+            // renderClock(circle as ClockCircle,circles.length==1);
         }
     })
 }
