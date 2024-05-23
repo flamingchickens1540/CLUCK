@@ -41,7 +41,8 @@ function renderCircle(circle: MemberCircle) {
     name.innerHTML = circle.name
     name.className = 'bubblename'
     name.style.backgroundColor = circle.bubbleColor;
-    name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
+    // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
+    name.style.fontSize = '10px';
     elem.appendChild(name)
 }
 
