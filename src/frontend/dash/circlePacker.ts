@@ -1,3 +1,5 @@
+const membersDiv = document.getElementById('members');
+
 export class Vector2D {
     x : number;
     y : number;
@@ -28,7 +30,12 @@ export class Circle {
     acceleration : Vector2D;
     
     r: number;
+
+    readonly element : HTMLElement;
+
     constructor(r) {
+        this.element = membersDiv.appendChild(document.createElement("name"));
+
         this.r = r;
         this.position = new Vector2D();
         this.acceleration = new Vector2D();
@@ -42,19 +49,35 @@ export class Circle {
     get charge() {
         return this.r**3 / 10;
     }
+
+    destroy() {
+        this.element.remove();
+        placedCircles.splice(placedCircles.indexOf(this), 1);
+    }
 }
 
 export class MemberCircle extends Circle {
-    name: string;
-    imgurl: string;
+    loginTime : number;
+    name : string;
 
-    bubbleColor : string;
-    constructor(hours, name, imgurl) {
-        super((Math.sqrt(hours + .2)) * 10);
-        this.name = name;
-        this.imgurl = imgurl;
+    constructor(loginTime, name, imgurl) {
+        super(Math.sqrt(.2) * 10);
 
-        this.bubbleColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+        this.loginTime = loginTime;
+
+        this.element.style.backgroundImage = `url(${imgurl})`;
+        this.element.className = 'memberCircle'
+
+        const nameBubble = this.element.appendChild(document.createElement('name'));
+        this.name = nameBubble.innerHTML = name
+        nameBubble.className = 'bubblename'
+        nameBubble.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+        // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
+        nameBubble.style.fontSize = '10px';
+    }
+
+    updateSize() {
+        this.r = Math.sqrt((Date.now() - this.loginTime) + .2) * 10;
     }
 }
 
@@ -69,6 +92,8 @@ const FORCE_MULTIPLIER = 0.1;
 const BOUNDARY_FIELD = 0.02;
 const FRICTION = 0.25;
 let TIME_SCALE = 1;
+const MARGIN = 1;
+
 
 export function getBounds() {
     if(placedCircles.length == 0) {
@@ -98,9 +123,7 @@ export function getBounds() {
 }
 
 function getAspectRatio() {
-    const container = document.getElementById("members");
-
-    return container.clientWidth / container.clientHeight;
+    return membersDiv.clientWidth / membersDiv.clientHeight;
 }
 
 export function updateCircleList(loggedIn : [string, number][]) {
@@ -140,12 +163,15 @@ export function placeCircles(circles : Circle[]) {
 
 export function updateCircles(time : number) {
     if(time > 100) return;
+
     placedCircles.forEach(circle => {
         if(circle instanceof MemberCircle) {
             circle.r += time / 360000;
         }
-    })
+    });
+
     time *= TIME_SCALE;
+    
     const centerX = placedCircles.map(circle => circle.position.x).reduce((sum, r) => sum + r, 0) / placedCircles.length;
     const centerY = placedCircles.map(circle => circle.position.y).reduce((sum, r) => sum + r, 0) / placedCircles.length;
     // const centerX = 0;
@@ -190,6 +216,29 @@ export function updateCircles(time : number) {
     }
 }
 
+export function sizeCircles() {
+    const { maxX, maxY, minX, minY } = getBounds()
+    const widthMult = membersDiv.clientWidth/membersDiv.clientHeight;
+
+    const lengthYX = (maxY - minY) * widthMult;
+    const lengthX = maxX - minX;
+
+    const vwWidth = membersDiv.clientWidth/window.innerWidth * 100;
+
+    const multiplier = vwWidth/(lengthYX > lengthX ? lengthYX : lengthX);
+    
+    const offsetX = (vwWidth - lengthX * multiplier)/2;
+    const offsetY = (vwWidth - lengthYX * multiplier)/2;
+
+    for(const circle of placedCircles) {
+        const elem = circle.element;
+        const radius = circle.r * 2 * multiplier - MARGIN;
+
+        elem.style.width = elem.style.height = `${radius}vw`;
+        elem.style.left = `${(circle.position.x - minX) * multiplier + offsetX - radius/2}vw`;
+        elem.style.top = `${(circle.position.y - minY) * multiplier + offsetY - radius/2}vw`;
+    }
+}
 function circlesTouching(circle : Circle, circles : Circle[]) {
     return !circles.every(otherCircle => circle.r + otherCircle.r <= circle.position.getDistanceFrom(otherCircle.position));
 }

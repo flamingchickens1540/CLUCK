@@ -1,7 +1,6 @@
 import { Circle, ClockCircle, getBounds } from "./circlePacker"
 import { MemberCircle } from "./circlePacker"
 import {getArrivals, busSigns} from "./trimet"
-
 const membersDiv = document.getElementById('members');
 
 const MARGIN = 1;
