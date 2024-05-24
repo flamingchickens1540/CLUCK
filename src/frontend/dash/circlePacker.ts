@@ -22,9 +22,13 @@ export class Vector2D {
     scaled(scalar : number) {
         return new Vector2D(this.x * scalar, this.y * scalar);
     }
+
+    added(vector : Vector2D) {
+        return new Vector2D(this.x + vector.x, this.y + vector.y);
+    }
 }
 
-export class Circle {
+export abstract class Circle {
     position : Vector2D;
     velocity : Vector2D;
     acceleration : Vector2D;
@@ -43,17 +47,20 @@ export class Circle {
     }
 
     get mass() {
-        return Math.PI * this.r**3;
+        return Math.PI * this.r**2;
+        // return 200;
     }
 
     get charge() {
-        return this.r**3 / 10;
+        return this.r**2 / 3;
     }
 
     destroy() {
         this.element.remove();
-        placedCircles.splice(placedCircles.indexOf(this), 1);
+        console.log(placedCircles.splice(placedCircles.indexOf(this), 0));
     }
+
+    abstract updateSize();
 }
 
 export class MemberCircle extends Circle {
@@ -77,21 +84,61 @@ export class MemberCircle extends Circle {
     }
 
     updateSize() {
-        this.r = Math.sqrt((Date.now() - this.loginTime) + .2) * 10;
+        this.r = Math.sqrt((Date.
+        now() - this.loginTime) / 36000 + .2) * 10;
     }
 }
 
 export class ClockCircle extends Circle{
+    constructor() {
+        super(Math.sqrt(.2) * 10);
+        this.element.className = 'clockCircle'
+        this.element.innerHTML = 
+        `<div class="timestack">
+        <div class="time">
+            <div class="colon">
+                
+            </div>
+            <div class="numbers">
+                <div class="hours" id="hoursCircleText">
+                11:35
+                </div>
+                
+            </div>
+        </div>
+        <div class="businfo">
+        <div class="busstack">
+            <div class="busname">
+            Gresham
+        <img src="../static/img/trimet-logo.png" class="trimetlogo">
+            </div>
+            <div class="bustime east ">--&nbsp;min</div>
+            <div class="bustime smoler east">--&nbsp;min</div>
+
+        </div>
+        <div class="busstack weststack">
+            <div class="busname">Beaverton</div>
+            <div class="bustime west">-- min</div>
+            <div class="bustime smoler west">-- min</div>
+
+        </div>
+        </div>
+        </div>`
+    }
+
+    updateSize() {
+        this.r = Math.sqrt(.2) * 10;
+
+        this.r = Math.max(...placedCircles.map(circle => circle.r));
+    }
 }
 
 export let placedCircles: Circle[] = [];
 
-
 const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93,34,.5)', 'rgba(108,157,204,.5)']
 const FORCE_MULTIPLIER = 0.1;
-const BOUNDARY_FIELD = 0.02;
-const FRICTION = 0.25;
-let TIME_SCALE = 1;
+const FRICTION = 0.8;
+const TIME_SCALE = 1;
 const MARGIN = 1;
 
 
@@ -122,13 +169,34 @@ export function getBounds() {
     return bounds;
 }
 
-function getAspectRatio() {
-    return membersDiv.clientWidth / membersDiv.clientHeight;
+let aspectRatio = 1;
+function updateAspectRatio() {
+    aspectRatio = membersDiv.clientWidth / membersDiv.clientHeight;
+}
+
+const BOUNDARY_FIELD = 0.005;
+
+export function applyBoundaryForce(circle : Circle) {
+    const acceleration = circle.position
+    .scaled(-circle.charge / circle.mass * BOUNDARY_FIELD * FORCE_MULTIPLIER);
+
+    acceleration.y *= aspectRatio;
+
+    circle.acceleration = acceleration.scaled(1 / (3 + 2**acceleration.getDistanceFrom(new Vector2D())));
+    // .scaled(1/Math.sqrt(acceleration.getDistanceFrom(new Vector2D())));
 }
 
 export function updateCircleList(loggedIn : [string, number][]) {
     placedCircles = placedCircles.filter(
-        circle => !(circle instanceof MemberCircle) || loggedIn.find(entry => entry[0] == circle.name)
+        circle => {
+            if(circle instanceof MemberCircle) {
+                if(!loggedIn.find(entry => entry[0] == circle.name)) {
+                    circle.destroy();
+                    return false;
+                }
+            }
+            return true;
+        }
     );
 
     return loggedIn.filter(
@@ -144,18 +212,17 @@ export function placeCircles(circles : Circle[]) {
     const bounds = getBounds();
 
     const newPlacedCircles = [];
-    const maxNewBoundSpace = Math.max(...circles.map(circle => circle.r));
+    let maxNewBoundSpace = Math.max(...circles.map(circle => circle.r));
 
     for(const circle of circles) {
-        // do {
-            const offsetX = Math.random() * maxNewBoundSpace + circle.r;
-            const offsetY = Math.random() * maxNewBoundSpace + circle.r;
-            
-            circle.position.x = Math.random() > 0.5 ? offsetX + bounds.maxX : bounds.minX - offsetX;
-            circle.position.y = Math.random() > 0.5 ? offsetY + bounds.maxY : bounds.minY - offsetY;
-        // } while (circlesTouching(circle, newPlacedCircles));
+        const offsetX = Math.random() * maxNewBoundSpace + circle.r;
+        const offsetY = Math.random() * maxNewBoundSpace + circle.r;
+        
+        circle.position.x = Math.random() > 0.5 ? offsetX + bounds.maxX : bounds.minX - offsetX;
+        circle.position.y = Math.random() > 0.5 ? offsetY + bounds.maxY : bounds.minY - offsetY;
 
         newPlacedCircles.push(circle);
+        maxNewBoundSpace += circle.r;
     }
 
     placedCircles.push(...newPlacedCircles);
@@ -164,36 +231,35 @@ export function placeCircles(circles : Circle[]) {
 export function updateCircles(time : number) {
     if(time > 100) return;
 
-    placedCircles.forEach(circle => {
-        if(circle instanceof MemberCircle) {
-            circle.r += time / 360000;
-        }
-    });
+    placedCircles.forEach(circle => circle.updateSize());
 
     time *= TIME_SCALE;
     
-    const centerX = placedCircles.map(circle => circle.position.x).reduce((sum, r) => sum + r, 0) / placedCircles.length;
-    const centerY = placedCircles.map(circle => circle.position.y).reduce((sum, r) => sum + r, 0) / placedCircles.length;
+    const center = new Vector2D(
+        placedCircles.map(circle => circle.position.x).reduce((sum, r) => sum + r, 0) / placedCircles.length,
+        placedCircles.map(circle => circle.position.y).reduce((sum, r) => sum + r, 0) / placedCircles.length
+    ).scaled(-1);
     // const centerX = 0;
     // const centerY = 0;
-
-    const aspectRatio = getAspectRatio();
+    updateAspectRatio();
     placedCircles.forEach(circle => {
-        circle.position.x += circle.velocity.x * time + circle.acceleration.x/2 * FRICTION * time**2 - centerX;
-        circle.position.y += circle.velocity.y * time + circle.acceleration.y/2 * FRICTION * time**2 - centerY;
 
-        circle.velocity.x = (circle.velocity.x + circle.acceleration.x * time) * FRICTION;
-        circle.velocity.y = (circle.velocity.y + circle.acceleration.y * time) * FRICTION;
+        circle.position = circle.position
+        .added(
+            circle.velocity.scaled(time)
+        )
+        .added(
+            circle.acceleration.scaled(FRICTION * time**2 / 2)
+        )
+        .added(center);
 
-        const boundaryFieldForce = new Vector2D((-circle.position.x - centerX) * circle.charge / circle.mass * BOUNDARY_FIELD * FORCE_MULTIPLIER, (-circle.position.y - centerY) * circle.charge / circle.mass * BOUNDARY_FIELD * aspectRatio * FORCE_MULTIPLIER);
+        circle.velocity = circle.velocity
+        .added(
+            circle.acceleration.scaled(time)
+        )
+        .scaled(FRICTION);
 
-        // const forceValue = boundaryFieldForce.getDistanceFrom(new Vector2D());
-
-        circle.acceleration = 
-            boundaryFieldForce
-            // .scaled(forceValue)
-            // .scaled(Math.sqrt(forceValue));
-            // .normalized().scaled(BOUNDARY_FIELD);
+        applyBoundaryForce(circle);
     });
 
     for(let circleIndex = 0; circleIndex < placedCircles.length; circleIndex++) {

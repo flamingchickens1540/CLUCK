@@ -32,7 +32,7 @@ function regenCircles(loggedin?: LoggedIn) {
         const member = members.find(o => o.name == entry[0]);
         
         return new MemberCircle(
-            (now - entry[1]) / 360000, // 1000 / 60 / 60
+            entry[1], // 1000 / 60 / 60
             member.name,
             member.img
         );
@@ -59,7 +59,7 @@ function update() {
 async function start() {
     members = await (await fetch(getApiEndpoint("members"))).json()
     loggedInCache = null
-
+    placedCircles.push(new ClockCircle());
     update()
 
     setInterval(() => {
