@@ -23,7 +23,7 @@ console.log(`Server is running on port ${port}`)
 ;(async () => {
     await connectDatabase()
     await createCertChangeListener()
-    // await syncSlackMembers()
+    await syncSlackMembers()
     serve({
         fetch: app.fetch,
         port

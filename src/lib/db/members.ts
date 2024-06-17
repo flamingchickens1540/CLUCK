@@ -60,7 +60,7 @@ export class Member extends Model {
         type: DataType.VIRTUAL,
         get() {
             const set = new Set(this.get('cert_ids') as string[])
-            return { has: (v: string) => set.has(v) }
+            return { has: (v: string) => set.has(v), keys: () => set.keys() }
         }
     })
     certs!: ReadonlySet<string>
@@ -79,7 +79,7 @@ export class Member extends Model {
     }
 }
 
-type ReadonlySet<T> = Pick<Set<T>, 'has'>
+type ReadonlySet<T> = Pick<Set<T>, 'has'|"keys">
 
 export async function createOrUpdateMember(data: Pick<Member, 'email' | 'full_name' | 'grade' | 'years' | 'team' | 'use_slack_photo'>): Promise<boolean> {
     const memberRecord: Partial<Member> = { ...data, first_name: data.full_name.split(' ')[0] }
