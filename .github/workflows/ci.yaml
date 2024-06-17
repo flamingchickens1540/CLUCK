@@ -6,6 +6,8 @@ jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node
@@ -17,7 +19,7 @@ jobs:
         run: npm ci
 
       # Linting
-      - name: Run ESLint
+      - name: Create ESLint Report
         run: node_modules/.bin/eslint --output-file eslint_report.json --format json .
         continue-on-error: true
       - name: Annotate Code Linting Results
@@ -25,13 +27,8 @@ jobs:
         continue-on-error: true
         with:
           report-json: "eslint_report.json"
-      - name: Upload ESLint report
-        uses: actions/upload-artifact@v4
-        with:
-          name: eslint_report.json
-          path: eslint_report.json
-      - name: Create ESLint Summary
-        run: node_modules/.bin/eslint --format node_modules/eslint-formatter-markdown/markdown.js . >> $GITHUB_STEP_SUMMARY
+      - name: Run ESLint
+        run: node_modules/.bin/eslint .
 
   build:
     name: "Build"
