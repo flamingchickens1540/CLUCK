@@ -94,10 +94,12 @@ export async function createOrUpdateMember(data: Pick<Member, 'email' | 'full_na
 
 export async function updateMember(email: string, data: Partial<Member>): Promise<boolean> {
     let success = true
-    await Member.update(data, { where: { email } }).catch((reason: DatabaseError) => {
+    logger.info("updating member")
+    await Member.update({...data, email}, { where: { email } }).catch((reason: DatabaseError) => {
         logger.debug(reason.original)
         logger.error(`${reason.name}: ${reason.original.message}`)
         success = false
     })
+
     return success
 }

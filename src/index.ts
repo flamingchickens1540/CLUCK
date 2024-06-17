@@ -6,7 +6,7 @@ import admin_router from './routes/admin'
 import api_router from './routes/api'
 import { connectDatabase } from '@/lib/db'
 import { syncSlackMembers } from '@/tasks/slack'
-// import { createCertChangeListener } from '@/tasks/certs'
+import { createCertChangeListener } from '@/tasks/certs'
 
 const app = new Hono()
 app.use(renderer)
@@ -22,7 +22,7 @@ const port = 3000
 console.log(`Server is running on port ${port}`)
 ;(async () => {
     await connectDatabase()
-    // await createCertChangeListener()
+    await createCertChangeListener()
     // await syncSlackMembers()
     serve({
         fetch: app.fetch,
