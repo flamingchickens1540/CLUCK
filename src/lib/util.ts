@@ -1,4 +1,4 @@
-export function safeParseInt(value: any): number | undefined {
+export function safeParseInt(value: unknown): number | undefined {
     if (typeof value === 'string') {
         const num = parseInt(value)
         return isNaN(num) ? undefined : num
