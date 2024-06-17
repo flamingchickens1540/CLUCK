@@ -1,5 +1,4 @@
 import { Table, Column, Model, DataType, HasMany, Index } from 'sequelize-typescript'
-import { MemberCert } from './certs'
 import { MeetingAttendance } from './meetings'
 import { HourLog } from './hours'
 import logger from '@/lib/logger'
@@ -48,14 +47,23 @@ export class Member extends Model {
     @Column({ type: DataType.STRING })
     fallback_photo?: string
 
-    @HasMany(() => MemberCert, 'member_id')
-    certs!: MemberCert[]
+    @Column({ type: DataType.ARRAY(DataType.STRING(15)), allowNull: true })
+    cert_ids!: string[]
 
     @HasMany(() => MeetingAttendance, 'member_id')
     meetings!: MeetingAttendance[]
 
     @HasMany(() => HourLog, 'member_id')
     hours!: HourLog[]
+
+    @Column({
+        type: DataType.VIRTUAL,
+        get() {
+            const set = new Set(this.get('cert_ids') as string[])
+            return { has: (v: string) => set.has(v) }
+        }
+    })
+    certs!: ReadonlySet<string>
 
     get photo(): string {
         if (this.use_slack_photo && this.slack_photo != null) {
@@ -71,10 +79,22 @@ export class Member extends Model {
     }
 }
 
-export async function updateMember(data: Pick<Member, 'email' | 'full_name' | 'grade' | 'years' | 'team' | 'use_slack_photo'>): Promise<boolean> {
+type ReadonlySet<T> = Pick<Set<T>, 'has'>
+
+export async function createOrUpdateMember(data: Pick<Member, 'email' | 'full_name' | 'grade' | 'years' | 'team' | 'use_slack_photo'>): Promise<boolean> {
     const memberRecord: Partial<Member> = { ...data, first_name: data.full_name.split(' ')[0] }
     let success = true
     await Member.upsert(memberRecord, { returning: false }).catch((reason: DatabaseError) => {
+        logger.debug(reason.original)
+        logger.error(`${reason.name}: ${reason.original.message}`)
+        success = false
+    })
+    return success
+}
+
+export async function updateMember(email: string, data: Partial<Member>): Promise<boolean> {
+    let success = true
+    await Member.update(data, { where: { email } }).catch((reason: DatabaseError) => {
         logger.debug(reason.original)
         logger.error(`${reason.name}: ${reason.original.message}`)
         success = false

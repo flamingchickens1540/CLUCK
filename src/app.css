@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.vertical-text-parent {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    writing-mode: vertical-rl;
+}

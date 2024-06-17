@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { Member, updateMember } from '@/lib/db/members'
+import { Member, createOrUpdateMember } from '@/lib/db/members'
 import { safeParseInt } from '@/lib/util'
 
 export const router = new Hono().basePath('/members')
@@ -48,7 +48,7 @@ router
     })
     .post(async (c) => {
         const data = await c.req.parseBody()
-        await updateMember({
+        await createOrUpdateMember({
             email: (data.email as string).trim(),
             full_name: (data.name as string).trim(),
             years: safeParseInt(data.years) ?? 0,

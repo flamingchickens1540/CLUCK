@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import { Member, updateMember } from '@/lib/db/members'
 import { Cert, updateCert } from '@/lib/db/certs'
 import { safeParseInt } from '@/lib/util'
 
