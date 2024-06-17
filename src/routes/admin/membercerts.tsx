@@ -13,7 +13,7 @@ router
                 <div class="flex flex-row items-center justify-center gap-3">
                     <p class={`pl-2`}>{member.full_name}</p>
                 </div>
-                <input type="hidden" name={`${member.email}::`} value=""/>
+                <input type="hidden" name={`${member.email}::`} value="" />
                 {certs.rows.map((cert) => (
                     <div class="border-l pt-3 pb-3 border-teal-500 text-xl">
                         <input name={`${member.email}::${cert.id}`} checked={member.certs.has(cert.id)} type="checkbox" />

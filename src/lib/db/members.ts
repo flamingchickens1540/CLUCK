@@ -79,7 +79,7 @@ export class Member extends Model {
     }
 }
 
-type ReadonlySet<T> = Pick<Set<T>, 'has'|"keys">
+type ReadonlySet<T> = Pick<Set<T>, 'has' | 'keys'>
 
 export async function createOrUpdateMember(data: Pick<Member, 'email' | 'full_name' | 'grade' | 'years' | 'team' | 'use_slack_photo'>): Promise<boolean> {
     const memberRecord: Partial<Member> = { ...data, first_name: data.full_name.split(' ')[0] }
@@ -94,7 +94,7 @@ export async function createOrUpdateMember(data: Pick<Member, 'email' | 'full_na
 
 export async function updateMember(email: string, data: Partial<Member>): Promise<boolean> {
     let success = true
-    await Member.update({...data, email}, { where: { email } }).catch((reason: DatabaseError) => {
+    await Member.update({ ...data, email }, { where: { email } }).catch((reason: DatabaseError) => {
         logger.debug(reason.original)
         logger.error(`${reason.name}: ${reason.original.message}`)
         success = false

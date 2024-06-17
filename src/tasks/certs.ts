@@ -1,11 +1,10 @@
-
 import logger from '@/lib/logger'
 import { Member } from '@/lib/db/members'
-import "core-js/full/set/difference";
+import 'core-js/full/set/difference'
 import { slack_celebration_channel } from '@config'
 import { Cert } from '@/lib/db/certs'
 import { getClient, setProfileAttribute } from '@/lib/slack'
-import { Op } from 'sequelize';
+import { Op } from 'sequelize'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line
@@ -18,19 +17,22 @@ const congratsMessages = [
 ]
 
 export async function createCertChangeListener() {
-    Member.addHook("afterValidate", async (updatedMember: Member) => {
-        if (updatedMember.changed("cert_ids")) {
-            logger.debug("Certs changed for "+updatedMember.email)
-            const existingMember = await Member.findOne({where: {email:updatedMember.email}});
-            if (!existingMember) {logger.warn("no existingMember entry for "+updatedMember.email);return}
+    Member.addHook('afterValidate', async (updatedMember: Member) => {
+        if (updatedMember.changed('cert_ids')) {
+            logger.debug('Certs changed for ' + updatedMember.email)
+            const existingMember = await Member.findOne({ where: { email: updatedMember.email } })
+            if (!existingMember) {
+                logger.warn('no existingMember entry for ' + updatedMember.email)
+                return
+            }
             const oldCerts = existingMember.certs
-            const newCerts = new Set([...updatedMember.cert_ids].filter(x => !oldCerts.has(x)));
+            const newCerts = new Set([...updatedMember.cert_ids].filter((x) => !oldCerts.has(x)))
             console.log(newCerts)
             if (newCerts.size > 0) {
                 logger.info(`Announcing new certs for ${existingMember.email}`)
                 const userText = existingMember.slack_id == null ? existingMember.first_name : `<@${existingMember.slack_id}>`
                 for (const cert_id of newCerts) {
-                    const cert = await Cert.findOne({where:{id:cert_id}})
+                    const cert = await Cert.findOne({ where: { id: cert_id } })
                     const certLabel = cert?.label ?? cert_id
                     let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
                     message = message.replace('@', userText) // set user mention
@@ -39,11 +41,10 @@ export async function createCertChangeListener() {
                 }
             }
             if (existingMember.slack_id) {
-                const certs = await Cert.findAll({where:{id: {[Op.in]: updatedMember.cert_ids}}, attributes:["label"]})
-                await setProfileAttribute(existingMember.slack_id, 'certs', certs.map(cert => cert.label).join(', '))
+                const certs = await Cert.findAll({ where: { id: { [Op.in]: updatedMember.cert_ids } }, attributes: ['label'] })
+                await setProfileAttribute(existingMember.slack_id, 'certs', certs.map((cert) => cert.label).join(', '))
             }
         }
-
 
         // let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
         // message = message.replace('@', userText) // set user mention

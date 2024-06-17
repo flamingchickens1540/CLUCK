@@ -1,5 +1,4 @@
-import { Column, DataType, Model, Table, Comment, ForeignKey, BelongsTo, HasMany, Index } from 'sequelize-typescript'
-import { Member } from './members'
+import { Column, DataType, Model, Table, Comment } from 'sequelize-typescript'
 import logger from '@/lib/logger'
 import { DatabaseError } from 'sequelize'
 

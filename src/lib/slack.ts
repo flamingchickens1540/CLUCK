@@ -2,7 +2,7 @@ import { slack_profile_fields, slack_profile_token, slack_token } from '@config'
 import logger from '@/lib/logger'
 import { LogLevel, Logger as SlackLogger, WebClient } from '@slack/web-api'
 
-const slack_logger:SlackLogger = {
+const slack_logger: SlackLogger = {
     ...logger,
     setLevel() {},
     setName() {},
@@ -13,7 +13,7 @@ const slack_logger:SlackLogger = {
 
 const client: WebClient = new WebClient(slack_token, { logger: slack_logger })
 
-const profile_client:WebClient = new WebClient(slack_profile_token, { logger: slack_logger })
+const profile_client: WebClient = new WebClient(slack_profile_token, { logger: slack_logger })
 
 export function getClient(): WebClient {
     return client

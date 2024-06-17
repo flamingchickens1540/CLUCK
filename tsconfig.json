@@ -1,28 +1,25 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "es6",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
+    "compilerOptions": {
+        "target": "es6",
+        "module": "es6",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
 
-    "types": [
-      "node",
-      "vite/client"
-    ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "paths": {
-      "@config/*": ["./config/*"],
-      "@types": ["./types/index.ts"],
-      "@config": ["./config/index.ts"],
-      "@/*": ["./src/*"]
-    },
-    "baseUrl": ".",
-  }
+        "types": ["node", "vite/client"],
+        "jsx": "react-jsx",
+        "jsxImportSource": "hono/jsx",
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "@config/*": ["./config/*"],
+            "@types": ["./types/index.ts"],
+            "@config": ["./config/index.ts"],
+            "@/*": ["./src/*"]
+        },
+        "baseUrl": "."
+    }
 }
