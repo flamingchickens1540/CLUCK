@@ -18,31 +18,29 @@ const congratsMessages = [
 ]
 
 export async function createCertChangeListener() {
-    logger.info("Adding listener")
-    Member.addHook("afterValidate", async (member: Member) => {
-        logger.info('Change triggered ' + member.email)
-        logger.info(member)
-        if (member.changed("cert_ids")) {
-            const old = await Member.findOne({where: {email:member.email}});
-            if (!old) {logger.warn("no old entry for "+member.email);return}
-            const oldCerts = old.certs
-            const newCerts = new Set([...member.cert_ids].filter(x => !oldCerts.has(x)));
+    Member.addHook("afterValidate", async (updatedMember: Member) => {
+        if (updatedMember.changed("cert_ids")) {
+            logger.debug("Certs changed for "+updatedMember.email)
+            const existingMember = await Member.findOne({where: {email:updatedMember.email}});
+            if (!existingMember) {logger.warn("no existingMember entry for "+updatedMember.email);return}
+            const oldCerts = existingMember.certs
+            const newCerts = new Set([...updatedMember.cert_ids].filter(x => !oldCerts.has(x)));
             console.log(newCerts)
             if (newCerts.size > 0) {
-                const userText = old.slack_id == null ? old.first_name : `<@${old.slack_id}>`
+                logger.info(`Announcing new certs for ${existingMember.email}`)
+                const userText = existingMember.slack_id == null ? existingMember.first_name : `<@${existingMember.slack_id}>`
                 for (const cert_id of newCerts) {
                     const cert = await Cert.findOne({where:{id:cert_id}})
                     const certLabel = cert?.label ?? cert_id
                     let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
                     message = message.replace('@', userText) // set user mention
                     message = message.replace('{}', `*${certLabel}*`) // set cert name in *bold*
-                    logger.info("Sending "+ message)
                     await getClient().chat.postMessage({ channel: slack_celebration_channel, text: message })
                 }
-                if (member.slack_id) {
-                    const certs = await Cert.findAll({where:{id: {[Op.in]: member.cert_ids}}, attributes:["id", "label"]})
-                    await setProfileAttribute(member.slack_id, 'certs', certs.map(cert => cert.label).join(', '))
-                }
+            }
+            if (existingMember.slack_id) {
+                const certs = await Cert.findAll({where:{id: {[Op.in]: updatedMember.cert_ids}}, attributes:["label"]})
+                await setProfileAttribute(existingMember.slack_id, 'certs', certs.map(cert => cert.label).join(', '))
             }
         }
 
