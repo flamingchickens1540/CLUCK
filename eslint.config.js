@@ -8,7 +8,7 @@ export default tseslint.config(
     ...tseslint.configs.recommended,
     { files: ['src/**/*.ts'] },
     {
-        ignores: ['**/grid/moses.js'],
+        ignores: ['public/', '**/moses.js', '**/_*.ts']
     },
     {
         rules: {

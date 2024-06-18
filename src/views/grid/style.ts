@@ -63,7 +63,7 @@ export function setButtonLoggedIn(element: HTMLButtonElement, state: boolean) {
     return element.setAttribute('data-loggedin', state.toString())
 }
 
-export function updateButtonStyles(button: HTMLMemberButtonElement): void {
+export function updateButtonStyles(button: HTMLButtonElement): void {
     const styleRules = gridStyles[gridstyle][isButtonLoggedIn(button) ? 'true' : 'false']
     styleRules.forEach((rule) => {
         button.style.setProperty(rule.styleName, rule.val)

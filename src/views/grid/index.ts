@@ -1,7 +1,7 @@
 import type { APIMember } from '@/types'
 import { openFullscreen } from '../util'
 import { clock, getLoggedIn, getMemberList, refreshMemberList } from './clockapi'
-// import { registerGestures } from './gestures'
+import { registerGestures } from './gestures'
 import { isButtonLoggedIn, randomizedStyleCategories, setButtonLoggedIn, updateButtonStyles } from './style'
 
 declare global {
@@ -81,7 +81,7 @@ export async function buildGrid() {
 ;(async () => {
     members = await getMemberList()
     await buildGrid()
-    // registerGestures()
+    registerGestures()
     addEventListener('resize', redrawRows)
 })()
 

@@ -32,4 +32,5 @@ lerna-debug.log*
 /!config/*.example*
 /static/app.css
 _*.ts
-.idea
+/.idea
+/public/
