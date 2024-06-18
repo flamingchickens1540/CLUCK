@@ -86,7 +86,7 @@ export async function buildGrid() {
 })()
 
 async function refreshLoggedIn() {
-    let membersIn = new Set<string>()
+    const membersIn = new Set<string>()
     const noconnect = document.getElementById('noconnect')!
     try {
         const loggedIn = await getLoggedIn()

@@ -1,6 +1,5 @@
 import { Column, DataType, Model, Table, Comment, Index } from 'sequelize-typescript'
 import logger from '@/lib/logger'
-import { DatabaseError } from 'sequelize'
 import crypto from 'crypto'
 
 @Table

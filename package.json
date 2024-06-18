@@ -9,7 +9,7 @@
         "serve": "tsx src/index.ts",
         "build": "echo 'come back later'",
         "lint:style": "prettier --check .",
-        "lint:code": "eslint .",
+        "lint:code": "eslint . -c eslint.config.js",
         "lint": "npm-run-all -l -c --parallel lint:**",
         "format": "prettier --write ."
     },

@@ -4,14 +4,14 @@ import { validateApiKey } from '@/lib/db/auth'
 import logger from '@/lib/logger'
 import { getCookie, setCookie } from 'hono/cookie'
 
-export function setAuthMsg(c: Context<BlankEnv, never, {}>, msg: string) {
+export function setAuthMsg(c: Context<BlankEnv, never, object>, msg: string) {
     setCookie(c, 'cluck_msg', msg, { path: '/auth/login' })
 }
-export function consumeAuthMsg(c: Context<BlankEnv, '/auth/login', {}>): string {
+export function consumeAuthMsg(c: Context<BlankEnv, '/auth/login', object>): string {
     setAuthMsg(c, '')
     return getCookie(c, 'cluck_msg') ?? ''
 }
-const validateAuth = async (c: Context<BlankEnv, never, {}>) => {
+const validateAuth = async (c: Context<BlankEnv, never, object>) => {
     const api_key = c.req.header('X-Api-Key') ?? getCookie(c, 'cluck_auth')
     const permissions = await validateApiKey(api_key)
     logger.info(`${c.req.method} ${c.req.url} from ${permissions.id} [write=${permissions.write}]`)
@@ -20,7 +20,7 @@ const validateAuth = async (c: Context<BlankEnv, never, {}>) => {
     c.set('auth_admin', permissions.admin)
 }
 
-export const requireReadLogin: MiddlewareHandler<BlankEnv, never, {}> = async (c, next) => {
+export const requireReadLogin: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
     await validateAuth(c)
     if (c.get('auth_read')) {
         await next()
@@ -28,7 +28,7 @@ export const requireReadLogin: MiddlewareHandler<BlankEnv, never, {}> = async (c
         return c.redirect(`/auth/login?redirectTo=${c.req.path}`, 302)
     }
 }
-export const requireReadAPI: MiddlewareHandler<BlankEnv, never, {}> = async (c, next) => {
+export const requireReadAPI: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
     await validateAuth(c)
     if (c.get('auth_read')) {
         await next()
@@ -38,7 +38,7 @@ export const requireReadAPI: MiddlewareHandler<BlankEnv, never, {}> = async (c, 
     }
 }
 
-export const requireWriteLogin: MiddlewareHandler<BlankEnv, never, {}> = async (c, next) => {
+export const requireWriteLogin: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
     await validateAuth(c)
     if (c.get('auth_write')) {
         await next()
@@ -47,7 +47,7 @@ export const requireWriteLogin: MiddlewareHandler<BlankEnv, never, {}> = async (
     }
 }
 
-export const requireWriteAPI: MiddlewareHandler<BlankEnv, never, {}> = async (c, next) => {
+export const requireWriteAPI: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
     await validateAuth(c)
     if (c.get('auth_write')) {
         await next()
@@ -57,7 +57,7 @@ export const requireWriteAPI: MiddlewareHandler<BlankEnv, never, {}> = async (c,
     }
 }
 
-export const requireAdminLogin: MiddlewareHandler<BlankEnv, never, {}> = async (c, next) => {
+export const requireAdminLogin: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
     await validateAuth(c)
     if (c.get('auth_admin')) {
         await next()

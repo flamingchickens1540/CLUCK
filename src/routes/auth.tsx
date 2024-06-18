@@ -1,8 +1,8 @@
-import { Context, Hono } from 'hono'
+import { Hono } from 'hono'
 import { validateLogin } from '@/lib/db/auth'
-import { getCookie, setCookie } from 'hono/cookie'
-import { BlankEnv } from 'hono/types'
+import { setCookie } from 'hono/cookie'
 import { consumeAuthMsg, setAuthMsg } from '@/lib/auth'
+
 const router = new Hono()
 
 router
