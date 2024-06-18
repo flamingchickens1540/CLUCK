@@ -1,7 +1,5 @@
-import type { HTMLMemberButtonElement } from '../../types'
-
 type GridStyle = 'void' | 'normal'
-const gridstyle = new URL(document.URL).searchParams.get("void") ? "void" : "normal"
+const gridstyle = new URL(document.URL).searchParams.get('void') ? 'void' : 'normal'
 
 type ButtonStates = {
     [key in 'true' | 'false']: StyleRule[]
@@ -57,17 +55,16 @@ const gridStyles: { [key in GridStyle]: ButtonStates } = {
     void: voidButtonStates,
     normal: normalButtonStates
 }
-export function isButtonLoggedIn(element:HTMLButtonElement):boolean {
-    return element.getAttribute("data-loggedin") == "true"
+export function isButtonLoggedIn(element: HTMLButtonElement): boolean {
+    return element.getAttribute('data-loggedin') == 'true'
 }
 
-export function setButtonLoggedIn(element:HTMLButtonElement, state:boolean) {
-    return element.setAttribute("data-loggedin", state.toString())
+export function setButtonLoggedIn(element: HTMLButtonElement, state: boolean) {
+    return element.setAttribute('data-loggedin', state.toString())
 }
 
-
-export function updateButtonStyles(button:HTMLMemberButtonElement):void {
-    const styleRules = gridStyles[gridstyle][isButtonLoggedIn(button) ? "true" : "false"]
+export function updateButtonStyles(button: HTMLMemberButtonElement): void {
+    const styleRules = gridStyles[gridstyle][isButtonLoggedIn(button) ? 'true' : 'false']
     styleRules.forEach((rule) => {
         button.style.setProperty(rule.styleName, rule.val)
     })

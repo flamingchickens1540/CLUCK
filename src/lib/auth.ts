@@ -4,16 +4,15 @@ import { validateApiKey } from '@/lib/db/auth'
 import logger from '@/lib/logger'
 import { getCookie, setCookie } from 'hono/cookie'
 
-
-export function setAuthMsg(c:Context<BlankEnv, never, {}>, msg:string) {
-    setCookie(c,"cluck_msg", msg, {path:"/auth/login"})
+export function setAuthMsg(c: Context<BlankEnv, never, {}>, msg: string) {
+    setCookie(c, 'cluck_msg', msg, { path: '/auth/login' })
 }
-export function consumeAuthMsg(c:Context<BlankEnv, "/auth/login", {}>):string {
-    setAuthMsg(c, "")
-    return getCookie(c, "cluck_msg") ?? ""
+export function consumeAuthMsg(c: Context<BlankEnv, '/auth/login', {}>): string {
+    setAuthMsg(c, '')
+    return getCookie(c, 'cluck_msg') ?? ''
 }
 const validateAuth = async (c: Context<BlankEnv, never, {}>) => {
-    const api_key = c.req.header('X-Api-Key') ?? getCookie(c, "cluck_auth")
+    const api_key = c.req.header('X-Api-Key') ?? getCookie(c, 'cluck_auth')
     const permissions = await validateApiKey(api_key)
     logger.info(`${c.req.method} ${c.req.url} from ${permissions.id} [write=${permissions.write}]`)
     c.set('auth_read', permissions.read)

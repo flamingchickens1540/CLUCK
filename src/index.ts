@@ -22,7 +22,7 @@ app.route('/api', api_router)
 app.route('/auth', account_router)
 app.use('/*', serveStatic({ root: './public' }))
 
-app.use("/grid/", requireReadLogin)
+app.use('/grid/', requireReadLogin)
 
 const port = 3000
 console.log(`Server is running on port ${port}`)

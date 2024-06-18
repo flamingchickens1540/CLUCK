@@ -14,7 +14,6 @@ declare global {
 window.openFullscreen = openFullscreen
 let members: APIMember[]
 
-
 export async function buildGrid() {
     redrawRows()
 
@@ -23,17 +22,18 @@ export async function buildGrid() {
     const memberButtons = members.map((member) => {
         // Init button
         const memberButton = document.createElement('div')
-        memberButton.classList.add("memberButton")
+        memberButton.classList.add('memberButton')
         memberButton.id = member.email
 
         // Set click toggle
         memberButton.onclick = async (click) => {
-            if (window.gestureDetected) { // Avoid registering clicks when swiping
+            if (window.gestureDetected) {
+                // Avoid registering clicks when swiping
                 return
             }
             let button = click.target as HTMLButtonElement
             if (button.classList.contains('buttonText')) {
-                console.warn("child clicked")
+                console.warn('child clicked')
                 button = button.parentElement as HTMLButtonElement
             }
 
@@ -53,8 +53,8 @@ export async function buildGrid() {
 
         // Add name text
         const text = document.createElement('div')
-        text.classList.add("buttonText")
-        text.classList.add("personName")
+        text.classList.add('buttonText')
+        text.classList.add('personName')
         text.innerHTML = member.first_name
 
         // Randomize mix and match text styles
@@ -100,7 +100,7 @@ async function refreshLoggedIn() {
     // Update buttons
     const buttons = document.getElementsByClassName('memberButton') as HTMLCollectionOf<HTMLButtonElement>
     for (const button of buttons) {
-        setButtonLoggedIn(button,membersIn.has(button.id))
+        setButtonLoggedIn(button, membersIn.has(button.id))
         updateButtonStyles(button)
     }
     redrawRows()

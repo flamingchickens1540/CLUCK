@@ -28,9 +28,9 @@ export async function createUser(id: string, password: string, write_access: boo
     logger.info('Creating user ' + id)
     return await Account.create({ id, password: hashedPassword, write_access, admin_access, api_key: crypto.randomUUID() })
 }
-type KeyAuth = {read: boolean; write: boolean; admin: boolean}
-type KeyValidation = { id: string; } & KeyAuth
-type LoginValidation = { valid: true; key: string } & KeyAuth | { valid: false }
+type KeyAuth = { read: boolean; write: boolean; admin: boolean }
+type KeyValidation = { id: string } & KeyAuth
+type LoginValidation = ({ valid: true; key: string } & KeyAuth) | { valid: false }
 
 export async function validateLogin(id: string, password: string): Promise<LoginValidation> {
     const acc = await Account.findOne({ where: { id } })
@@ -41,7 +41,7 @@ export async function validateLogin(id: string, password: string): Promise<Login
     if (hashedPassword != acc.password) {
         return { valid: false }
     }
-    return { valid: true, key: acc.api_key, read:true, write: acc.write_access, admin: acc.admin_access }
+    return { valid: true, key: acc.api_key, read: true, write: acc.write_access, admin: acc.admin_access }
 }
 
 export async function validateApiKey(key?: string): Promise<KeyValidation> {
