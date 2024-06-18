@@ -1,6 +1,6 @@
 import { BelongsTo, Column, DataType, ForeignKey, Index, Model, Table, Comment } from 'sequelize-typescript'
 import { Member } from './members'
-import { HourCategory } from '@types'
+import { HourCategory } from 'src/types'
 
 @Table
 export class HourLog extends Model {

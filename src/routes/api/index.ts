@@ -1,13 +1,14 @@
 import { Context, Hono } from 'hono'
 import { Member } from '@/lib/db/members'
 import { syncSlackMembers } from '@/tasks/slack'
-import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from '@types'
+import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from 'src/types'
 import logger from '@/lib/logger'
 import { HourLog } from '@/lib/db/hours'
+import { requireReadAPI, requireReadLogin, requireWriteAPI, requireWriteLogin } from '@/lib/auth'
 
 const router = new Hono()
 
-router.get('/members', async (c) => {
+router.get('/members', requireReadAPI, async (c) => {
     const members = await Member.findAll({ attributes: ['email', 'first_name', 'full_name', 'use_slack_photo', 'slack_photo', 'slack_photo_small', 'fallback_photo'], order: [['full_name', 'ASC']] })
     const resp: APIMember[] = members.map((member) => ({
         email: member.email,
@@ -19,7 +20,7 @@ router.get('/members', async (c) => {
     return c.json(resp)
 })
 
-router.get('/members/refresh', async (c) => {
+router.get('/members/refresh', requireReadAPI, async (c) => {
     await syncSlackMembers()
     return c.redirect('/api/members', 302)
 })
@@ -28,7 +29,7 @@ function clockJson(c: Context, payload: APIClockResponse) {
     return c.json(payload)
 }
 router
-    .post('/clock/lab', async (c) => {
+    .post('/clock/lab', requireWriteAPI, async (c) => {
         const { email, action }: APIClockLabRequest = await c.req.json()
         const member = await Member.findOne({ where: { email }, attributes: ['email'] })
         if (member == null) {
@@ -69,14 +70,14 @@ router
         }
     })
     .get(async (c) => {
-        return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'lab' }, attributes: ['id', ['member_id', 'email'], 'time_in'] }))
+        return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'lab' }, attributes: ['id', 'member_id', 'time_in'] }))
     })
 
-router.get('/clock/external', async (c) => {
+router.get('/clock/external', requireReadAPI, async (c) => {
     return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'external' }, attributes: ['id', ['member_id', 'email'], 'time_in', 'duration', 'slack_ts'] }))
 })
 
-router.post('/clock/external/submit', async (c) => {
+router.post('/clock/external/submit', requireWriteAPI, async (c) => {
     const { email, message, hours }: APIClockExternalSubmitRequest = await c.req.json()
     const member = await Member.findOne({ where: { email }, attributes: ['email'] })
     if (member == null) {
@@ -94,7 +95,7 @@ router.post('/clock/external/submit', async (c) => {
     }
 })
 
-router.post('/clock/external/respond', async (c) => {
+router.post('/clock/external/respond', requireWriteAPI, async (c) => {
     const { id, action, category }: APIClockExternalRespondRequest = await c.req.json()
     const log = await HourLog.findByPk(id)
     if (log == null) {

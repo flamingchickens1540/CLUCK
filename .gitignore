@@ -28,7 +28,8 @@ lerna-debug.log*
 .DS_Store
 
 
-config/*.*
-!config/*.example*
-static/app.css
+/config/*.*
+/!config/*.example*
+/static/app.css
+_*.ts
 .idea

@@ -1,6 +1,6 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
-export const renderer = jsxRenderer(({ children, title, js }) => {
+export const renderer = jsxRenderer(({ children, title, js, body_class }) => {
     return (
         <html>
             <head>
@@ -9,7 +9,7 @@ export const renderer = jsxRenderer(({ children, title, js }) => {
                 <link href="/static/app.css" rel="stylesheet" />
                 {js && <script async defer src={'/static/' + js + '.js'}></script>}
             </head>
-            <body>{children}</body>
+            <body class={body_class ?? ''}>{children}</body>
         </html>
     )
 })
