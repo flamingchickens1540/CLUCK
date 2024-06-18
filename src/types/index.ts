@@ -29,7 +29,18 @@ export type APIClockResponse = { success: false; error: string; log_id?: number 
 type APIMembersResponse = APIMember[]
 export type APILoggedIn = { id: string; email: string; time_in: string }
 
-export type APIRoutes = {
+
+interface APIMethod {
+    req: unknown
+    resp: unknown
+}
+interface APIRoute {
+    POST?:APIMethod
+    GET?:APIMethod
+    PUT?:APIMethod
+}
+
+export interface APIRoutes extends Record<string, APIRoute> {
     '/clock/lab': {
         POST: { req: APIClockLabRequest; resp: APIClockResponse }
         GET: { req: null; resp: APILoggedIn[] }

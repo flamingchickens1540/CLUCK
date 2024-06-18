@@ -70,7 +70,7 @@ router
         }
     })
     .get(async (c) => {
-        return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'lab' }, attributes: ['id', 'member_id', 'time_in'] }))
+        return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'lab' }, attributes: ['id', ['member_id', 'email'], 'time_in'] }))
     })
 
 router.get('/clock/external', requireReadAPI, async (c) => {
