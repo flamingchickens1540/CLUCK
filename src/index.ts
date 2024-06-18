@@ -8,6 +8,7 @@ import account_router from './routes/auth'
 import { connectDatabase } from '@/lib/db'
 import { syncSlackMembers } from '@/tasks/slack'
 import { createCertChangeListener } from '@/tasks/certs'
+import { requireReadLogin } from '@/lib/auth'
 
 const app = new Hono()
 app.use(renderer)
@@ -20,6 +21,8 @@ app.route('/admin', admin_router)
 app.route('/api', api_router)
 app.route('/auth', account_router)
 app.use('/*', serveStatic({ root: './public' }))
+
+app.use("/grid/", requireReadLogin)
 
 const port = 3000
 console.log(`Server is running on port ${port}`)

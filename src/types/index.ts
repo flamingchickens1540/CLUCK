@@ -26,18 +26,13 @@ export type APIClockExternalRespondRequest = {
 }
 export type APIClockResponse = { success: false; error: string; log_id?: number } | { success: true; log_id: number }
 
-type APIMembersResponse = {
-    email: string
-    first_name: string
-    full_name: string
-    photo: string
-    photo_small: string
-}[]
+type APIMembersResponse = APIMember[]
+export type APILoggedIn = { id: string; email: string; time_in: string }
 
 export type APIRoutes = {
     '/clock/lab': {
         POST: { req: APIClockLabRequest; resp: APIClockResponse }
-        GET: { req: null; resp: { id: string; email: string; time_in: string }[] }
+        GET: { req: null; resp: APILoggedIn[] }
     }
     '/members': {
         GET: { req: null; resp: APIMembersResponse }
