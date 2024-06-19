@@ -4,7 +4,9 @@ import { syncSlackMembers } from '@/tasks/slack'
 import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from 'src/types'
 import logger from '@/lib/logger'
 import { HourLog } from '@/lib/db/hours'
-import { requireReadAPI, requireReadLogin, requireWriteAPI, requireWriteLogin } from '@/lib/auth'
+import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
+import { SSEStreamingApi, streamSSE } from 'hono/streaming'
+import { emitCluckChange } from '@/lib/ws'
 
 const router = new Hono()
 
@@ -49,15 +51,19 @@ router
                     log.state = 'complete'
                     log.duration = (log.time_out.getTime() - log.time_in.getTime()) / 1000 / 60 / 60
                     await log.save()
+                    emitCluckChange({ email, logging_in: false })
                 } else if (action == 'void') {
                     log.time_out = new Date()
                     log.state = 'cancelled'
                     log.duration = 0
                     await log.save()
+                    emitCluckChange({ email, logging_in: false })
                 }
+
                 return clockJson(c, { success: true, log_id: log.id })
             } else if (action == 'in') {
                 const newLog = await HourLog.create({ member_id: email, time_in: new Date(), type: 'lab', state: 'pending' })
+                emitCluckChange({ email, logging_in: true })
                 return clockJson(c, { success: true, log_id: newLog.id })
             } else {
                 c.status(400)

@@ -1,4 +1,5 @@
 import htmlPlugin from '@chialab/esbuild-plugin-html'
+import { sassPlugin } from 'esbuild-sass-plugin'
 import esbuild from 'esbuild'
 import fs from 'fs/promises'
 import path from 'path'
@@ -20,9 +21,22 @@ for (const view of views) {
                 outdir: `public/${id}`,
                 assetNames: `assets/[name]`,
                 chunkNames: `assets/[name]`,
-                plugins: [htmlPlugin({ minifyOptions: { minifySvg: false } })],
+                plugins: [
+                    sassPlugin(),
+                    htmlPlugin({ minifyOptions: { minifySvg: false } }),
+                    {
+                        name: 'rebuild-notify',
+                        setup(build) {
+                            build.onEnd((result) => {
+                                console.log(`build ended with ${result.errors.length} errors`)
+                                // HERE: somehow restart the server from here, e.g., by sending a signal that you trap and react to inside the server.
+                            })
+                        }
+                    }
+                ],
                 bundle: true,
                 minify: true,
+                sourcemap: 'inline',
                 external: ['/static/*']
             })
         )
@@ -30,21 +44,23 @@ for (const view of views) {
     }
 }
 const watch = process.argv.includes('--watch')
-const endPromise = Promise.all(
-    contexts.map(async (context) => {
-        if (watch) {
-            await context.watch()
-        } else {
-            await context.rebuild()
-            await context.dispose()
-        }
-    })
-)
+// const endPromise = Promise.all(
+//     contexts.map(async (context) => {
+//         if (watch) {
+//             logger.info('adding watch listener')
+//             await context.watch({})
+//         } else {
+//             await context.rebuild()
+//             await context.dispose()
+//         }
+//     })
+// )
 if (watch) {
     logger.info('Watching...')
-    await endPromise
+    await contexts[0].watch()
+    logger.info('Done...')
 } else {
     logger.info('Building...')
-    await endPromise
+    // await endPromise
     logger.info('Build complete')
 }

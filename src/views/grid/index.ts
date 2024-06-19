@@ -1,8 +1,9 @@
-import type { APIMember } from '@/types'
+import { APIMember, WSCluckChange } from '@/types'
 import { openFullscreen } from '../util'
 import { clock, getLoggedIn, getMemberList, refreshMemberList } from './clockapi'
 import { registerGestures } from './gestures'
-import { isButtonLoggedIn, randomizedStyleCategories, setButtonLoggedIn, updateButtonStyles } from './style'
+import { applyRandomStyles, isButtonLoggedIn, setButtonLoggedIn } from './style'
+import socket_io from 'socket.io-client'
 
 declare global {
     interface Window {
@@ -15,6 +16,7 @@ window.openFullscreen = openFullscreen
 let members: APIMember[]
 
 export async function buildGrid() {
+    // document.getElementById('button-grid')!.style.display = 'none'
     redrawRows()
 
     // Make member buttons
@@ -31,21 +33,14 @@ export async function buildGrid() {
                 // Avoid registering clicks when swiping
                 return
             }
-            let button = click.target as HTMLButtonElement
+            let button = click.target as HTMLDivElement
             if (button.classList.contains('buttonText')) {
                 console.warn('child clicked')
-                button = button.parentElement as HTMLButtonElement
+                button = button.parentElement as HTMLDivElement
             }
 
-            // Toggle logged in
-            setButtonLoggedIn(button, !isButtonLoggedIn(button))
-
-            // Update style
-            updateButtonStyles(button)
-
             // Cluck API Call
-
-            const ok = await clock(button.id, isButtonLoggedIn(button))
+            const ok = await clock(button.id, !isButtonLoggedIn(button))
             if (!ok) {
                 await refreshLoggedIn()
             }
@@ -54,20 +49,10 @@ export async function buildGrid() {
         // Add name text
         const text = document.createElement('div')
         text.classList.add('buttonText')
-        text.classList.add('personName')
         text.innerHTML = member.first_name
 
         // Randomize mix and match text styles
-        randomizedStyleCategories.forEach((styleCategory) => {
-            const styleOptions = Object.values(styleCategory)
-            if (styleOptions.length == 0) {
-                return
-            }
-            const toSet = styleOptions[Math.floor(Math.random() * styleOptions.length)]
-            toSet.forEach((attribute) => {
-                text.style.setProperty(attribute.styleName, attribute.val)
-            })
-        })
+        applyRandomStyles(text)
 
         // Do other adding and styling things
         memberButton.appendChild(text)
@@ -98,12 +83,10 @@ async function refreshLoggedIn() {
     }
 
     // Update buttons
-    const buttons = document.getElementsByClassName('memberButton') as HTMLCollectionOf<HTMLButtonElement>
+    const buttons = document.getElementsByClassName('memberButton') as HTMLCollectionOf<HTMLDivElement>
     for (const button of buttons) {
         setButtonLoggedIn(button, membersIn.has(button.id))
-        updateButtonStyles(button)
     }
-    redrawRows()
 }
 
 export function redrawRows() {
@@ -153,4 +136,11 @@ export async function refreshMemberListAndRerun() {
 }
 
 setInterval(refreshMemberListAndRerun, 60 * 60 * 1000)
-setInterval(refreshLoggedIn, 5 * 1000)
+
+const socket = socket_io('//localhost:3001')
+socket.on('cluck_change', (data: WSCluckChange) => {
+    const element = document.getElementById(data.email)
+    if (element) {
+        setButtonLoggedIn(element as HTMLDivElement, data.logging_in)
+    }
+})
