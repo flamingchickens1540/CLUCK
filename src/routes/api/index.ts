@@ -5,8 +5,7 @@ import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClock
 import logger from '@/lib/logger'
 import { HourLog } from '@/lib/db/hours'
 import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
-import { SSEStreamingApi, streamSSE } from 'hono/streaming'
-import { emitCluckChange } from '@/lib/ws'
+import { emitCluckChange } from '@/lib/sockets'
 
 const router = new Hono()
 

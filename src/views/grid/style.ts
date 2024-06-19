@@ -1,5 +1,4 @@
 type GridStyle = 'void' | 'normal'
-console.log(new URL(document.URL).searchParams)
 const gridstyle = new URL(document.URL).searchParams.get('void') != null ? 'void' : 'normal'
 document.body.setAttribute('data-gridstyle', gridstyle)
 

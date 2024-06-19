@@ -27,7 +27,6 @@ export async function createCertChangeListener() {
             }
             const oldCerts = existingMember.certs
             const newCerts = new Set([...updatedMember.cert_ids].filter((x) => !oldCerts.has(x)))
-            console.log(newCerts)
             if (newCerts.size > 0) {
                 logger.info(`Announcing new certs for ${existingMember.email}`)
                 const userText = existingMember.slack_id == null ? existingMember.first_name : `<@${existingMember.slack_id}>`

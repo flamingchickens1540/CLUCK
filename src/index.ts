@@ -14,14 +14,11 @@ import { connectDatabase } from '@/lib/db'
 import { createCertChangeListener } from '@/tasks/certs'
 import { requireReadLogin } from '@/lib/auth'
 import logger from '@/lib/logger'
-import { startWS } from '@/lib/ws'
+import { startWS } from '@/lib/sockets'
 
 const app = new Hono()
 app.use(renderer)
-app.get('/', (c) => {
-    return c.text('Hello Hono!')
-})
-// app.use(compress())
+app.use(compress())
 app.use(appendTrailingSlash())
 app.use('/grid/', requireReadLogin)
 app.get('/grid', (c) => c.redirect('/grid/', 301))
