@@ -5,7 +5,7 @@ import { router as membercert_route } from './membercerts'
 import { router as meeting_route } from './meetings'
 import { requireAdminLogin } from '@/lib/auth'
 import { trimTrailingSlash } from 'hono/trailing-slash'
-import { getMemberPhoto } from '@/lib/db'
+
 export const router = new Hono()
 
 router.get('/', (c) => c.text('admin'))

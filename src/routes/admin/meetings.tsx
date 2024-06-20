@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import { safeParseInt } from '@/lib/util'
 import prisma, { getMemberPhoto } from '@/lib/db'
-import { getStudentCard } from '@/lib/components'
 import { enum_MeetingAttendances_state } from '@prisma/client'
 
 export const router = new Hono().basePath('/meetings')
@@ -49,7 +48,7 @@ router
                     MeetingAttendances: true
                 }
             })
-        ).map((member, i) => {
+        ).map((member) => {
             const memberMeetings = new Map(member.MeetingAttendances.map((attendance) => [attendance.meeting_id, attendance.state]))
             return (
                 <div class="grid grid-cols-subgrid border-t-2 border-cyan-500 bg-cyan-200" style={`grid-column: span ${colcount} / span ${colcount}`}>

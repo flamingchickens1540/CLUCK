@@ -2,7 +2,6 @@ import { Hono } from 'hono'
 import { safeParseInt } from '@/lib/util'
 import prisma, { getMemberPhoto } from '@/lib/db'
 import { syncSlackMembers } from '@/tasks/slack'
-import { getStudentCard } from '@/lib/components'
 
 export const router = new Hono().basePath('/members')
 
@@ -38,7 +37,10 @@ router
             }
         ].map((member, i) => (
             <form method="post" name={`member-${i}`} autocomplete="off" class="grid grid-cols-subgrid col-span-7 border-t-2 border-purple-500 gap-2 p-3 bg-purple-200">
-                {getStudentCard(member, <input required placeholder="doej@catlin.edu" name="email" type="email" value={member.email} readonly={member.email != ''} class={`bg-purple-100  rounded-lg pl-2 read-only:bg-purple-200 read-only:cursor-default focus:outline-0`} />)}
+                <div class="flex flex-row items-center justify-center gap-3">
+                    <img class={`w-10 h-10 object-cover object-top -m-1 rounded-full border-4 ${member.slack_id == null ? 'border-red-600' : 'border-green-600'}`} alt={member.slack_id == null ? 'Slack not found' : 'Slack connected'} src={getMemberPhoto(member, true)} />
+                    <input required placeholder="doej@catlin.edu" name="email" type="email" value={member.email} readonly={member.email != ''} class={`bg-purple-100  rounded-lg pl-2 read-only:bg-purple-200 read-only:cursor-default focus:outline-0`} />
+                </div>
                 <input required placeholder="John Doe" name="name" type="text" value={member.full_name} class="bg-purple-100  rounded-lg pl-2" />
                 <input required placeholder="0" name="grade" type="number" value={member.grade} class="bg-purple-100  rounded-lg pl-2" />
                 <input required placeholder="0" name="years" type="number" value={member.years} class="bg-purple-100  rounded-lg pl-2" />
