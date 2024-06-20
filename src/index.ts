@@ -13,11 +13,14 @@ import account_router from './routes/auth'
 import { requireReadLogin } from '@/lib/auth'
 import logger from '@/lib/logger'
 import { startWS } from '@/lib/sockets'
+import { cors } from 'hono/cors'
 
 const app = new Hono()
 app.use(renderer)
+
 app.use(compress())
 app.use(appendTrailingSlash())
+
 app.use('/grid/', requireReadLogin)
 app.get('/grid', (c) => c.redirect('/grid/', 301))
 

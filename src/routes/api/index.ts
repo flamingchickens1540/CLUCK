@@ -6,6 +6,7 @@ import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
 import { emitCluckChange } from '@/lib/sockets'
 import prisma, { getMemberPhoto } from '@/lib/db'
 import { Prisma } from '@prisma/client'
+import { cors } from 'hono/cors'
 
 const router = new Hono()
 
@@ -37,6 +38,19 @@ router.get('/members/refresh', requireReadAPI, async (c) => {
     return c.redirect('/api/members', 302)
 })
 
+router.use('/members/fallback_photos', cors({ origin: ['https://portals.veracross.com'] }))
+router.post('/members/fallback_photos', requireWriteAPI, async (c) => {
+    console.time('fallback')
+    const body: Record<string, string> = await c.req.json()
+    await prisma.fallbackPhoto.deleteMany({})
+    const { count } = await prisma.fallbackPhoto.createMany({ data: Object.entries(body).map(([k, v]) => ({ email: k.toLowerCase(), url: v })) })
+    const members = await prisma.member.findMany({ select: { email: true } })
+    for (const member of members) {
+        await prisma.member.update({ where: { email: member.email }, data: { fallback_photo: body[member.email] } })
+    }
+    console.timeEnd('fallback')
+    return c.text(`Updated ${count} fallback photos`)
+})
 function clockJson(c: Context, payload: APIClockResponse) {
     return c.json(payload)
 }

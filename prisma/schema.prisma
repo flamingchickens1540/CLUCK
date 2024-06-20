@@ -122,6 +122,13 @@ model MemberCert {
   @@map("MemberCerts")
 }
 
+model FallbackPhoto {
+  email    String @id
+  url      String
+
+  @@map("FallbackPhotos")
+}
+
 enum enum_HourLogs_state {
   complete
   pending
