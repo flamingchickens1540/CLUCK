@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { Cert, updateCert } from '@/lib/db/certs'
 import { safeParseInt } from '@/lib/util'
+import prisma from '@/lib/db'
 
 export const router = new Hono().basePath('/certs')
 
@@ -8,7 +8,7 @@ const certDepartments = ['', 'admin', 'fab', 'design', 'robot_sw', 'app_sw', 'el
 
 router
     .get('/', async (c) => {
-        const rows = [...(await Cert.findAll({ order: [['id', 'ASC']] })), { id: '', label: '', level: '', department: '' }].map((cert, i) => (
+        const rows = [...(await prisma.cert.findMany({ orderBy: { id: 'asc' } })), { id: '', label: '', level: '', department: '' }].map((cert, i) => (
             <form method="post" name={`cert-${i}`} autocomplete="off" class="grid grid-cols-subgrid col-span-5 border-t-2 border-teal-500 gap-2 p-3 bg-teal-200">
                 <div class="flex flex-row items-center justify-center gap-3">
                     <input required placeholder="FAB_1" name="id" type="text" value={cert.id} readonly={cert.id != ''} class={`bg-teal-100  rounded-lg pl-2 read-only:bg-teal-200 read-only:cursor-default focus:outline-0`} />
@@ -43,11 +43,15 @@ router
     })
     .post(async (c) => {
         const data = await c.req.parseBody()
-        await updateCert({
-            id: (data.id as string).trim().toUpperCase().replace(' ', '_'),
-            label: (data.label as string).trim(),
-            department: data.department as string,
-            level: safeParseInt(data.level) ?? 0
+        await prisma.cert.update({
+            where: {
+                id: (data.id as string).trim().toUpperCase().replace(' ', '_')
+            },
+            data: {
+                label: (data.label as string).trim(),
+                department: data.department as string,
+                level: safeParseInt(data.level) ?? 0
+            }
         })
         return c.redirect(c.req.url, 302)
     })

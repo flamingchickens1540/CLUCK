@@ -1,22 +1,33 @@
 import { Context, Hono } from 'hono'
-import { Member } from '@/lib/db/members'
 import { syncSlackMembers } from '@/tasks/slack'
 import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from 'src/types'
 import logger from '@/lib/logger'
-import { HourLog } from '@/lib/db/hours'
 import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
 import { emitCluckChange } from '@/lib/sockets'
+import prisma, { getMemberPhoto } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 
 const router = new Hono()
 
 router.get('/members', requireReadAPI, async (c) => {
-    const members = await Member.findAll({ attributes: ['email', 'first_name', 'full_name', 'use_slack_photo', 'slack_photo', 'slack_photo_small', 'fallback_photo'], order: [['full_name', 'ASC']] })
+    const members = await prisma.member.findMany({
+        select: {
+            email: true,
+            first_name: true,
+            full_name: true,
+            use_slack_photo: true,
+            slack_photo: true,
+            slack_photo_small: true,
+            fallback_photo: true
+        },
+        orderBy: { full_name: 'asc' }
+    })
     const resp: APIMember[] = members.map((member) => ({
         email: member.email,
         first_name: member.first_name,
         full_name: member.full_name,
-        photo: member.photo,
-        photo_small: member.photo_small
+        photo: getMemberPhoto(member, false),
+        photo_small: getMemberPhoto(member, true)
     }))
     return c.json(resp)
 })
@@ -29,39 +40,56 @@ router.get('/members/refresh', requireReadAPI, async (c) => {
 function clockJson(c: Context, payload: APIClockResponse) {
     return c.json(payload)
 }
+
 router
     .post('/clock/lab', requireWriteAPI, async (c) => {
         const { email, action }: APIClockLabRequest = await c.req.json()
-        const member = await Member.findOne({ where: { email }, attributes: ['email'] })
+        const member = await prisma.member.findUnique({ where: { email }, select: { email: true } })
         if (member == null) {
             logger.warn('ignoring login for unknown user ' + email)
             c.status(400)
             return clockJson(c, { success: false, error: 'member unknown' })
         }
         try {
-            const log = await HourLog.findOne({ where: { state: 'pending', type: 'lab', member_id: email } })
+            const log = await prisma.hourLog.findFirst({ where: { state: 'pending', type: 'lab', member_id: email } })
             if (log) {
                 if (action == 'in') {
                     logger.warn('ignoring duplicate login for ' + email)
                     return clockJson(c, { success: false, error: 'member already logged in', log_id: log.id })
                 }
                 if (action == 'out') {
-                    log.time_out = new Date()
-                    log.state = 'complete'
-                    log.duration = (log.time_out.getTime() - log.time_in.getTime()) / 1000 / 60 / 60
-                    await log.save()
+                    const now = new Date()
+                    await prisma.hourLog.update({
+                        where: { id: log.id },
+                        data: {
+                            time_out: now,
+                            state: 'complete',
+                            duration: new Prisma.Decimal((now.getTime() - log.time_in.getTime()) / 1000 / 60 / 60)
+                        }
+                    })
                     emitCluckChange({ email, logging_in: false })
                 } else if (action == 'void') {
-                    log.time_out = new Date()
-                    log.state = 'cancelled'
-                    log.duration = 0
-                    await log.save()
+                    await prisma.hourLog.update({
+                        where: { id: log.id },
+                        data: {
+                            time_out: new Date(),
+                            state: 'complete',
+                            duration: new Prisma.Decimal(0)
+                        }
+                    })
                     emitCluckChange({ email, logging_in: false })
                 }
 
                 return clockJson(c, { success: true, log_id: log.id })
             } else if (action == 'in') {
-                const newLog = await HourLog.create({ member_id: email, time_in: new Date(), type: 'lab', state: 'pending' })
+                const newLog = await prisma.hourLog.create({
+                    data: {
+                        member_id: email,
+                        time_in: new Date(),
+                        type: 'lab',
+                        state: 'pending'
+                    }
+                })
                 emitCluckChange({ email, logging_in: true })
                 return clockJson(c, { success: true, log_id: newLog.id })
             } else {
@@ -75,23 +103,40 @@ router
         }
     })
     .get(async (c) => {
-        return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'lab' }, attributes: ['id', ['member_id', 'email'], 'time_in'] }))
+        const records = await prisma.hourLog.findMany({
+            where: { state: 'pending', type: 'lab' },
+            select: { id: true, member_id: true, time_in: true }
+        })
+        return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
     })
 
 router.get('/clock/external', requireReadAPI, async (c) => {
-    return c.json(await HourLog.findAll({ where: { state: 'pending', type: 'external' }, attributes: ['id', ['member_id', 'email'], 'time_in', 'duration', 'slack_ts'] }))
+    const records = await prisma.hourLog.findMany({
+        where: { state: 'pending', type: 'external' },
+        select: { id: true, member_id: true, time_in: true, duration: true, slack_ts: true, message: true }
+    })
+    return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
 })
 
 router.post('/clock/external/submit', requireWriteAPI, async (c) => {
     const { email, message, hours }: APIClockExternalSubmitRequest = await c.req.json()
-    const member = await Member.findOne({ where: { email }, attributes: ['email'] })
+    const member = await prisma.member.findUnique({ where: { email }, select: { email: true } })
     if (member == null) {
         logger.warn('ignoring external submission for unknown user ' + email)
         c.status(400)
         return c.json({ success: false, error: 'member unknown' })
     }
     try {
-        const newLog = await HourLog.create({ member_id: email, time_in: new Date(), duration: hours, message, type: 'external', state: 'pending' })
+        const newLog = await prisma.hourLog.create({
+            data: {
+                member_id: email,
+                time_in: new Date(),
+                duration: hours,
+                message,
+                type: 'external',
+                state: 'pending'
+            }
+        })
         return clockJson(c, { success: true, log_id: newLog.id })
     } catch (e) {
         logger.error(e)
@@ -102,7 +147,7 @@ router.post('/clock/external/submit', requireWriteAPI, async (c) => {
 
 router.post('/clock/external/respond', requireWriteAPI, async (c) => {
     const { id, action, category }: APIClockExternalRespondRequest = await c.req.json()
-    const log = await HourLog.findByPk(id)
+    const log = await prisma.hourLog.findUnique({ where: { id } })
     if (log == null) {
         logger.warn('Ignoring confirmation for unknown hour request ' + id)
         c.status(400)
@@ -113,14 +158,22 @@ router.post('/clock/external/respond', requireWriteAPI, async (c) => {
     }
     try {
         if (action == 'approve') {
-            log.state = 'complete'
-            log.time_out = new Date()
-            log.type = category
-            await log.save()
+            await prisma.hourLog.update({
+                where: { id: log.id },
+                data: {
+                    time_out: new Date(),
+                    state: 'complete',
+                    type: category
+                }
+            })
         } else {
-            log.state = 'cancelled'
-            log.time_out = new Date()
-            await log.save()
+            await prisma.hourLog.update({
+                where: { id: log.id },
+                data: {
+                    time_out: new Date(),
+                    state: 'cancelled'
+                }
+            })
         }
         return clockJson(c, { success: true, log_id: log.id })
     } catch (e) {

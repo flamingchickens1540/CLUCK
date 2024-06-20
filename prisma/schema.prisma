@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Account {
+  id           String   @id @db.VarChar(255)
+  password     String   @db.Char(64)
+  api_key      String   @db.Char(36)
+  write_access Boolean
+  admin_access Boolean
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([api_key], map: "accounts_api_key")
+  @@map("Accounts")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Cert {
+  id         String       @id @db.VarChar(15)
+  label      String       @db.VarChar(100)
+  department String       @db.VarChar(50)
+  level      Int          @db.SmallInt
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime     @updatedAt @db.Timestamptz(6)
+  MemberCert MemberCert[]
+
+  @@map("Certs")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model HourLog {
+  id        Int                 @id @default(autoincrement())
+  member_id String              @db.VarChar(50)
+  time_in   DateTime            @db.Timestamptz(6)
+  time_out  DateTime?           @db.Timestamptz(6)
+  duration  Decimal?            @db.Decimal(6, 3)
+  type      enum_HourLogs_type
+  state     enum_HourLogs_state
+  message   String?             @db.VarChar(2000)
+  slack_ts  Decimal?            @db.Decimal(16, 6)
+  createdAt DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime            @updatedAt @db.Timestamptz(6)
+  Member    Member              @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@index([member_id], map: "hour_logs_member_id")
+  @@index([state], map: "hour_logs_state")
+  @@index([type], map: "hour_logs_type")
+  @@map("HourLogs")
+}
+
+model MeetingAttendanceEntry {
+  id         Int                           @id @default(autoincrement())
+  state      enum_MeetingAttendances_state
+  meeting_id Int                           @db.SmallInt
+  member_id  String                        @db.VarChar(50)
+  createdAt  DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                      @updatedAt @db.Timestamptz(6)
+  Meetings   Meetings                      @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Member     Member                        @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@index([meeting_id], map: "meeting_attendances_meeting_id")
+  @@index([member_id], map: "meeting_attendances_member_id")
+  @@map("MeetingAttendances")
+}
+
+model Meetings {
+  id                 Int                      @id @default(autoincrement()) @db.SmallInt
+  date               DateTime                 @db.Date
+  mandatory          Boolean
+  createdAt          DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime                 @updatedAt @db.Timestamptz(6)
+  MeetingAttendances MeetingAttendanceEntry[]
+
+  @@map("Meetings")
+}
+
+model Member {
+  email                  String                               @id @db.VarChar(50)
+  first_name             String                               @db.VarChar(50)
+  full_name              String                               @db.VarChar(100)
+  team                   enum_Members_team
+  grade                  Int                                  @db.SmallInt
+  years                  Int                                  @db.SmallInt
+  use_slack_photo        Boolean
+  slack_id               String?                              @db.VarChar(15)
+  slack_photo            String?                              @db.VarChar(255)
+  slack_photo_small      String?                              @db.VarChar(255)
+  slack_leaderboard_type enum_Members_slack_leaderboard_type?
+  slack_department       String?                              @db.VarChar(50)
+  fallback_photo         String?                              @db.VarChar(255)
+  cert_ids               String[]                             @db.VarChar(15)
+  createdAt              DateTime                             @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                             @updatedAt @db.Timestamptz(6)
+  HourLogs               HourLog[]
+  MeetingAttendances     MeetingAttendanceEntry[]
+  MemberCerts             MemberCert[]
+
+  @@index([full_name], map: "members_full_name")
+  @@map("Members")
+}
+
+model MemberCert {
+  id        Int    @id @default(autoincrement())
+  cert_id   String
+  member_id String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  Member Member @relation(fields: [member_id], references: [email], onDelete: Cascade)
+  Cert   Cert   @relation(fields: [cert_id], references: [id], onDelete: Cascade)
+
+  @@index([member_id], map: "membercerts_memberid")
+  @@index([cert_id], map: "membercerts_certid")
+  @@map("MemberCerts")
+}
+
+enum enum_HourLogs_state {
+  complete
+  pending
+  cancelled
+}
+
+enum enum_HourLogs_type {
+  lab
+  external
+  summer
+  event
+}
+
+enum enum_MeetingAttendances_state {
+  present
+  absent
+  no_credit
+}
+
+enum enum_Members_slack_leaderboard_type {
+  weekly
+  department
+}
+
+enum enum_Members_team {
+  primary
+  junior
+}

@@ -1,10 +1,8 @@
 import logger from '@/lib/logger'
-import { Member } from '@/lib/db/members'
 import 'core-js/full/set/difference'
 import { slack_celebration_channel } from '@config'
-import { Cert } from '@/lib/db/certs'
 import { getClient, setProfileAttribute } from '@/lib/slack'
-import { Op } from 'sequelize'
+import prisma from '@/lib/db'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line
@@ -16,52 +14,32 @@ const congratsMessages = [
     '@ just earned a {}. Did you know: Software is the bread and butter of robotics.'
 ]
 
-export async function createCertChangeListener() {
-    Member.addHook('afterValidate', async (updatedMember: Member) => {
-        if (updatedMember.changed('cert_ids')) {
-            logger.debug('Certs changed for ' + updatedMember.email)
-            const existingMember = await Member.findOne({ where: { email: updatedMember.email } })
-            if (!existingMember) {
-                logger.warn('no existingMember entry for ' + updatedMember.email)
-                return
-            }
-            const oldCerts = existingMember.certs
-            const newCerts = new Set([...updatedMember.cert_ids].filter((x) => !oldCerts.has(x)))
-            if (newCerts.size > 0) {
-                logger.info(`Announcing new certs for ${existingMember.email}`)
-                const userText = existingMember.slack_id == null ? existingMember.first_name : `<@${existingMember.slack_id}>`
-                for (const cert_id of newCerts) {
-                    const cert = await Cert.findOne({ where: { id: cert_id } })
-                    const certLabel = cert?.label ?? cert_id
-                    let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
-                    message = message.replace('@', userText) // set user mention
-                    message = message.replace('{}', `*${certLabel}*`) // set cert name in *bold*
-                    await getClient().chat.postMessage({ channel: slack_celebration_channel, text: message })
-                }
-            }
-            if (existingMember.slack_id) {
-                const certs = await Cert.findAll({ where: { id: { [Op.in]: updatedMember.cert_ids } }, attributes: ['label'] })
-                await setProfileAttribute(existingMember.slack_id, 'certs', certs.map((cert) => cert.label).join(', '))
-            }
-        }
-
-        // let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
-        // message = message.replace('@', userText) // set user mention
-        // message = message.replace('{}', `*${cert.label}*`) // set cert name in *bold*
-        //
-        // await getClient().chat.postMessage({ channel: slack_celebration_channel, text: message })
-        // if (member.slack_id) {
-        //     const certs = await member.$get('certs')
-        //     const certNames = []
-        //     for (const membercert of certs) {
-        //         const cert = await membercert.$get('cert')
-        //         if (cert) {
-        //             certNames.push(cert?.label)
-        //         } else {
-        //             logger.warn('unknown cert ' + membercert.cert_id)
-        //         }
-        //     }
-        //     await setProfileAttribute(member.slack_id, 'certs', certNames.join(', '))
-        // }
+export async function notifyCertChanged(email: string, certs: string[]) {
+    // All certs expected to be of same member
+    const member = await prisma.member.findUnique({ where: { email } })
+    if (member == null) {
+        return
+    }
+    const existingCerts = await prisma.memberCert.findMany({
+        where: { member_id: email },
+        select: { cert_id: true }
     })
+    const oldCerts = new Set(existingCerts.map((cert) => cert.cert_id))
+    const newCerts = certs.filter((x) => !oldCerts.has(x))
+    const labels = await prisma.cert.findMany({ where: { id: { in: certs } }, select: { id: true, label: true } })
+    const labelMap = new Map(labels.map(({ id, label }) => [id, label]))
+    if (newCerts.length > 0) {
+        logger.info(`Announcing new certs for ${email}`)
+        const userText = member.slack_id == null ? member.first_name : `<@${member.slack_id}>`
+        for (const cert_id of newCerts) {
+            const certLabel = labelMap.get(cert_id) ?? cert_id
+            let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
+            message = message.replace('@', userText) // set user mention
+            message = message.replace('{}', `*${certLabel}*`) // set cert name in *bold*
+            await getClient().chat.postMessage({ channel: slack_celebration_channel, text: message })
+        }
+    }
+    if (member.slack_id) {
+        await setProfileAttribute(member.slack_id, 'certs', labels.map((cert) => cert.label).join(', '))
+    }
 }

@@ -12,7 +12,7 @@ export function getClient(): WebClient {
 
 export async function setProfileAttribute(user: string, field: keyof typeof slack_profile_fields, value: string): Promise<boolean> {
     try {
-        logger.info(`Setting slack ${field} for ${user} to '${value}'`)
+        logger.debug(`Setting slack ${field} for ${user} to '${value}'`)
         const resp = await profile_client.users.profile.set({
             user: user,
             name: slack_profile_fields[field],
