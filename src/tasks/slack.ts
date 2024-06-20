@@ -17,7 +17,11 @@ export async function syncSlackMembers() {
             const slack_members = (await getClient().users.list({})).members ?? []
 
             const slack_members_lookup: Record<string, SlackMember> = {}
-            slack_members.forEach((member) => (slack_members_lookup[member.profile!.email!] = member))
+            slack_members.forEach((member) => {
+                if (member.profile?.email) {
+                    slack_members_lookup[member.profile.email.toLowerCase().trim()] = member
+                }
+            })
             let updated = 0
             for (const member of db_members) {
                 const slack_member = slack_members_lookup[member.email]
