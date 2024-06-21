@@ -137,19 +137,21 @@ router
         }
         if (meeting_id) {
             const members = await prisma.member.findMany({ select: { email: true } })
-            await prisma.meetingAttendanceEntry.deleteMany({
-                where: {
-                    meeting_id
-                }
-            })
-            await prisma.meetingAttendanceEntry.createMany({
-                data: members.map((m) => ({
-                    member_id: m.email,
-                    meeting_id,
-                    state: (data[m.email] ?? 'absent') as enum_MeetingAttendances_state
-                })),
-                skipDuplicates: true
-            })
+            await prisma.$transaction([
+                prisma.meetingAttendanceEntry.deleteMany({
+                    where: {
+                        meeting_id
+                    }
+                }),
+                prisma.meetingAttendanceEntry.createMany({
+                    data: members.map((m) => ({
+                        member_id: m.email,
+                        meeting_id,
+                        state: (data[m.email] ?? 'absent') as enum_MeetingAttendances_state
+                    })),
+                    skipDuplicates: true
+                })
+            ])
         }
         return c.redirect('/admin/meetings', 302)
     })
