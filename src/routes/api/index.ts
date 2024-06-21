@@ -4,7 +4,7 @@ import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClock
 import logger from '@/lib/logger'
 import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
 import { emitCluckChange } from '@/lib/sockets'
-import prisma, { getMemberPhoto } from '@/lib/db'
+import prisma, { getMemberPhoto } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import { cors } from 'hono/cors'
 

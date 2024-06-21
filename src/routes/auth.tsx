@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { validateLogin } from '@/lib/db/auth'
+import { validateLogin } from '@/lib/auth'
 import { setCookie } from 'hono/cookie'
 import { consumeAuthMsg, setAuthMsg } from '@/lib/auth'
 

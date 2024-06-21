@@ -2,7 +2,7 @@ import logger from '@/lib/logger'
 import 'core-js/full/set/difference'
 import { slack_celebration_channel } from '@config'
 import { getClient, setProfileAttribute } from '@/lib/slack'
-import prisma from '@/lib/db'
+import prisma from '@/lib/prisma'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line

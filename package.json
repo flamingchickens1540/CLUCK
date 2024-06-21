@@ -2,7 +2,7 @@
     "name": "cluck2",
     "type": "module",
     "scripts": {
-        "dev": "npm-run-all -l -c --parallel watch:**",
+        "dev": "npm-run-all -c --parallel watch:**",
         "dev:frontend": "npm-run-all -c --parallel serve build:css watch:frontend",
         "watch:ts": "tsx watch src/index.ts",
         "watch:css": "tailwindcss -i ./src/app.css -o static/app.css --watch",

@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import prisma from '@/lib/db'
+import prisma from '@/lib/prisma'
 import logger from '@/lib/logger'
 import { notifyCertChanged } from '@/tasks/certs'
 
