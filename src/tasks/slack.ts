@@ -1,8 +1,8 @@
 import logger from '@/lib/logger'
 import { Member as SlackMember } from '@slack/web-api/dist/types/response/UsersListResponse'
 import AsyncLock from 'async-lock'
-import { getClient } from '@/lib/slack'
 import prisma from '@/lib/prisma'
+import { slack_client } from '@/slack'
 
 const lock = new AsyncLock({ maxExecutionTime: 3000, maxPending: 0 })
 
@@ -14,7 +14,7 @@ export async function syncSlackMembers() {
         .acquire('slack_sync', async () => {
             logger.info('Starting slack sync...')
             const db_members = await prisma.member.findMany()
-            const slack_members = (await getClient().users.list({})).members ?? []
+            const slack_members = (await slack_client.users.list({})).members ?? []
 
             const slack_members_lookup: Record<string, SlackMember> = {}
             slack_members.forEach((member) => {

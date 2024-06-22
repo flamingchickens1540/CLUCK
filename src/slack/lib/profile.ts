@@ -1,14 +1,8 @@
-import { slack_profile_fields, slack_profile_token, slack_token } from '@config'
+import { slack_profile_fields, slack_user_token } from '@config'
 import logger from '@/lib/logger'
 import { WebClient } from '@slack/web-api'
 
-const client: WebClient = new WebClient(slack_token)
-
-const profile_client: WebClient = new WebClient(slack_profile_token)
-
-export function getClient(): WebClient {
-    return client
-}
+const profile_client: WebClient = new WebClient(slack_user_token)
 
 export async function setProfileAttribute(user: string, field: keyof typeof slack_profile_fields, value: string): Promise<boolean> {
     try {

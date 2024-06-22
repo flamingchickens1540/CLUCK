@@ -1,8 +1,9 @@
 import logger from '@/lib/logger'
 import 'core-js/full/set/difference'
 import { slack_celebration_channel } from '@config'
-import { getClient, setProfileAttribute } from '@/lib/slack'
+import { setProfileAttribute } from '@/slack/lib/profile'
 import prisma from '@/lib/prisma'
+import { slack_client } from '@/slack'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line
@@ -36,7 +37,7 @@ export async function notifyCertChanged(email: string, certs: string[]) {
             let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
             message = message.replace('@', userText) // set user mention
             message = message.replace('{}', `*${certLabel}*`) // set cert name in *bold*
-            await getClient().chat.postMessage({ channel: slack_celebration_channel, text: message })
+            await slack_client.chat.postMessage({ channel: slack_celebration_channel, text: message })
         }
     }
     if (member.slack_id) {

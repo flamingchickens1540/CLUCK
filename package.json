@@ -20,6 +20,7 @@
     "dependencies": {
         "@hono/node-server": "^1.11.3",
         "@prisma/client": "^5.15.1",
+        "@slack/bolt": "^3.19.0",
         "@slack/web-api": "^7.1.0",
         "async-lock": "^1.4.1",
         "core-js-pure": "^3.37.1",
