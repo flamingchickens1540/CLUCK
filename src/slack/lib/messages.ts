@@ -1,4 +1,7 @@
-import type { KnownBlock, WebClient } from '@slack/web-api'
+import { KnownBlock } from '@slack/bolt'
+import prisma from '@/lib/prisma'
+import { slack_client } from '@/slack'
+import { approver_id } from '@config'
 
 /**
  * Push notification message for when a time request is submitted
@@ -11,47 +14,47 @@ export const tooFewHours = ':warning: I just blocked your submission of ZERO hou
 export const submissionLogged = 'Your submission has been logged'
 export const noActivitySpecified = ':warning: I just blocked your submission with no activity. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
 
-// /**
-//  * Gets a list of pending time requests
-//  */
-// export const getAllPendingRequestBlocks = async (slack_client: WebClient) => {
-//
-//     const output: KnownBlock[] = [
-//         {
-//             "type": "header",
-//             "text": {
-//                 "type": "plain_text",
-//                 "text": ":clock1: Pending Time Requests:",
-//                 "emoji": true
-//             }
-//         },
-//     ]
-//     await Promise.all(Object.values(data.timeRequests).map(async (person) => {
-//         data.slackApproverIDs.forEach(async (approver_id) => {
-//             if (person.requestMessages[approver_id] == null) {
-//                 return
-//             }
-//             const permalink = await slack_client.chat.getPermalink({ channel: person.requestMessages[approver_id].channel, message_ts: person.requestMessages[approver_id].ts })
-//             output.push({
-//                 "type": "section",
-//                 "text": {
-//                     "type": "mrkdwn",
-//                     "text": `*${person.name}* - ${formatDuration(person.time)}\n\`${sanitizeCodeblock(person.activity)}\``,
-//                 },
-//                 "accessory": {
-//                     "type": "button",
-//                     "text": {
-//                         "type": "plain_text",
-//                         "text": "Jump"
-//                     },
-//                     "url": permalink.permalink,
-//                     "action_id": "jump_url"
-//                 }
-//             }, { "type": "divider" })
-//         })
-//     }));
-//     return output
-// }
+/**
+ * Gets a list of pending time requests
+ */
+export async function getAllPendingRequestBlocks() {
+    const output: KnownBlock[] = [
+        {
+            type: 'header',
+            text: {
+                type: 'plain_text',
+                text: ':clock1: Pending Time Requests:',
+                emoji: true
+            }
+        }
+    ]
+    const pendingRequests = await prisma.hourLog.findMany({ where: { type: 'external', state: 'pending' }, select: { duration: true, message: true, slack_ts: true, Member: { select: { first_name: true } } } })
+    await Promise.all(
+        pendingRequests.map(async (log) => {
+            const permalink = await slack_client.chat.getPermalink({ channel: approver_id, message_ts: log.slack_ts! })
+            output.push(
+                {
+                    type: 'section',
+                    text: {
+                        type: 'mrkdwn',
+                        text: `*${log.Member.first_name}* - ${formatDuration(log.duration!.toNumber())}\n\`${sanitizeCodeblock(log.message!)}\``
+                    },
+                    accessory: {
+                        type: 'button',
+                        text: {
+                            type: 'plain_text',
+                            text: 'Jump'
+                        },
+                        url: permalink.permalink,
+                        action_id: 'jump_url'
+                    }
+                },
+                { type: 'divider' }
+            )
+        })
+    )
+    return output
+}
 
 export function sanitizeCodeblock(activity: string): string {
     return activity.replace('`', "'")
