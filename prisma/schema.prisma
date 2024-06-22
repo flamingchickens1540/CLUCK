@@ -44,7 +44,7 @@ model HourLog {
   type      enum_HourLogs_type
   state     enum_HourLogs_state
   message   String?             @db.VarChar(2000)
-  slack_ts  Decimal?            @db.Decimal(16, 6)
+  slack_ts  String?             @db.VarChar()
   createdAt DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt DateTime            @updatedAt @db.Timestamptz(6)
   Member    Member              @relation(fields: [member_id], references: [email], onDelete: Cascade)
@@ -92,7 +92,7 @@ model Member {
   slack_id               String?                              @db.VarChar(15)
   slack_photo            String?                              @db.VarChar(255)
   slack_photo_small      String?                              @db.VarChar(255)
-  slack_leaderboard_type enum_Members_slack_leaderboard_type?
+  slack_leaderboard_type String?                              @db.VarChar(50)
   slack_department       String?                              @db.VarChar(50)
   fallback_photo         String?                              @db.VarChar(255)
   cert_ids               String[]                             @db.VarChar(15)
@@ -146,11 +146,6 @@ enum enum_MeetingAttendances_state {
   present
   absent
   no_credit
-}
-
-enum enum_Members_slack_leaderboard_type {
-  weekly
-  department
 }
 
 enum enum_Members_team {
