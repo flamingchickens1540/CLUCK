@@ -16,9 +16,9 @@ export class Vector2D {
     }
 
     normalized() {
-        const divider = new Vector2D().getDistanceFrom(this);
+        const divisor = new Vector2D().getDistanceFrom(this);
 
-        return new Vector2D(this.x / divider, this.y / divider);
+        return new Vector2D(this.x / divisor, this.y / divisor);
     }
 
     scaled(scalar : number) {
@@ -59,7 +59,6 @@ export abstract class Circle {
 
     destroy() {
         this.element.remove();
-        console.log(placedCircles.splice(placedCircles.indexOf(this), 0));
     }
 
     abstract updateSize();

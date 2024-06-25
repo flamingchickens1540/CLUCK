@@ -1,7 +1,6 @@
 import { getApiEndpoint } from "../../consts";
 import type { LoggedIn, CluckMember } from "../../types";
 import { Circle, ClockCircle, MemberCircle, placeCircles, placedCircles, sizeCircles, updateCircleList, updateCircles } from "./circlePacker";
-import { redrawCircles, getRatio } from "./renderCircles";
 import { cyclePanel, setPanelVisibility } from "./chiefdelphi"
 import { openFullscreen } from "../util";
 
