@@ -125,48 +125,51 @@ export class ClockCircle extends Circle{
         </div>
         </div>
         </div>`
+
+        setTimeout(() => {
+            let now = new Date()
+            let timetext = document.querySelector('#hoursCircleText')
+            timetext.innerHTML = 
+            '' + (((now.getHours()+12-1) % 12)+1) + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
+            if(('' + (((now.getHours()+12-1) % 12)+1)).length == 2) {
+                timetext.classList.add('timeSmallerText')
+            } else {
+                timetext.classList.remove('timeSmallerText')
+            }
+            (async () => {
+                let arrivals = await getArrivals()
+                let timeElemsWest = document.querySelectorAll('.bustime.west')
+                let timeElemsEast = document.querySelectorAll('.bustime.east')
+                
+                arrivals[busSigns[0]].forEach((v,i)=>{
+                    if(i>=2) {return} // only set first 2 arrivals
+                    let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
+                    timeElemsEast[i].innerHTML = minutesTill + '&nbsp;min'
+                    if(minutesTill <= 5) {
+                        timeElemsEast[i].classList.add('soonish')
+                    } else {
+                        timeElemsEast[i].classList.remove('soonish')
+                    }
+                })
+                arrivals[busSigns[1]].forEach((v,i)=>{
+                    if(i>=2) {return} // only set first 2 arrivals
+                    let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
+                    timeElemsWest[i].innerHTML = minutesTill + '&nbsp;min'
+                    if(minutesTill <= 5) {
+                        timeElemsWest[i].classList.add('soonish')
+                    } else {
+                        timeElemsWest[i].classList.remove('soonish')
+                    }
+                })
+            })();
+        },
+        15000);
     }
 
     updateSize() {
         this.r = Math.sqrt(.2) * 10;
 
         this.r = Math.max(...placedCircles.map(circle => circle.r));
-
-        let now = new Date()
-        let timetext = document.querySelector('#hoursCircleText')
-        timetext.innerHTML = 
-        '' + (((now.getHours()+12-1) % 12)+1) + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
-        if(('' + (((now.getHours()+12-1) % 12)+1)).length == 2) {
-            timetext.classList.add('timeSmallerText')
-        } else {
-            timetext.classList.remove('timeSmallerText')
-        }
-        (async () => {
-            let arrivals = await getArrivals()
-            let timeElemsWest = document.querySelectorAll('.bustime.west')
-            let timeElemsEast = document.querySelectorAll('.bustime.east')
-            
-            arrivals[busSigns[0]].forEach((v,i)=>{
-                if(i>=2) {return} // only set first 2 arrivals
-                let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
-                timeElemsEast[i].innerHTML = minutesTill + '&nbsp;min'
-                if(minutesTill <= 5) {
-                    timeElemsEast[i].classList.add('soonish')
-                } else {
-                    timeElemsEast[i].classList.remove('soonish')
-                }
-            })
-            arrivals[busSigns[1]].forEach((v,i)=>{
-                if(i>=2) {return} // only set first 2 arrivals
-                let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
-                timeElemsWest[i].innerHTML = minutesTill + '&nbsp;min'
-                if(minutesTill <= 5) {
-                    timeElemsWest[i].classList.add('soonish')
-                } else {
-                    timeElemsWest[i].classList.remove('soonish')
-                }
-            })
-        })();
     }
 }
 
