@@ -15,12 +15,11 @@ setInterval(regenCircles, 10) // chnage panel every 1 minutes
 
 let prevTime = Date.now();
 
-function regenCircles(loggedin?: LoggedIn) {
-    if(loggedin===undefined) {loggedin = loggedInCache}
+function regenCircles() {
 
     const now = Date.now()
     
-    const loginEntries = Object.entries(loggedin)
+    const loginEntries = Object.entries(loggedInCache)
     .filter(entry => members.find(member => member.name == entry[0]))
     ;
 
@@ -51,7 +50,6 @@ function update() {
         // return if there's no change
         if (JSON.stringify(loggedInCache) == JSON.stringify(loggedin)) { return }
         loggedInCache = loggedin
-        regenCircles(loggedin)
     }));
 }
 
@@ -61,9 +59,6 @@ async function start() {
     placedCircles.push(new ClockCircle());
     update()
 
-    setInterval(() => {
-        regenCircles(loggedInCache)
-    }, 1000 * 60);
     setInterval(() => {
         update()
     }, 1000 * 3);

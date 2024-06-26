@@ -141,26 +141,38 @@ export class ClockCircle extends Circle{
                 let timeElemsWest = document.querySelectorAll('.bustime.west')
                 let timeElemsEast = document.querySelectorAll('.bustime.east')
                 
-                arrivals[busSigns[0]].forEach((v,i)=>{
-                    if(i>=2) {return} // only set first 2 arrivals
-                    let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
-                    timeElemsEast[i].innerHTML = minutesTill + '&nbsp;min'
-                    if(minutesTill <= 5) {
-                        timeElemsEast[i].classList.add('soonish')
-                    } else {
-                        timeElemsEast[i].classList.remove('soonish')
-                    }
-                })
-                arrivals[busSigns[1]].forEach((v,i)=>{
-                    if(i>=2) {return} // only set first 2 arrivals
-                    let minutesTill = Math.max(0,Math.round((v - Date.now())/1000/60));
-                    timeElemsWest[i].innerHTML = minutesTill + '&nbsp;min'
-                    if(minutesTill <= 5) {
-                        timeElemsWest[i].classList.add('soonish')
-                    } else {
-                        timeElemsWest[i].classList.remove('soonish')
-                    }
-                })
+                let minutesTillEastFirst = Math.max(0,Math.round((arrivals[busSigns[0]][0] - Date.now())/1000/60));
+                timeElemsEast[0].innerHTML = minutesTillEastFirst + '&nbsp;min'
+                if(minutesTillEastFirst <= 5) {
+                    timeElemsEast[0].classList.add('soonish')
+                } else {
+                    timeElemsEast[0].classList.remove('soonish')
+                }
+
+                let minutesTillEastSecond = Math.max(0,Math.round((arrivals[busSigns[0]][1] - Date.now())/1000/60));
+                timeElemsEast[1].innerHTML = minutesTillEastSecond + '&nbsp;min'
+                if(minutesTillEastSecond <= 5) {
+                    timeElemsEast[1].classList.add('soonish')
+                } else {
+                    timeElemsEast[1].classList.remove('soonish')
+                }
+
+                let minutesTillWestFirst = Math.max(0,Math.round((arrivals[busSigns[1]][0] - Date.now())/1000/60));
+                timeElemsWest[0].innerHTML = minutesTillWestFirst + '&nbsp;min'
+                if(minutesTillEastFirst <= 5) {
+                    timeElemsWest[0].classList.add('soonish')
+                } else {
+                    timeElemsWest[0].classList.remove('soonish')
+                }
+
+                let minutesTillWestSecond = Math.max(0,Math.round((arrivals[busSigns[1]][1] - Date.now())/1000/60));
+                timeElemsWest[1].innerHTML = minutesTillWestSecond + '&nbsp;min'
+                if(minutesTillWestSecond <= 5) {
+                    timeElemsWest[1].classList.add('soonish')
+                } else {
+                    timeElemsWest[1].classList.remove('soonish')
+                }
+
             })();
         },
         15000);
