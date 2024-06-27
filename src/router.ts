@@ -29,6 +29,45 @@ router.get('/dash/image', async (req, res, next) => {
         next(e)
     }
 })
+router.get('/dash/imageproxy', async (req, res, next) => {
+    try{
+        let url = req.query.googleurl as string;
+        let response = await fetch(url, {
+            "headers": {
+              "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+              "accept-language": "en-US,en;q=0.9",
+              "cache-control": "no-cache",
+              "pragma": "no-cache",
+              "priority": "u=0, i",
+              "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+              "sec-ch-ua-arch": "\"arm\"",
+              "sec-ch-ua-bitness": "\"64\"",
+              "sec-ch-ua-full-version-list": "\"Not/A)Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"126.0.6478.127\", \"Google Chrome\";v=\"126.0.6478.127\"",
+              "sec-ch-ua-mobile": "?0",
+              "sec-ch-ua-model": "\"\"",
+              "sec-ch-ua-platform": "\"macOS\"",
+              "sec-ch-ua-platform-version": "\"14.2.1\"",
+              "sec-ch-ua-wow64": "?0",
+              "sec-fetch-dest": "document",
+              "sec-fetch-mode": "navigate",
+              "sec-fetch-site": "none",
+              "sec-fetch-user": "?1",
+              "upgrade-insecure-requests": "1",
+            },
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": null,
+            "method": "GET"
+        });
+        let blob = await response.blob();
+        // source https://stackoverflow.com/questions/52665103/using-express-how-to-send-blob-object-as-response
+        blob.arrayBuffer().then((buf) => {
+            res.send(Buffer.from(buf))
+        })
+    } catch (e) {
+        console.error(e)
+        next(e)
+    }
+})
 router.get('/dash/delphi', async (req, res) => {
     delphiPost++; delphiPost %= 20; // switch to next post
     

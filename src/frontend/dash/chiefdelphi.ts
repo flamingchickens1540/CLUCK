@@ -101,7 +101,8 @@ async function refreshDelphi() {
 }
 async function refreshImage() {
     const url = await (await fetch(getResourceURL('/dash/image'))).text();
-    (document.querySelector('.theimage') as HTMLImageElement).src = url;
+    (document.querySelector('.theimage') as HTMLImageElement).src = 
+        `/dash/imageproxy?googleurl=${encodeURIComponent(url)}`;
 }
 
 export function setPanelType(type: PanelType) {
