@@ -179,9 +179,8 @@ export class ClockCircle extends Circle{
     }
 
     updateSize() {
-        this.r = Math.sqrt(.2) * 10;
-
-        this.r = Math.max(...placedCircles.map(circle => circle.r));
+        this.r = 30;
+        this.r = Math.max(...placedCircles.map(circle => circle.r * 1.5));
     }
 }
 
