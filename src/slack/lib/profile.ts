@@ -2,12 +2,16 @@ import config from '@config'
 import logger from '@/lib/logger'
 import { WebClient } from '@slack/web-api'
 
-const profile_client: WebClient = new WebClient(config.slack.app.user_token)
+const token = config.slack.app.user_token
+const profile_client: WebClient | null = token ? new WebClient(token) : null
 
 export async function setProfileAttribute(user: string, field: keyof typeof config.slack.profile, value: string): Promise<boolean> {
+    if (!token) {
+        return false
+    }
     try {
         logger.debug(`Setting slack ${field} for ${user} to '${value}'`)
-        const resp = await profile_client.users.profile.set({
+        const resp = await profile_client!.users.profile.set({
             user: user,
             name: config.slack.profile[field],
             value
