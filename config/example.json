@@ -1,22 +1,22 @@
 {
-  "slack": {
-    "app": {
-      "signing_secret": "XXX",
-      "bot_token": "xoxb-XXX",
-      "app_token": "xapp-X-XXX",
-      "user_token": "xoxp-XXX",
-      "command_prefix": ""
+    "slack": {
+        "app": {
+            "signing_secret": "XXX",
+            "bot_token": "xoxb-XXX",
+            "app_token": "xapp-X-XXX",
+            "user_token": "xoxp-XXX",
+            "command_prefix": ""
+        },
+        "profile": {
+            "department": "XAAAAA",
+            "certs": "XAAAA"
+        },
+        "channels": {
+            "celebration": "CXXXX"
+        },
+        "users": {
+            "request_approver": "UXXXX"
+        }
     },
-    "profile": {
-      "department": "XAAAAA",
-      "certs": "XAAAA"
-    },
-    "channels": {
-      "celebration": "CXXXX"
-    },
-    "users": {
-      "request_approver": "UXXXX"
-    }
-  },
-  "default_photo": "/static/img/default_member.webp"
+    "default_photo": "/static/img/default_member.webp"
 }
