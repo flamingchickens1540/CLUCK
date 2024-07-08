@@ -29,7 +29,8 @@ lerna-debug.log*
 
 
 /config/*.*
-/!config/*.example*
+!/config/custom-environment-variables.json5
+!/config/example.json5
 /static/app.css
 _*.ts
 /.idea
