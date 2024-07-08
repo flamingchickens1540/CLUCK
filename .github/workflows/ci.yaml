@@ -43,11 +43,5 @@ jobs:
             - name: Install Node Dependencies
               run: npm ci
             # Build
-            - name: Rename config files
-              run: |
-                  for i in config/*.example.*
-                  do
-                    mv "$i" "`echo $i | sed 's/.example//'`"
-                  done
             - name: Build
               run: npm run build
