@@ -1,4 +1,4 @@
-import { PrismaClient, Member, HourLog, enum_Members_team, Prisma } from '@prisma/client'
+import { PrismaClient, Member, HourLog, enum_Members_team, Prisma, enum_MeetingAttendances_state } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 
 const prisma = new PrismaClient()
@@ -11,7 +11,7 @@ async function main() {
     await prisma.meetingAttendanceEntry.deleteMany()
     await prisma.meetings.deleteMany()
     await seedCerts()
-    await seedMembers(20)
+    await seedMembers(15)
     await seedMemberCerts()
     await seedLabHours(500)
     await seedMeetings(6)
@@ -114,7 +114,7 @@ async function seedMeetings(count: number) {
     for (let i = 0; i < count; i++) {
         newMeetings.push({
             date: new Date(meetingDate),
-            mandatory: false
+            mandatory: true
         })
         meetingDate += MEETING_SPACING
     }
@@ -122,6 +122,27 @@ async function seedMeetings(count: number) {
         select: { id: true },
         data: newMeetings
     })
+
+    const newMeetingAttendance: Prisma.MeetingAttendanceEntryCreateManyInput[] = []
+    const members = await prisma.member.findMany({ select: { email: true } })
+    meetings.forEach((meeting, i) => {
+        if (i + 1 == count) {
+            return // don't fill for last meeting
+        }
+        members.forEach((member) => {
+            const rand = Math.random()
+            let state: enum_MeetingAttendances_state = enum_MeetingAttendances_state.present
+            if (rand < 0.3) state = enum_MeetingAttendances_state.absent
+            if (rand < 0.05) state = enum_MeetingAttendances_state.no_credit
+
+            newMeetingAttendance.push({
+                state: state,
+                meeting_id: meeting.id,
+                member_id: member.email
+            })
+        })
+    })
+    await prisma.meetingAttendanceEntry.createMany({ data: newMeetingAttendance })
 }
 
 await main()
