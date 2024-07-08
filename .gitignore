@@ -34,3 +34,5 @@ lerna-debug.log*
 _*.ts
 /.idea
 /public/
+
+dev/*_manifest.json
