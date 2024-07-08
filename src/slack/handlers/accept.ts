@@ -7,7 +7,7 @@ import { safeParseInt } from '@/lib/util'
 import logger from '@/lib/logger'
 import { enum_HourLogs_type } from '@prisma/client'
 import { slack_client } from '@/slack'
-import { approver_id } from '@config'
+import config from '@config'
 
 export async function handleAcceptMessageButton({ ack, body, action, client, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
@@ -67,10 +67,10 @@ async function handleAccept(time_request: { id: number; duration: number; messag
         return
     }
     try {
-        const message = (await slack_client.conversations.history({ channel: approver_id, latest: time_request.slack_ts, limit: 1, inclusive: true })).messages![0]
+        const message = (await slack_client.conversations.history({ channel: config.slack.users.request_approver, latest: time_request.slack_ts, limit: 1, inclusive: true })).messages![0]
         const oldBlocks = message.blocks! as KnownBlock[]
         await slack_client.chat.update({
-            channel: approver_id,
+            channel: config.slack.users.request_approver,
             ts: time_request.slack_ts,
             text: message.text + ' (ACCEPTED)',
             blocks: [

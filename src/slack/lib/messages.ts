@@ -1,8 +1,7 @@
 import { KnownBlock } from '@slack/bolt'
 import prisma from '@/lib/prisma'
 import { slack_client } from '@/slack'
-import { approver_id } from '@config'
-
+import config from '@config'
 /**
  * Push notification message for when a time request is submitted
  */
@@ -31,7 +30,7 @@ export async function getAllPendingRequestBlocks() {
     const pendingRequests = await prisma.hourLog.findMany({ where: { type: 'external', state: 'pending' }, select: { duration: true, message: true, slack_ts: true, Member: { select: { first_name: true } } } })
     await Promise.all(
         pendingRequests.map(async (log) => {
-            const permalink = await slack_client.chat.getPermalink({ channel: approver_id, message_ts: log.slack_ts! })
+            const permalink = await slack_client.chat.getPermalink({ channel: config.slack.users.request_approver, message_ts: log.slack_ts! })
             output.push(
                 {
                     type: 'section',

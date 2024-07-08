@@ -15,11 +15,10 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "paths": {
-            "@config/*": ["./config/*"],
+            "@config": ["./lib/config.ts"],
             "@types": ["./types/index.ts"],
-            "@config": ["./config/index.ts"],
-            "@/*": ["./src/*"]
+            "@/*": ["./*"]
         },
-        "baseUrl": "."
+        "baseUrl": "./src"
     }
 }
