@@ -1,10 +1,10 @@
 import type { App } from '@slack/bolt'
-import { getAcceptButtonHandler, handleAcceptMessageButton, handleAcceptModal } from './accept'
+import { getAcceptButtonHandler, handleAcceptMessageButton, handleAcceptModal } from './button/accept'
 import { handleLeaderboardAction, handleAppHomeOpened } from './app_home'
 import { handleGraphCommand } from './graph'
 import { handleLogCommand, handleLogModal, handleLogShortcut } from './cmd/log'
 import { handleLogoutCommand } from './cmd/logout'
-import { handleRejectButton, handleRejectModal } from './reject'
+import { handleRejectButton, handleRejectModal } from './button/reject'
 import { handleOpenSettingsModal, handleSettingsSave } from './settings'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
@@ -38,8 +38,8 @@ export function registerSlackHandlers(app: App) {
     // app.action('selected_metric', handleLeaderboardAction)
     //
     // // Modals
-    // app.view('reject_modal', handleRejectModal)
-    // app.view('accept_modal', handleAcceptModal)
+    app.view('reject_modal', handleRejectModal)
+    app.view('accept_modal', handleAcceptModal)
     // app.view('time_submission', handleLogModal)
     // app.view('save_settings', handleSettingsSave)
     //

@@ -41,8 +41,10 @@ export async function handleAcceptModal({ ack, body, view, client }: SlackViewMi
         return
     }
 
-    await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!, body.view.state.values.message.input.value) })
-    await handleAccept({ id: requestInfo.id, duration: requestInfo.duration!.toNumber(), message: requestInfo.message!, slack_ts: requestInfo.slack_ts! }, (body.view.state.values.type_selector.selector.selected_option?.value as enum_HourLogs_type) ?? 'external')
+    const success = await handleAccept({ id: requestInfo.id, duration: requestInfo.duration!.toNumber(), message: requestInfo.message!, slack_ts: requestInfo.slack_ts! }, body.view.state.values.message.input.value as enum_HourLogs_type)
+    if (success) {
+        await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!) })
+    }
 }
 export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
     return async function ({ ack, body, action, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
@@ -54,17 +56,19 @@ export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
             return
         }
 
-        await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!) })
-        await handleAccept({ id: requestInfo.id, duration: requestInfo.duration!.toNumber(), message: requestInfo.message!, slack_ts: requestInfo.slack_ts! }, prefix)
+        const success = await handleAccept({ id: requestInfo.id, duration: requestInfo.duration!.toNumber(), message: requestInfo.message!, slack_ts: requestInfo.slack_ts! }, prefix)
+        if (success) {
+            await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!) })
+        }
     }
 }
 
-async function handleAccept(time_request: { id: number; duration: number; message: string; slack_ts: string }, type: enum_HourLogs_type) {
+async function handleAccept(time_request: { id: number; duration: number; message: string; slack_ts: string }, type: enum_HourLogs_type): Promise<boolean> {
     try {
         await prisma.hourLog.update({ where: { id: time_request.id }, data: { state: 'complete', type } })
-    } catch {
-        console.error('Failed to add hours with request', time_request)
-        return
+    } catch (e) {
+        console.error('Failed to add hours with request', time_request, e)
+        return false
     }
     try {
         const message = (await slack_client.conversations.history({ channel: config.slack.channels.approval, latest: time_request.slack_ts, limit: 1, inclusive: true })).messages![0]
@@ -86,8 +90,10 @@ async function handleAccept(time_request: { id: number; duration: number; messag
                 { type: 'divider' }
             ]
         })
+        return true
     } catch (err) {
         console.error('Failed to handle accept modal:\n' + err)
+        return false
     }
 }
 

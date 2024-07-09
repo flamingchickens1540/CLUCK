@@ -67,7 +67,7 @@ export function getRespondMessageModal(type: 'Accept' | 'Reject', request: { id:
                         text: 'Regular',
                         emoji: true
                     },
-                    value: 'regular'
+                    value: 'external'
                 },
                 placeholder: {
                     type: 'plain_text',
@@ -82,7 +82,7 @@ export function getRespondMessageModal(type: 'Accept' | 'Reject', request: { id:
                             text: 'Regular',
                             emoji: true
                         },
-                        value: 'regular'
+                        value: 'external'
                     },
                     {
                         text: {
