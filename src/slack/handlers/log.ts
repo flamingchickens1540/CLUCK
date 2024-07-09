@@ -70,14 +70,14 @@ export async function handleLogModal({ ack, body, view, client, logger }: SlackV
     // Ensure the time values are valid
     hours = isNaN(hours) ? 0 : hours
 
-    if (Math.round(hours * 60) / 60 != 0) {
+    if (hours > 0.1) {
         const message = getSubmittedDm({ hours: hours, activity: activity })
         try {
             await client.chat.postMessage({ channel: body.user.id, text: message })
         } catch (err) {
             logger.error('Failed to handle log modal:\n' + err)
         }
-        handleHoursRequest(body.user.id, hours, activity)
+        await handleHoursRequest(body.user.id, hours, activity)
     } else {
         await client.chat.postMessage({ channel: body.user.id, text: tooFewHours })
     }
