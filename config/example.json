@@ -13,10 +13,8 @@
         },
         "channels": {
             "celebration": "CXXXX",
-            "void": "CXXX"
-        },
-        "users": {
-            "request_approver": "UXXXX"
+            "void": "CXXX",
+            "approval": "DXXX"
         }
     },
     "default_photo": "/static/img/default_member.webp"

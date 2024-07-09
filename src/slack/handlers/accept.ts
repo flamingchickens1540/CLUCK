@@ -67,10 +67,10 @@ async function handleAccept(time_request: { id: number; duration: number; messag
         return
     }
     try {
-        const message = (await slack_client.conversations.history({ channel: config.slack.users.request_approver, latest: time_request.slack_ts, limit: 1, inclusive: true })).messages![0]
+        const message = (await slack_client.conversations.history({ channel: config.slack.channels.approval, latest: time_request.slack_ts, limit: 1, inclusive: true })).messages![0]
         const oldBlocks = message.blocks! as KnownBlock[]
         await slack_client.chat.update({
-            channel: config.slack.users.request_approver,
+            channel: config.slack.channels.approval,
             ts: time_request.slack_ts,
             text: message.text + ' (ACCEPTED)',
             blocks: [

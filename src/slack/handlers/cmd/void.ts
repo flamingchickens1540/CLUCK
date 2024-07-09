@@ -1,5 +1,5 @@
 import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
-import type { WebClient } from '@slack/bolt/node_modules/@slack/web-api' // I know this is stupid but bolt is running a major release behind for some reason
+import type { WebClient } from '@slack/bolt' // I know this is stupid but bolt is running a major release behind for some reason
 import config from '~config'
 import { completeHourLog, HourError } from '~lib/hour_operations'
 import prisma from '~lib/prisma'
