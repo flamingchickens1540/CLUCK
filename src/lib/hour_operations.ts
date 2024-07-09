@@ -2,10 +2,14 @@ import prisma from '@/lib/prisma'
 import { emitCluckChange } from '@/lib/sockets'
 import { Prisma } from '@prisma/client'
 
-export async function completeHourLog(email: string, isVoid: boolean): Promise<{ success: boolean; msg: string }> {
+export enum HourError {
+    NOT_SIGNED_IN
+}
+
+export async function completeHourLog(email: string, isVoid: boolean): Promise<{ success: true } | { success: false; error: HourError }> {
     const log = await prisma.hourLog.findFirst({ where: { state: 'pending', type: 'lab', member_id: email } })
     if (!log) {
-        return { success: false, msg: 'You are not signed in' }
+        return { success: false, error: HourError.NOT_SIGNED_IN }
     }
 
     const now = new Date()
@@ -20,5 +24,5 @@ export async function completeHourLog(email: string, isVoid: boolean): Promise<{
         }
     })
     emitCluckChange({ email, logging_in: false })
-    return { success: true, msg: '' }
+    return { success: true }
 }

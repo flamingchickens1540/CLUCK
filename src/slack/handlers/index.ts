@@ -2,12 +2,12 @@ import type { App } from '@slack/bolt'
 import { getAcceptButtonHandler, handleAcceptMessageButton, handleAcceptModal } from './accept'
 import { handleLeaderboardAction, handleAppHomeOpened } from './app_home'
 import { handleGraphCommand } from './graph'
-import { handleLogCommand, handleLogModal, handleLogShortcut } from './log'
-import { handleLogoutCommand } from './logout'
+import { handleLogCommand, handleLogModal, handleLogShortcut } from './cmd/log'
+import { handleLogoutCommand } from './cmd/logout'
 import { handleRejectButton, handleRejectModal } from './reject'
 import { handleOpenSettingsModal, handleSettingsSave } from './settings'
-import { handleVoidCommand } from './void'
-import { handleGetLoggedInCommand } from './loggedin'
+import { handleVoidCommand } from './cmd/void'
+import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '@config'
 
 export function register_listeners(app: App) {
@@ -19,9 +19,9 @@ export function register_listeners(app: App) {
     app.command(cmd_prefix + 'log', handleLogCommand)
     // app.command(cmd_prefix + 'graph', handleGraphCommand)
     app.command(cmd_prefix + 'clearlogin', handleLogoutCommand)
-    // app.command(cmd_prefix + 'voidtime', handleVoidCommand)
+    app.command(cmd_prefix + 'voidtime', handleVoidCommand)
     app.command(cmd_prefix + 'loggedin', handleGetLoggedInCommand)
-    // // app.shortcut('log_hours', handleLogShortcut)
+    // app.shortcut('log_hours', handleLogShortcut)
     //
     // // Buttons
     // app.action('accept', getAcceptButtonHandler('regular'))

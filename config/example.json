@@ -12,7 +12,8 @@
             "certs": "XAAAA"
         },
         "channels": {
-            "celebration": "CXXXX"
+            "celebration": "CXXXX",
+            "void": "CXXX"
         },
         "users": {
             "request_approver": "UXXXX"

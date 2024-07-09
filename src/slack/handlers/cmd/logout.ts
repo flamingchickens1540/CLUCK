@@ -1,6 +1,6 @@
 import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
 import prisma from '@/lib/prisma'
-import { completeHourLog } from '@/lib/hour_operations'
+import { completeHourLog, HourError } from '@/lib/hour_operations'
 
 export async function handleLogoutCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
@@ -10,8 +10,8 @@ export async function handleLogoutCommand({ command, logger, ack, respond, clien
             const result = await completeHourLog(member.email, true)
             if (result.success) {
                 await respond({ response_type: 'ephemeral', text: `Successfully cleared, you are no longer signed in` })
-            } else {
-                await respond({ response_type: 'ephemeral', text: result.msg })
+            } else if (result.error == HourError.NOT_SIGNED_IN) {
+                await respond({ response_type: 'ephemeral', text: 'You are not signed in' })
             }
         } catch (e) {
             logger.error(e)
