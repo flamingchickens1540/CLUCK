@@ -18,7 +18,7 @@ export function register_listeners(app: App) {
     }
     app.command(cmd_prefix + 'log', handleLogCommand)
     // app.command(cmd_prefix + 'graph', handleGraphCommand)
-    // app.command(cmd_prefix + 'clearlogin', handleLogoutCommand)
+    app.command(cmd_prefix + 'clearlogin', handleLogoutCommand)
     // app.command(cmd_prefix + 'voidtime', handleVoidCommand)
     app.command(cmd_prefix + 'loggedin', handleGetLoggedInCommand)
     // // app.shortcut('log_hours', handleLogShortcut)

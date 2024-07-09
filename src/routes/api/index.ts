@@ -1,12 +1,13 @@
 import { Context, Hono } from 'hono'
 import { syncSlackMembers } from '@/tasks/slack'
-import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from 'src/types'
+import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from '@types'
 import logger from '@/lib/logger'
 import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
 import { emitCluckChange } from '@/lib/sockets'
 import prisma, { getMemberPhoto } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import { cors } from 'hono/cors'
+import { completeHourLog } from '@/lib/hour_operations'
 
 const router = new Hono()
 
@@ -72,26 +73,9 @@ router
                     return clockJson(c, { success: false, error: 'member already logged in', log_id: log.id })
                 }
                 if (action == 'out') {
-                    const now = new Date()
-                    await prisma.hourLog.update({
-                        where: { id: log.id },
-                        data: {
-                            time_out: now,
-                            state: 'complete',
-                            duration: new Prisma.Decimal((now.getTime() - log.time_in.getTime()) / 1000 / 60 / 60)
-                        }
-                    })
-                    emitCluckChange({ email, logging_in: false })
+                    await completeHourLog(email, false)
                 } else if (action == 'void') {
-                    await prisma.hourLog.update({
-                        where: { id: log.id },
-                        data: {
-                            time_out: new Date(),
-                            state: 'complete',
-                            duration: new Prisma.Decimal(0)
-                        }
-                    })
-                    emitCluckChange({ email, logging_in: false })
+                    await completeHourLog(email, true)
                 }
 
                 return clockJson(c, { success: true, log_id: log.id })
