@@ -1,9 +1,9 @@
-import logger from '@/lib/logger'
+import logger from '~lib/logger'
 import 'core-js/full/set/difference'
-import { setProfileAttribute } from '@/slack/lib/profile'
-import prisma from '@/lib/prisma'
-import { slack_client } from '@/slack'
-import config from '@config'
+import { setProfileAttribute } from '~slack/lib/profile'
+import prisma from '~lib/prisma'
+import { slack_client } from '~slack'
+import config from '~config'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line

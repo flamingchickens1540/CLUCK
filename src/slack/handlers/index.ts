@@ -8,9 +8,9 @@ import { handleRejectButton, handleRejectModal } from './reject'
 import { handleOpenSettingsModal, handleSettingsSave } from './settings'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
-import config from '@config'
+import config from '~config'
 
-export function register_listeners(app: App) {
+export function registerSlackHandlers(app: App) {
     // Commands and Shortcuts
     let cmd_prefix = '/'
     if (config.slack.app.command_prefix) {

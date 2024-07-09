@@ -1,6 +1,6 @@
 import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
-import prisma from '@/lib/prisma'
-import { completeHourLog, HourError } from '@/lib/hour_operations'
+import prisma from '~lib/prisma'
+import { completeHourLog, HourError } from '~lib/hour_operations'
 
 export async function handleLogoutCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     await ack()

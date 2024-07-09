@@ -1,4 +1,4 @@
-import { APIMember, WSCluckChange } from '@/types'
+import { APIMember, WSCluckChange } from '~types'
 import { openFullscreen } from '../util'
 import { clock, getLoggedIn, getMemberList, refreshMemberList } from './clockapi'
 import { registerGestures } from './gestures'

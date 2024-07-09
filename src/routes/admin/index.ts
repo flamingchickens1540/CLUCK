@@ -3,7 +3,7 @@ import { router as member_route } from './members'
 import { router as cert_route } from './certs'
 import { router as membercert_route } from './membercerts'
 import { router as meeting_route } from './meetings'
-import { requireAdminLogin } from '@/lib/auth'
+import { requireAdminLogin } from '~lib/auth'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 
 export const router = new Hono()

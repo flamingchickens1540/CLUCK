@@ -1,8 +1,8 @@
 /* exported clock cluckedIn ping refreshMemberList getApiKey checkAuth*/
 
-import type { APIClockLabRequest, APIMember, APILoggedIn } from '@/types'
-import { apiFetch } from '@/views/util'
-import { getClockMode } from '@/views/grid/style'
+import type { APIClockLabRequest, APIMember, APILoggedIn } from '~types'
+import { apiFetch } from '~views/util'
+import { getClockMode } from '~views/grid/style'
 
 export async function clock(email: string, clockingIn: boolean): Promise<boolean> {
     const outMode = getClockMode() == 'normal' ? 'out' : 'void'

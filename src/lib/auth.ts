@@ -1,8 +1,8 @@
 import { Context, MiddlewareHandler } from 'hono'
 import { BlankEnv } from 'hono/types'
-import logger from '@/lib/logger'
+import logger from '~lib/logger'
 import { getCookie, setCookie } from 'hono/cookie'
-import prisma from '@/lib/prisma'
+import prisma from '~lib/prisma'
 import crypto from 'crypto'
 import { Account } from '@prisma/client'
 

@@ -1,5 +1,5 @@
 import { Server as SocketIOServer } from 'socket.io'
-import { WSCluckChange } from '@/types'
+import { WSCluckChange } from '~types'
 
 let io: SocketIOServer | null = null
 export function startWS() {

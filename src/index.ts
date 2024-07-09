@@ -10,9 +10,9 @@ import admin_router from './routes/admin'
 import api_router from './routes/api'
 import account_router from './routes/auth'
 
-import { requireReadLogin } from '@/lib/auth'
-import logger from '@/lib/logger'
-import { startWS } from '@/lib/sockets'
+import { requireReadLogin } from '~lib/auth'
+import logger from '~lib/logger'
+import { startWS } from '~lib/sockets'
 
 const app = new Hono()
 app.use(renderer)

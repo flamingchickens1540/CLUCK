@@ -1,5 +1,5 @@
 import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
-import prisma from '@/lib/prisma'
+import prisma from '~lib/prisma'
 
 export async function handleGetLoggedInCommand({ logger, ack, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     await ack()

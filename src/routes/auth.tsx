@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { validateLogin } from '@/lib/auth'
+import { validateLogin } from '~lib/auth'
 import { setCookie } from 'hono/cookie'
-import { consumeAuthMsg, setAuthMsg } from '@/lib/auth'
+import { consumeAuthMsg, setAuthMsg } from '~lib/auth'
 
 const router = new Hono()
 

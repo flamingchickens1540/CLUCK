@@ -1,23 +1,8 @@
 import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
 import type { WebClient } from '@slack/bolt/node_modules/@slack/web-api' // I know this is stupid but bolt is running a major release behind for some reason
-import config from '@config'
-import { completeHourLog, HourError } from '@/lib/hour_operations'
-import prisma from '@/lib/prisma'
-
-async function getVoidPermissions(client: WebClient, user_id: string): Promise<{ ok: boolean; isVoider: boolean }> {
-    const conversations = await client.conversations.members({ channel: config.slack.channels.void })
-    if (!conversations.ok) {
-        console.warn(conversations.error)
-        return {
-            ok: false,
-            isVoider: false
-        }
-    }
-    return {
-        ok: true,
-        isVoider: conversations.members!.some((member) => member == user_id)
-    }
-}
+import config from '~config'
+import { completeHourLog, HourError } from '~lib/hour_operations'
+import prisma from '~lib/prisma'
 
 export async function handleVoidCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     await ack()

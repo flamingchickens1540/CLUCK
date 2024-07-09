@@ -1,4 +1,4 @@
-import { APIRoutes } from '@/types'
+import { APIRoutes } from '~types'
 
 export function openFullscreen() {
     const elem = document.documentElement

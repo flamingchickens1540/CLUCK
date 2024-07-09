@@ -1,13 +1,12 @@
 import { Context, Hono } from 'hono'
-import { syncSlackMembers } from '@/tasks/slack'
-import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from '@types'
-import logger from '@/lib/logger'
-import { requireReadAPI, requireWriteAPI } from '@/lib/auth'
-import { emitCluckChange } from '@/lib/sockets'
-import prisma, { getMemberPhoto } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { syncSlackMembers } from '~tasks/slack'
+import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from '~types'
+import logger from '~lib/logger'
+import { requireReadAPI, requireWriteAPI } from '~lib/auth'
+import { emitCluckChange } from '~lib/sockets'
+import prisma, { getMemberPhoto } from '~lib/prisma'
 import { cors } from 'hono/cors'
-import { completeHourLog } from '@/lib/hour_operations'
+import { completeHourLog } from '~lib/hour_operations'
 
 const router = new Hono()
 

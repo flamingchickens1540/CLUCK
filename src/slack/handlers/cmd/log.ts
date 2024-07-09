@@ -1,10 +1,10 @@
 import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
 
-import { formatDuration, noActivitySpecified, sanitizeCodeblock, submissionLogged, tooFewHours } from '@/slack/lib/messages'
-import log_modal from '@/slack/modals/log'
-import { safeParseFloat } from '@/lib/util'
-import { handleHoursRequest } from '@/slack/lib/submission'
+import { formatDuration, noActivitySpecified, sanitizeCodeblock, submissionLogged, tooFewHours } from '~slack/lib/messages'
+import log_modal from '~slack/modals/log'
+import { safeParseFloat } from '~lib/util'
+import { handleHoursRequest } from '~slack/lib/submission'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/

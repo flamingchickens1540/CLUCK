@@ -1,7 +1,7 @@
 import { KnownBlock } from '@slack/bolt'
-import prisma from '@/lib/prisma'
-import { slack_client } from '@/slack'
-import config from '@config'
+import prisma from '~lib/prisma'
+import { slack_client } from '~slack'
+import config from '~config'
 /**
  * Push notification message for when a time request is submitted
  */

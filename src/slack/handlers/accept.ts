@@ -1,13 +1,13 @@
 import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import { formatDuration, sanitizeCodeblock } from '@/slack/lib/messages'
-import { ButtonActionMiddlewareArgs } from '@/slack/lib/types'
-import { getRespondMessageModal } from '@/slack/modals/respond'
-import prisma from '@/lib/prisma'
-import { safeParseInt } from '@/lib/util'
-import logger from '@/lib/logger'
+import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
+import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import { getRespondMessageModal } from '~slack/modals/respond'
+import prisma from '~lib/prisma'
+import { safeParseInt } from '~lib/util'
+import logger from '~lib/logger'
 import { enum_HourLogs_type } from '@prisma/client'
-import { slack_client } from '@/slack'
-import config from '@config'
+import { slack_client } from '~slack'
+import config from '~config'
 
 export async function handleAcceptMessageButton({ ack, body, action, client, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()

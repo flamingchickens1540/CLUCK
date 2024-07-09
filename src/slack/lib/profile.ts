@@ -1,5 +1,5 @@
-import config from '@config'
-import logger from '@/lib/logger'
+import config from '~config'
+import logger from '~lib/logger'
 import { WebClient } from '@slack/web-api'
 
 const token = config.slack.app.user_token

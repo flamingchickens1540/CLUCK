@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
 
-import { parseArgs } from '@/slack/handlers/cmd/log'
-vi.mock(import('@/slack'))
+import { parseArgs } from '~slack/handlers/cmd/log'
+vi.mock(import('~slack'))
 
 test('parses /log arguments', () => {
     expect(parseArgs('3h30m lots of working').activity).toBe('lots of working')

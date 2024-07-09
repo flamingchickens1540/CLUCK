@@ -1,9 +1,9 @@
-import prisma from '@/lib/prisma'
+import prisma from '~lib/prisma'
 import { Prisma } from '@prisma/client'
-import config from '@config'
-import { slack_client } from '@/slack'
-import { getSubmittedAltText } from '@/slack/lib/messages'
-import { getRequestBlocks } from '@/slack/modals/new_request'
+import config from '~config'
+import { slack_client } from '~slack'
+import { getSubmittedAltText } from '~slack/lib/messages'
+import { getRequestBlocks } from '~slack/modals/new_request'
 
 export async function handleHoursRequest(slack_id: string, hrs: number, activity: string) {
     const member = await prisma.member.findFirst({ where: { slack_id } })

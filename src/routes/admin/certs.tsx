@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { safeParseInt } from '@/lib/util'
-import prisma from '@/lib/prisma'
+import { safeParseInt } from '~lib/util'
+import prisma from '~lib/prisma'
 
 export const router = new Hono().basePath('/certs')
 

@@ -1,5 +1,5 @@
 import type { ModalView } from '@slack/bolt'
-import { formatDuration, sanitizeCodeblock } from '@/slack/lib/messages'
+import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
 
 export function getRespondMessageModal(type: 'Accept' | 'Reject', request: { id: number; duration: number; activity: string; first_name: string }): ModalView {
     const callback_id = `${type.toLowerCase()}_modal`

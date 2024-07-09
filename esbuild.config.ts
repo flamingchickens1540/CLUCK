@@ -3,7 +3,7 @@ import { sassPlugin } from 'esbuild-sass-plugin'
 import esbuild from 'esbuild'
 import fs from 'fs/promises'
 import path from 'path'
-import logger from '@/lib/logger'
+import logger from '~lib/logger'
 
 if (!(await fs.stat('./public')).isDirectory()) {
     await fs.mkdir('./public')

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import prisma from '@/lib/prisma'
-import logger from '@/lib/logger'
-import { notifyCertChanged } from '@/tasks/certs'
+import prisma from '~lib/prisma'
+import logger from '~lib/logger'
+import { notifyCertChanged } from '~tasks/certs'
 
 export const router = new Hono().basePath('/membercerts')
 

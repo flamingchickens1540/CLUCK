@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { safeParseInt } from '@/lib/util'
-import prisma, { getMemberPhoto } from '@/lib/prisma'
-import { syncSlackMembers } from '@/tasks/slack'
+import { safeParseInt } from '~lib/util'
+import prisma, { getMemberPhoto } from '~lib/prisma'
+import { syncSlackMembers } from '~tasks/slack'
 
 export const router = new Hono().basePath('/members')
 

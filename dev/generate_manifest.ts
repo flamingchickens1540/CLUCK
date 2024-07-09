@@ -1,6 +1,6 @@
 import prod_manifest from './manifest.json'
 import fs from 'fs/promises'
-import config from '@config'
+import config from '~config'
 
 const dev_manifest = structuredClone(prod_manifest)
 const prefix = config.slack.app.command_prefix

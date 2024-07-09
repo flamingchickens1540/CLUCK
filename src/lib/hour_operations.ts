@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma'
-import { emitCluckChange } from '@/lib/sockets'
+import prisma from '~lib/prisma'
+import { emitCluckChange } from '~lib/sockets'
 import { Prisma } from '@prisma/client'
 
 export enum HourError {
