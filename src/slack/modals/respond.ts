@@ -1,11 +1,11 @@
 import type { ModalView } from '@slack/bolt'
-import { formatDuration, sanitizeCodeblock } from '../../../../slack-time-bot/src/messages'
+import { formatDuration, sanitizeCodeblock } from '@/slack/lib/messages'
 
 export function getRespondMessageModal(type: 'Accept' | 'Reject', request: { id: number; duration: number; activity: string; first_name: string }): ModalView {
     const callback_id = `${type.toLowerCase()}_modal`
     const data: ModalView = {
         type: 'modal',
-        private_metadata: request_id,
+        private_metadata: request.id.toString(),
         callback_id: callback_id,
         title: {
             type: 'plain_text',
@@ -27,7 +27,7 @@ export function getRespondMessageModal(type: 'Accept' | 'Reject', request: { id:
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text: `_*${name}*_ submitted *${formatDuration(hours)}* for activity\n\n>_\`\`\`${sanitizeCodeblock(activity)}\`\`\`_`
+                    text: `_*${request.first_name}*_ submitted *${formatDuration(request.duration)}* for activity\n\n>_\`\`\`${sanitizeCodeblock(request.activity)}\`\`\`_`
                 }
             },
             {
