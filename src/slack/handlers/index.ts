@@ -27,8 +27,8 @@ export function registerSlackHandlers(app: App) {
     app.action('accept', getAcceptButtonHandler('external'))
     app.action('accept_summer', getAcceptButtonHandler('summer'))
     app.action('accept_comp', getAcceptButtonHandler('event'))
-    // app.action('accept_msg', handleAcceptMessageButton)
-    // app.action('reject', handleRejectButton)
+    app.action('accept_msg', handleAcceptMessageButton)
+    app.action('reject', handleRejectButton)
     // app.action('open_settings_modal', handleOpenSettingsModal)
     // app.action('jump_url', async ({ ack }) => {
     //     await ack()
