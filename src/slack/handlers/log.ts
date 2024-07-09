@@ -6,7 +6,7 @@ import log_modal from '@/slack/modals/log'
 import { safeParseFloat } from '@/lib/util'
 import { handleHoursRequest } from '@/slack/lib/submission'
 
-function parseArgs(text: string): { hours: number; activity: string | undefined } {
+export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/
     if (!timeRegex.test(text)) {
         return { hours: 0, activity: undefined }

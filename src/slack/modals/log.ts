@@ -1,52 +1,52 @@
-import type { ModalView } from "@slack/bolt";
+import type { ModalView } from '@slack/bolt'
 
-export const log_modal:ModalView = {
-    "type": "modal",
-    "callback_id": "time_submission",
-    "title": {
-        "type": "plain_text",
-        "text": "Log Work Time",
-        "emoji": true
+export const log_modal: ModalView = {
+    type: 'modal',
+    callback_id: 'time_submission',
+    title: {
+        type: 'plain_text',
+        text: 'Log Work Time',
+        emoji: true
     },
-    "submit": {
-        "type": "plain_text",
-        "text": "Submit",
-        "emoji": true
+    submit: {
+        type: 'plain_text',
+        text: 'Submit',
+        emoji: true
     },
-    "close": {
-        "type": "plain_text",
-        "text": "Cancel",
-        "emoji": true
+    close: {
+        type: 'plain_text',
+        text: 'Cancel',
+        emoji: true
     },
-    "blocks": [
+    blocks: [
         {
-            "type": "input",
-            "block_id": "hours",
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "hours"
+            type: 'input',
+            block_id: 'hours',
+            element: {
+                type: 'plain_text_input',
+                action_id: 'hours'
             },
-            "label": {
-                "type": "plain_text",
-                "text": ":clock9: Hours Spent",
-                "emoji": true
+            label: {
+                type: 'plain_text',
+                text: ':clock9: Hours Spent',
+                emoji: true
             }
         },
         {
-            "type": "input",
-            "block_id": "task",
-            "element": {
-                "type": "plain_text_input",
-                "multiline": true,
-                "action_id": "task"
+            type: 'input',
+            block_id: 'task',
+            element: {
+                type: 'plain_text_input',
+                multiline: true,
+                action_id: 'task'
             },
-            "label": {
-                "type": "plain_text",
-                "text": ":person_climbing: Activity",
-                "emoji": true
+            label: {
+                type: 'plain_text',
+                text: ':person_climbing: Activity',
+                emoji: true
             }
         }
     ]
-};
+}
 
-export default log_modal;
+export default log_modal
