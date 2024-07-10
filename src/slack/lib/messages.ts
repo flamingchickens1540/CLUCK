@@ -22,6 +22,13 @@ export const slackResponses = {
     },
     submissionLoggedDM(v: { hours: number; activity: string }) {
         return `:clock2: You submitted *${formatDuration(v.hours)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
+    },
+    submissionAcceptedDM(v: { slack_id: string; hours: number; activity: string; message?: string }) {
+        let msg = `:white_check_mark: *<@${v.slack_id}>* accepted *${formatDuration(v.hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
+        if (v.message) {
+            msg += `\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(v.message)}\``
+        }
+        return msg
     }
 }
 

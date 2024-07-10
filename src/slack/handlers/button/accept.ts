@@ -1,5 +1,5 @@
 import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
+import { formatDuration, sanitizeCodeblock, slackResponses } from '~slack/lib/messages'
 import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
@@ -52,7 +52,15 @@ export async function handleAcceptModal({ ack, body, view, client }: SlackViewMi
         body.view.state.values.message.input.value as enum_HourLogs_type
     )
     if (success) {
-        await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!) })
+        await client.chat.postMessage({
+            channel: requestInfo.Member.slack_id!,
+            text: slackResponses.submissionAcceptedDM({
+                slack_id: body.user.id,
+                hours: requestInfo.duration!.toNumber(),
+                activity: requestInfo.message!,
+                message: body.view.state.values.message.input.value ?? undefined
+            })
+        })
     }
 }
 export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
@@ -73,7 +81,10 @@ export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
             prefix
         )
         if (success) {
-            await client.chat.postMessage({ channel: requestInfo.Member.slack_id!, text: getAcceptedDm(body.user.id, requestInfo.duration!.toNumber(), requestInfo.message!) })
+            await client.chat.postMessage({
+                channel: requestInfo.Member.slack_id!,
+                text: slackResponses.submissionAcceptedDM({ slack_id: body.user.id, hours: requestInfo.duration!.toNumber(), activity: requestInfo.message! })
+            })
         }
     }
 }
@@ -111,11 +122,4 @@ async function handleAccept(time_request: { id: number; duration: number; messag
         console.error('Failed to handle accept modal:\n' + err)
         return false
     }
-}
-
-const getAcceptedDm = (user: string, hours: number, activity: string, message: string | null = null) => {
-    if (message != null) {
-        return `:white_check_mark: *<@${user}>* accepted *${formatDuration(hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(activity)}\`\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(message)}\``
-    }
-    return `:white_check_mark: *<@${user}>* accepted *${formatDuration(hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(activity)}\``
 }
