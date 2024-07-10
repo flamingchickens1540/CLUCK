@@ -1,83 +1,39 @@
-import type { KnownBlock } from '@slack/bolt'
+import { Blocks, Elements, Message } from 'slack-block-builder'
 import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
+import { ActionIDs } from '~slack/handlers'
 
-export function getRequestBlocks(uid: string, hrs: number, activity: string, request_id: string): KnownBlock[] {
-    return [
-        {
-            type: 'header',
-            text: {
-                type: 'plain_text',
-                text: 'Time Submission',
-                emoji: true
-            }
-        },
-        {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: `>>>*<@${uid}>* submitted *${formatDuration(hrs)}* for activity\n\`${sanitizeCodeblock(activity)}\``
-            }
-        },
-        {
-            type: 'actions',
-            elements: [
-                {
-                    type: 'button',
-                    text: {
-                        type: 'plain_text',
-                        emoji: true,
-                        text: 'Accept'
-                    },
-                    style: 'primary',
-                    action_id: 'accept',
-                    value: request_id
-                },
-                {
-                    type: 'button',
-                    text: {
-                        type: 'plain_text',
-                        emoji: true,
-                        text: 'Accept Summer ☀️'
-                    },
-                    action_id: 'accept_summer',
-                    value: request_id
-                },
-                {
-                    type: 'button',
-                    text: {
-                        type: 'plain_text',
-                        emoji: true,
-                        text: 'Accept Competition'
-                    },
-                    action_id: 'accept_comp',
-                    value: request_id
-                },
-                {
-                    type: 'button',
-                    text: {
-                        type: 'plain_text',
-                        emoji: true,
-                        text: 'Accept w/ Message'
-                    },
-                    style: 'primary',
-                    action_id: 'accept_msg',
-                    value: request_id
-                },
-                {
-                    type: 'button',
-                    text: {
-                        type: 'plain_text',
-                        emoji: true,
-                        text: 'Reject w/ Message'
-                    },
-                    style: 'danger',
-                    action_id: 'reject',
-                    value: request_id
-                }
-            ]
-        },
-        {
-            type: 'divider'
-        }
-    ]
+export function getHourSubmissionMessage(v: { request_id: string; slack_id: string; hours: number; activity: string }) {
+    //prettier-ignore
+    return Message()
+        .text(`<@${v.slack_id}> submitted ${formatDuration(v.hours)} for ${v.activity}`)
+        .blocks(
+            Blocks.Header().text("Time Submission"),
+            Blocks.Section().text(`>>>*<@${v.slack_id}>* submitted *${formatDuration(v.hours)}* for activity\n\`${sanitizeCodeblock(v.activity)}\``),
+            Blocks.Actions()
+                .elements(
+                    Elements.Button()
+                        .primary()
+                        .text("Accept")
+                        .actionId(ActionIDs.ACCEPT)
+                        .value(v.request_id),
+                    Elements.Button()
+                        .text("Accept Summer ☀️")
+                        .actionId(ActionIDs.ACCEPT_SUMMER)
+                        .value(v.request_id),
+                    Elements.Button()
+                        .text("Accept Event 📆")
+                        .actionId(ActionIDs.ACCEPT_EVENT)
+                        .value(v.request_id),
+                    Elements.Button()
+                        .text("Accept w/ Message")
+                        .actionId(ActionIDs.ACCEPT_WITH_MSG)
+                        .value(v.request_id),
+                    Elements.Button()
+                        .danger()
+                        .text("Reject")
+                        .actionId(ActionIDs.REJECT)
+                        .value(v.request_id)
+                ),
+            Blocks.Divider(),
+        ).buildToObject()
 }

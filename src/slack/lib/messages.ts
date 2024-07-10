@@ -3,13 +3,6 @@ import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import config from '~config'
 
-/**
- * Push notification message for when a time request is submitted
- */
-export const getSubmittedAltText = (name: string, hours: number, activity: string) => {
-    return `${name} submitted ${formatDuration(hours)} for ${activity}`
-}
-
 export const slackResponses = {
     tooFewHours() {
         return ':warning: I just blocked your submission of ZERO hours. Please submit hours in the form: `/log 2h15m write error messaging for the slack time bot #METAAAAA!!!`'

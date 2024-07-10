@@ -9,6 +9,22 @@ import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
 
+export enum ActionIDs {
+    ACCEPT = 'accept',
+    ACCEPT_SUMMER = 'accept_summer',
+    ACCEPT_EVENT = 'accept_event',
+    ACCEPT_WITH_MSG = 'accept_msg',
+    REJECT = 'reject',
+    OPEN_SETTINGS_MODAL = 'open_settings_modal'
+}
+
+export enum ViewIDs {
+    MODAL_REJECT = 'reject_modal',
+    MODAL_ACCEPT = 'accept_modal',
+    MODAL_LOG = 'time_submission',
+    MODAL_SETTINGS = 'save_settings'
+}
+
 export function registerSlackHandlers(app: App) {
     // Commands and Shortcuts
     let cmd_prefix = '/'
@@ -23,12 +39,12 @@ export function registerSlackHandlers(app: App) {
     app.shortcut('log_hours', handleLogShortcut)
     //
     // // Buttons
-    app.action('accept', getAcceptButtonHandler('external'))
-    app.action('accept_summer', getAcceptButtonHandler('summer'))
-    app.action('accept_comp', getAcceptButtonHandler('event'))
-    app.action('accept_msg', handleAcceptMessageButton)
-    app.action('reject', handleRejectButton)
-    app.action('open_settings_modal', handleOpenSettingsModal)
+    app.action(ActionIDs.ACCEPT, getAcceptButtonHandler('external'))
+    app.action(ActionIDs.ACCEPT_SUMMER, getAcceptButtonHandler('summer'))
+    app.action(ActionIDs.ACCEPT_EVENT, getAcceptButtonHandler('event'))
+    app.action(ActionIDs.ACCEPT_WITH_MSG, handleAcceptMessageButton)
+    app.action(ActionIDs.REJECT, handleRejectButton)
+    app.action(ActionIDs.OPEN_SETTINGS_MODAL, handleOpenSettingsModal)
     // app.action('jump_url', async ({ ack }) => {
     //     await ack()
     // })
