@@ -27,7 +27,7 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
 
     if (command.text.trim().length === 0) {
         await client.views.open({
-            view: log_modal,
+            view: log_modal.buildToObject(),
             trigger_id: command.trigger_id
         })
     } else {
@@ -63,7 +63,7 @@ export async function handleLogShortcut({
     await ack()
 
     await client.views.open({
-        view: log_modal,
+        view: log_modal.buildToObject(),
         trigger_id: shortcut.trigger_id
     })
 }

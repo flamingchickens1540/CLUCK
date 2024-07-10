@@ -1,52 +1,20 @@
-import type { ModalView } from '@slack/bolt'
+import { Blocks, Elements, Modal } from 'slack-block-builder'
 
-export const log_modal: ModalView = {
-    type: 'modal',
-    callback_id: 'time_submission',
-    title: {
-        type: 'plain_text',
-        text: 'Log Work Time',
-        emoji: true
-    },
-    submit: {
-        type: 'plain_text',
-        text: 'Submit',
-        emoji: true
-    },
-    close: {
-        type: 'plain_text',
-        text: 'Cancel',
-        emoji: true
-    },
-    blocks: [
-        {
-            type: 'input',
-            block_id: 'hours',
-            element: {
-                type: 'plain_text_input',
-                action_id: 'hours'
-            },
-            label: {
-                type: 'plain_text',
-                text: ':clock9: Hours Spent',
-                emoji: true
-            }
-        },
-        {
-            type: 'input',
-            block_id: 'task',
-            element: {
-                type: 'plain_text_input',
-                multiline: true,
-                action_id: 'task'
-            },
-            label: {
-                type: 'plain_text',
-                text: ':person_climbing: Activity',
-                emoji: true
-            }
-        }
-    ]
-}
+//prettier-ignore
+export const log_modal = Modal()
+    .title('Log External Hours')
+    .callbackId('time_submission')
+    .submit('Log')
+    .close('Cancel')
+    .blocks(
+        Blocks.Input()
+            .blockId('hours')
+            .element(Elements.TextInput().actionId('hours'))
+            .label('🕘Hours Spent'),
+        Blocks.Input()
+            .blockId('task')
+            .element(Elements.TextInput().actionId('task').multiline())
+            .label('🧗 Activity')
+    )
 
 export default log_modal
