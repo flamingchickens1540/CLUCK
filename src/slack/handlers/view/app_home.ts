@@ -1,6 +1,6 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
-import { Blocks, HomeTab, ViewBlockBuilder } from 'slack-block-builder'
+import { Blocks, HomeTab } from 'slack-block-builder'
 import { calculateHours } from '~lib/hour_operations'
 
 export async function handleAppHomeOpened({ body, event, client }: SlackEventMiddlewareArgs<'app_home_opened'> & AllMiddlewareArgs) {
@@ -26,7 +26,8 @@ export async function publishDefaultHomeView(user: string, client: WebClient) {
         Blocks.Section().fields('Summer', hours.summer.toFixed(1)),
         Blocks.Divider(),
         Blocks.Section().fields('*Total*', '*' + hours.total.toFixed(1) + '*'),
-        Blocks.Divider()
+        Blocks.Divider(),
+        Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString())
     )
 
     await client.views.publish({

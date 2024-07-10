@@ -16,7 +16,11 @@ export function openFullscreen() {
 type Req<T> = T extends { req: unknown } ? T['req'] : never
 type Res<T> = T extends { resp: unknown } ? T['resp'] : never
 
-export async function apiFetch<Route extends keyof APIRoutes, Method extends keyof APIRoutes[Route] & string>(endpoint: Route, method: Method, body: Req<APIRoutes[Route][Method]>): Promise<Res<APIRoutes[Route][Method]> | undefined> {
+export async function apiFetch<Route extends keyof APIRoutes, Method extends keyof APIRoutes[Route] & string>(
+    endpoint: Route,
+    method: Method,
+    body: Req<APIRoutes[Route][Method]>
+): Promise<Res<APIRoutes[Route][Method]> | undefined> {
     const response = await fetch('/api' + endpoint, {
         method: method,
         body: body == null ? undefined : JSON.stringify(body),

@@ -9,9 +9,11 @@ export const getSubmittedAltText = (name: string, hours: number, activity: strin
     return `${name} submitted ${formatDuration(hours)} for ${activity}`
 }
 
-export const tooFewHours = ':warning: I just blocked your submission of ZERO hours. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
+export const tooFewHours =
+    ':warning: I just blocked your submission of ZERO hours. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
 export const submissionLogged = 'Your submission has been logged'
-export const noActivitySpecified = ':warning: I just blocked your submission with no activity. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
+export const noActivitySpecified =
+    ':warning: I just blocked your submission with no activity. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
 
 /**
  * Gets a list of pending time requests
@@ -27,7 +29,10 @@ export async function getAllPendingRequestBlocks() {
             }
         }
     ]
-    const pendingRequests = await prisma.hourLog.findMany({ where: { type: 'external', state: 'pending' }, select: { duration: true, message: true, slack_ts: true, Member: { select: { first_name: true } } } })
+    const pendingRequests = await prisma.hourLog.findMany({
+        where: { type: 'external', state: 'pending' },
+        select: { duration: true, message: true, slack_ts: true, Member: { select: { first_name: true } } }
+    })
     await Promise.all(
         pendingRequests.map(async (log) => {
             const permalink = await slack_client.chat.getPermalink({ channel: config.slack.channels.approval, message_ts: log.slack_ts! })
