@@ -1,7 +1,8 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
-import { Blocks, HomeTab } from 'slack-block-builder'
+import { Blocks, Elements, HomeTab } from 'slack-block-builder'
 import { calculateHours } from '~lib/hour_operations'
+import { ActionIDs } from '~slack/handlers'
 
 export async function handleAppHomeOpened({ body, event, client }: SlackEventMiddlewareArgs<'app_home_opened'> & AllMiddlewareArgs) {
     // Don't update when the messages tab is opened
@@ -14,6 +15,10 @@ export async function publishDefaultHomeView(user: string, client: WebClient) {
     const hours = (await calculateHours({ slack_id: user }))!
 
     const homeTab = HomeTab().blocks(
+        Blocks.Actions().elements(
+            // Elements.Button().text('Log Hours').actionId('log_hours'),
+            Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL)
+        ),
         Blocks.Header().text('⏳ Your Hours'),
         Blocks.Section().fields('*Category*', '*Hours*'),
         Blocks.Divider(),
