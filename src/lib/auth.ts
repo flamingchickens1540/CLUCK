@@ -24,7 +24,7 @@ export async function createUser(id: string, password: string, write_access: boo
     })
 }
 export async function validateLogin(id: string, password: string): Promise<LoginValidation> {
-    const acc = await prisma.account.findFirst({ where: { id } })
+    const acc = await prisma.account.findUnique({ where: { id } })
     if (!acc) {
         return { valid: false }
     }

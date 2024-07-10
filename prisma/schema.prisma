@@ -89,7 +89,7 @@ model Member {
   grade                  Int                                  @db.SmallInt
   years                  Int                                  @db.SmallInt
   use_slack_photo        Boolean
-  slack_id               String?                              @db.VarChar(15)
+  slack_id               String?                              @unique @db.VarChar(15)
   slack_photo            String?                              @db.VarChar(255)
   slack_photo_small      String?                              @db.VarChar(255)
   slack_leaderboard_type String?                              @db.VarChar(50)
@@ -101,6 +101,7 @@ model Member {
   MeetingAttendances     MeetingAttendanceEntry[]
   MemberCerts             MemberCert[]
 
+  @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
   @@map("Members")
 }

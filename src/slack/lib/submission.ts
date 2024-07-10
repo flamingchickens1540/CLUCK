@@ -6,7 +6,7 @@ import { getSubmittedAltText } from '~slack/lib/messages'
 import { getRequestBlocks } from '~slack/modals/new_request'
 
 export async function handleHoursRequest(slack_id: string, hrs: number, activity: string) {
-    const member = await prisma.member.findFirst({ where: { slack_id } })
+    const member = await prisma.member.findUnique({ where: { slack_id } })
     if (member == null) {
         return
     }
