@@ -2,6 +2,7 @@ import { KnownBlock } from '@slack/bolt'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import config from '~config'
+
 /**
  * Push notification message for when a time request is submitted
  */
@@ -9,11 +10,20 @@ export const getSubmittedAltText = (name: string, hours: number, activity: strin
     return `${name} submitted ${formatDuration(hours)} for ${activity}`
 }
 
-export const tooFewHours =
-    ':warning: I just blocked your submission of ZERO hours. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
-export const submissionLogged = 'Your submission has been logged'
-export const noActivitySpecified =
-    ':warning: I just blocked your submission with no activity. Please submit hours in the form: `/log 2h 15m write error messaging for the slack time bot #METAAAAA!!!` :warning: (Make note of spaces/lack of spaces)'
+export const slackResponses = {
+    tooFewHours() {
+        return ':warning: I just blocked your submission of ZERO hours. Please submit hours in the form: `/log 2h15m write error messaging for the slack time bot #METAAAAA!!!`'
+    },
+    submissionLogged() {
+        return 'Your submission has been logged'
+    },
+    noActivitySpecified() {
+        return ':warning: I just blocked your submission with no activity. Please submit hours in the form: `/log 2h15m write error messaging for the slack time bot #METAAAAA!!!`'
+    },
+    submissionLoggedDM(v: { hours: number; activity: string }) {
+        return `:clock2: You submitted *${formatDuration(v.hours)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
+    }
+}
 
 /**
  * Gets a list of pending time requests
@@ -35,7 +45,10 @@ export async function getAllPendingRequestBlocks() {
     })
     await Promise.all(
         pendingRequests.map(async (log) => {
-            const permalink = await slack_client.chat.getPermalink({ channel: config.slack.channels.approval, message_ts: log.slack_ts! })
+            const permalink = await slack_client.chat.getPermalink({
+                channel: config.slack.channels.approval,
+                message_ts: log.slack_ts!
+            })
             output.push(
                 {
                     type: 'section',
@@ -63,6 +76,7 @@ export async function getAllPendingRequestBlocks() {
 export function sanitizeCodeblock(activity: string): string {
     return activity.replace('`', "'")
 }
+
 export function formatDuration(hrs: number, mins?: number): string {
     if (typeof mins === 'undefined') {
         const mins_cached = hrs * 60

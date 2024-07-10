@@ -1,7 +1,7 @@
 import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
 
-import { formatDuration, noActivitySpecified, sanitizeCodeblock, submissionLogged, tooFewHours } from '~slack/lib/messages'
+import { slackResponses } from '~slack/lib/messages'
 import log_modal from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
@@ -33,16 +33,18 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
     } else {
         const { hours, activity } = parseArgs(command.text.trim())
         if (activity == '' || activity == undefined) {
-            await respond({ response_type: 'ephemeral', text: noActivitySpecified })
+            await respond({ response_type: 'ephemeral', text: slackResponses.noActivitySpecified() })
             return
         }
-        const msg_txt = getSubmittedDm({ hours: hours, activity: activity })
         try {
             if (hours < 0.1) {
-                await respond({ response_type: 'ephemeral', text: tooFewHours })
+                await respond({ response_type: 'ephemeral', text: slackResponses.tooFewHours() })
             } else {
-                await respond({ response_type: 'ephemeral', text: submissionLogged })
-                await client.chat.postMessage({ channel: command.user_id, text: msg_txt })
+                await respond({ response_type: 'ephemeral', text: slackResponses.submissionLogged() })
+                await client.chat.postMessage({
+                    channel: command.user_id,
+                    text: slackResponses.submissionLoggedDM({ hours, activity })
+                })
                 await handleHoursRequest(command.user_id, hours, activity)
             }
         } catch (err) {
@@ -51,7 +53,13 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
     }
 }
 
-export async function handleLogShortcut({ shortcut, ack, client }: SlackShortcutMiddlewareArgs & { client: WebClient }) {
+export async function handleLogShortcut({
+    shortcut,
+    ack,
+    client
+}: SlackShortcutMiddlewareArgs & {
+    client: WebClient
+}) {
     await ack()
 
     await client.views.open({
@@ -71,18 +79,16 @@ export async function handleLogModal({ ack, body, view, client, logger }: SlackV
     hours = isNaN(hours) ? 0 : hours
 
     if (hours > 0.1) {
-        const message = getSubmittedDm({ hours: hours, activity: activity })
         try {
-            await client.chat.postMessage({ channel: body.user.id, text: message })
+            await client.chat.postMessage({
+                channel: body.user.id,
+                text: slackResponses.submissionLoggedDM({ hours, activity })
+            })
         } catch (err) {
             logger.error('Failed to handle log modal:\n' + err)
         }
         await handleHoursRequest(body.user.id, hours, activity)
     } else {
-        await client.chat.postMessage({ channel: body.user.id, text: tooFewHours })
+        await client.chat.postMessage({ channel: body.user.id, text: slackResponses.tooFewHours() })
     }
-}
-
-export const getSubmittedDm = (data: { hours: number; minutes?: number; activity: string }) => {
-    return `:clock2: You submitted *${formatDuration(data.hours, data.minutes)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(data.activity)}\``
 }
