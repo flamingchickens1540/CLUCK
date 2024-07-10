@@ -40,12 +40,8 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
             if (hours < 0.1) {
                 await respond({ response_type: 'ephemeral', text: slackResponses.tooFewHours() })
             } else {
-                await respond({ response_type: 'ephemeral', text: slackResponses.submissionLogged() })
-                await client.chat.postMessage({
-                    channel: command.user_id,
-                    text: slackResponses.submissionLoggedDM({ hours, activity })
-                })
                 await handleHoursRequest(command.user_id, hours, activity)
+                await respond({ response_type: 'ephemeral', text: slackResponses.submissionLogged() })
             }
         } catch (err) {
             logger.error('Failed to complete log command:\n' + err)
@@ -68,25 +64,17 @@ export async function handleLogShortcut({
     })
 }
 
-export async function handleLogModal({ ack, body, view, client, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export async function handleLogModal({ ack, body, view, client }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
 
     // Get the hours and task from the modal
-    let hours = parseFloat(view.state.values.hours.hours.value ?? '0')
+    let hours = safeParseFloat(view.state.values.hours.hours.value) ?? 0
     const activity = view.state.values.task.task.value ?? 'Unknown'
 
     // Ensure the time values are valid
     hours = isNaN(hours) ? 0 : hours
 
     if (hours > 0.1) {
-        try {
-            await client.chat.postMessage({
-                channel: body.user.id,
-                text: slackResponses.submissionLoggedDM({ hours, activity })
-            })
-        } catch (err) {
-            logger.error('Failed to handle log modal:\n' + err)
-        }
         await handleHoursRequest(body.user.id, hours, activity)
     } else {
         await client.chat.postMessage({ channel: body.user.id, text: slackResponses.tooFewHours() })

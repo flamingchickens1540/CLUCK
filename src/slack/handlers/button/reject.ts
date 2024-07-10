@@ -27,7 +27,7 @@ export async function handleRejectButton({ ack, body, action, client, logger }: 
                 activity: requestInfo.message!,
                 duration: requestInfo.duration!.toNumber(),
                 first_name: requestInfo.Member.first_name
-            })
+            }).buildToObject()
         })
     } catch (err) {
         logger.error('Failed to handle reject button:\n' + err)

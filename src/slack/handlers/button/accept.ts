@@ -27,7 +27,7 @@ export async function handleAcceptMessageButton({ ack, body, action, client, log
                 activity: requestInfo.message!,
                 duration: requestInfo.duration!.toNumber(),
                 first_name: requestInfo.Member.first_name
-            })
+            }).buildToObject()
         })
     } catch (err) {
         logger.error('Failed to handle accept button:\n' + err)
