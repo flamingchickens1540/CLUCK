@@ -5,5 +5,13 @@
     "tabWidth": 4,
     "semi": false,
     "singleQuote": true,
-    "printWidth": 1000
+    "printWidth": 1000,
+    "overrides": [
+        {
+            "files": ["**/*.ts", "**/*.js"],
+            "options": {
+                "printWidth": 180
+            }
+        }
+    ]
 }
