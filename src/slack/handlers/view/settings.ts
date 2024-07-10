@@ -1,6 +1,6 @@
 import type { AllMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import type { ButtonActionMiddlewareArgs, Department } from '~slack/lib/types'
-import { publishDefaultHomeView } from './event/app_home'
+import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import { publishDefaultHomeView } from './app_home'
 import { getSettingsView } from '~slack/modals/settings'
 import prisma from '~lib/prisma'
 
