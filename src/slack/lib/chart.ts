@@ -65,6 +65,26 @@ export async function createHoursChart(slack_ids: string[]) {
             },
             legend: {
                 display: false
+            },
+            scales: {
+                xAxis: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                yAxes: [
+                    {
+                        title: {
+                            display: true,
+                            text: 'Hours'
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            display: false
+                        }
+                    }
+                ]
             }
         },
         data: {
