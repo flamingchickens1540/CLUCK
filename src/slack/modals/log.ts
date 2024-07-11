@@ -10,7 +10,7 @@ export const log_modal = Modal()
         Blocks.Input()
             .blockId('hours')
             .element(Elements.TextInput().actionId('hours'))
-            .label('🕘Hours Spent'),
+            .label('🕘 Hours Spent'),
         Blocks.Input()
             .blockId('task')
             .element(Elements.TextInput().actionId('task').multiline())

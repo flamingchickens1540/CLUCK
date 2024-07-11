@@ -16,7 +16,7 @@ export async function publishDefaultHomeView(user: string, client: WebClient) {
 
     const homeTab = HomeTab().blocks(
         Blocks.Actions().elements(
-            // Elements.Button().text('Log Hours').actionId('log_hours'),
+            Elements.Button().text('Log Hours').actionId(ActionIDs.OPEN_LOG_MODAL),
             Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL)
         ),
         Blocks.Header().text('⏳ Your Hours'),

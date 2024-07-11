@@ -22,7 +22,7 @@ export async function handleHoursRequest(slack_id: string, hours: number, activi
     const entry = await prisma.hourLog.create({ data: request })
 
     // Send request message to approvers
-    const message = getHourSubmissionMessage({ slack_id, activity, hours, request_id: entry.id.toString() })
+    const message = getHourSubmissionMessage({ slack_id, activity, hours, request_id: entry.id.toString(), state: 'pending' })
     const msg = await slack_client.chat.postMessage({ channel: config.slack.channels.approval, text: message.text, blocks: message.blocks })
 
     await slack_client.chat.postMessage({

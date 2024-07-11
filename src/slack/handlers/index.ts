@@ -1,7 +1,7 @@
 import type { App } from '@slack/bolt'
-import { getAcceptButtonHandler, handleAcceptMessageButton, handleAcceptModal } from './button/accept'
+import { getAcceptButtonHandler, handleAcceptWithMessageButton, handleAcceptModal } from './button/accept'
 import { handleAppHomeOpened } from './view/app_home'
-import { handleLogCommand, handleLogModal, handleLogShortcut } from './cmd/log'
+import { handleLogCommand, handleLogModal, handleLogShortcut, handleOpenLogModal } from './cmd/log'
 import { handleLogoutCommand } from './cmd/logout'
 import { handleRejectButton, handleRejectModal } from './button/reject'
 import { handleOpenUserInfoModal } from './view/userinfo'
@@ -15,7 +15,8 @@ export enum ActionIDs {
     ACCEPT_EVENT = 'accept_event',
     ACCEPT_WITH_MSG = 'accept_msg',
     REJECT = 'reject',
-    OPEN_USERINFO_MODAL = 'open_settings_modal'
+    OPEN_USERINFO_MODAL = 'open_settings_modal',
+    OPEN_LOG_MODAL = 'open_log_modal'
 }
 
 export enum ViewIDs {
@@ -42,9 +43,10 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.ACCEPT, getAcceptButtonHandler('external'))
     app.action(ActionIDs.ACCEPT_SUMMER, getAcceptButtonHandler('summer'))
     app.action(ActionIDs.ACCEPT_EVENT, getAcceptButtonHandler('event'))
-    app.action(ActionIDs.ACCEPT_WITH_MSG, handleAcceptMessageButton)
+    app.action(ActionIDs.ACCEPT_WITH_MSG, handleAcceptWithMessageButton)
     app.action(ActionIDs.REJECT, handleRejectButton)
     app.action(ActionIDs.OPEN_USERINFO_MODAL, handleOpenUserInfoModal)
+    app.action(ActionIDs.OPEN_LOG_MODAL, handleOpenLogModal)
     // app.action('jump_url', async ({ ack }) => {
     //     await ack()
     // })

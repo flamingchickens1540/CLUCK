@@ -5,6 +5,7 @@ import { slackResponses } from '~slack/lib/messages'
 import log_modal from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
+import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/
@@ -49,13 +50,7 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
     }
 }
 
-export async function handleLogShortcut({
-    shortcut,
-    ack,
-    client
-}: SlackShortcutMiddlewareArgs & {
-    client: WebClient
-}) {
+export async function handleLogShortcut({ shortcut, ack, client }: SlackShortcutMiddlewareArgs & { client: WebClient }) {
     await ack()
 
     await client.views.open({
@@ -63,12 +58,20 @@ export async function handleLogShortcut({
         trigger_id: shortcut.trigger_id
     })
 }
+export async function handleOpenLogModal({ body, ack, client }: ButtonActionMiddlewareArgs & { client: WebClient }) {
+    await ack()
+
+    await client.views.open({
+        view: log_modal.buildToObject(),
+        trigger_id: body.trigger_id
+    })
+}
 
 export async function handleLogModal({ ack, body, view, client }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
 
     // Get the hours and task from the modal
-    let hours = safeParseFloat(view.state.values.hours.hours.value) ?? 0
+    let hours = safeParseFloat(view.state.values.hours.hours.value) ?? parseArgs(view.state.values.hours.hours.value ?? '').hours
     const activity = view.state.values.task.task.value ?? 'Unknown'
 
     // Ensure the time values are valid

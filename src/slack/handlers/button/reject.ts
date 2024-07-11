@@ -1,6 +1,6 @@
 import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
-import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
+import { formatDuration, sanitizeCodeblock, slackResponses } from '~slack/lib/messages'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
@@ -8,6 +8,7 @@ import { slack_client } from '~slack'
 import config from '~config'
 import logger from '~lib/logger'
 import { Decimal } from '@prisma/client/runtime/library'
+import { getHourSubmissionMessage } from '~slack/modals/new_request'
 
 export async function handleRejectButton({ ack, body, action, client, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
@@ -36,49 +37,37 @@ export async function handleRejectButton({ ack, body, action, client, logger }: 
 
 export async function handleRejectModal({ ack, body, view, client, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
-    const time_request = await prisma.hourLog.findUnique({
+    const log = await prisma.hourLog.update({
         where: { id: safeParseInt(view.private_metadata) },
-        select: { id: true, message: true, duration: true, slack_ts: true, Member: { select: { slack_id: true } } }
+        data: { state: 'cancelled' },
+        include: { Member: { select: { slack_id: true } } }
     })
-    if (!time_request) {
-        logger.error('Could not find request info')
-        return
+    if (!log) {
+        logger.error('Could not find request info ', safeParseInt(view.private_metadata))
+        return false
     }
-    await prisma.hourLog.update({ where: { id: time_request.id }, data: { state: 'cancelled', type: 'external' } })
-
     try {
-        const message = (
-            await slack_client.conversations.history({
-                channel: config.slack.channels.approval,
-                latest: time_request.slack_ts!,
-                limit: 1,
-                inclusive: true
-            })
-        ).messages![0]
-        const oldBlocks = message.blocks! as KnownBlock[]
+        const message = getHourSubmissionMessage({
+            slack_id: log.Member.slack_id!,
+            activity: log.message!,
+            hours: log.duration!.toNumber(),
+            request_id: log.id.toString(),
+            state: 'rejected'
+        })
         await slack_client.chat.update({
             channel: config.slack.channels.approval,
-            ts: time_request.slack_ts!,
-            text: message.text + ' (REJECTED)',
-            blocks: [
-                oldBlocks[0],
-                oldBlocks[1],
-                {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: `*_:x: Rejected ${new Date().toLocaleString()} :x:_*`
-                    }
-                },
-                { type: 'divider' }
-            ]
+            ts: log.slack_ts!,
+            text: message.text,
+            blocks: message.blocks
         })
-        await client.chat.postMessage({
-            channel: time_request.Member.slack_id!,
-            text: getRejectedDm(body.user.id, time_request.duration!.toNumber(), time_request.message ?? 'Unknown', body.view.state.values.message.input.value ?? 'Unknown')
+        await slack_client.chat.postMessage({
+            channel: log.Member.slack_id!,
+            text: getRejectedDm(body.user.id, log.duration!.toNumber(), log.message ?? 'Unknown', body.view.state.values.message.input.value ?? 'Unknown')
         })
+        return true
     } catch (err) {
         console.error('Failed to handle reject modal:\n' + err)
+        return false
     }
 }
 
