@@ -2,8 +2,8 @@ import prisma from '~lib/prisma'
 import { Prisma } from '@prisma/client'
 import config from '~config'
 import { slack_client } from '~slack'
-import { getHourSubmissionMessage } from '~slack/modals/new_request'
-import { slackResponses } from '~slack/lib/messages'
+import { getHourSubmissionMessage } from '~slack/messages/new_request'
+import responses from '~slack/messages/responses'
 
 export async function handleHoursRequest(slack_id: string, hours: number, activity: string) {
     const request: Prisma.HourLogCreateInput = {
@@ -26,8 +26,8 @@ export async function handleHoursRequest(slack_id: string, hours: number, activi
     const msg = await slack_client.chat.postMessage({ channel: config.slack.channels.approval, text: message.text, blocks: message.blocks })
 
     await slack_client.chat.postMessage({
-        channel: slack_id,
-        text: slackResponses.submissionLoggedDM({ hours, activity })
+        ...responses.submissionLoggedDM({ hours, activity }),
+        channel: slack_id
     })
 
     await prisma.hourLog.update({ where: { id: entry.id }, data: { slack_ts: msg.ts } })

@@ -10,6 +10,7 @@ import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
 import { getPendingRequests } from '~slack/messages/pending_requests'
 import { handleGraphCommand } from '~slack/handlers/graph'
+import { handleShowHoursCommand } from '~slack/handlers/cmd/hours'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -40,6 +41,7 @@ export function registerSlackHandlers(app: App) {
     app.command(cmd_prefix + 'clearlogin', handleLogoutCommand)
     app.command(cmd_prefix + 'voidtime', handleVoidCommand)
     app.command(cmd_prefix + 'loggedin', handleGetLoggedInCommand)
+    app.command(cmd_prefix + 'hours', handleShowHoursCommand)
     app.shortcut('log_hours', handleLogShortcut)
     //
     // // Buttons

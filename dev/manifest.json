@@ -50,6 +50,11 @@
                 "command": "/loggedin",
                 "description": "Shows who is currently signed in",
                 "should_escape": false
+            },
+            {
+                "command": "/hours",
+                "description": "Shows your current hour information",
+                "should_escape": false
             }
         ]
     },

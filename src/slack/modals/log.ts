@@ -9,12 +9,18 @@ export const log_modal = Modal()
     .blocks(
         Blocks.Input()
             .blockId('hours')
-            .element(Elements.TextInput().actionId('hours'))
+            .element(Elements.TextInput()
+                .actionId('hours')
+                .placeholder('2h15m')
+            )
             .label('🕘 Hours Spent'),
         Blocks.Input()
             .blockId('task')
-            .element(Elements.TextInput().actionId('task').multiline())
+            .element(Elements.TextInput()
+                .actionId('task')
+                .placeholder("Write error messaging for the slack time bot #METAAAAA!!!")
+                .multiline())
             .label('🧗 Activity')
-    )
+    ).buildToObject()
 
 export default log_modal
