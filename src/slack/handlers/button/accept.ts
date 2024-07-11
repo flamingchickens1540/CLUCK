@@ -1,5 +1,4 @@
 import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import { slackResponses } from '~slack/lib/messages'
 import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
@@ -8,7 +7,8 @@ import logger from '~lib/logger'
 import { enum_HourLogs_type } from '@prisma/client'
 import { slack_client } from '~slack'
 import config from '~config'
-import { getHourSubmissionMessage } from '~slack/modals/new_request'
+import { getHourSubmissionMessage } from '~slack/messages/new_request'
+import responses from '~slack/messages/responses'
 
 export async function handleAcceptWithMessageButton({ ack, body, action, client, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
@@ -66,9 +66,10 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
             text: message.text,
             blocks: message.blocks
         })
+        const dm = responses.submissionAcceptedDM({ slack_id: actor_slack_id, hours: log.duration!.toNumber(), activity: log.message! })
         await slack_client.chat.postMessage({
-            channel: log.Member.slack_id!,
-            text: slackResponses.submissionAcceptedDM({ slack_id: actor_slack_id, hours: log.duration!.toNumber(), activity: log.message! })
+            ...dm,
+            channel: log.Member.slack_id!
         })
         return true
     } catch (err) {

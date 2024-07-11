@@ -8,7 +8,7 @@ import { handleOpenUserInfoModal } from './view/userinfo'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
-import { getAllPendingRequestBlocks } from '~slack/lib/messages'
+import { getPendingRequests } from '~slack/messages/pending_requests'
 import { handleGraphCommand } from '~slack/handlers/graph'
 
 export enum ActionIDs {
@@ -52,11 +52,10 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.OPEN_LOG_MODAL, handleOpenLogModal)
     app.action(ActionIDs.SEND_PENDING_REQUESTS, async ({ ack, client }) => {
         await ack()
-        const msg = await getAllPendingRequestBlocks()
+        const msg = await getPendingRequests()
         await client.chat.postMessage({
-            channel: config.slack.channels.approval,
-            text: 'Pending requests',
-            blocks: msg.blocks
+            ...msg,
+            channel: config.slack.channels.approval
         })
     })
     app.action('jump_url', async ({ ack }) => {

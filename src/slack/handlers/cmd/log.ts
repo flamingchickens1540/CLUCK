@@ -1,11 +1,11 @@
 import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
 
-import { slackResponses } from '~slack/lib/messages'
 import log_modal from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
 import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import responses from '~slack/messages/responses'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/
@@ -28,21 +28,21 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
 
     if (command.text.trim().length === 0) {
         await client.views.open({
-            view: log_modal.buildToObject(),
+            view: log_modal,
             trigger_id: command.trigger_id
         })
     } else {
         const { hours, activity } = parseArgs(command.text.trim())
         if (activity == '' || activity == undefined) {
-            await respond({ response_type: 'ephemeral', text: slackResponses.noActivitySpecified() })
+            await respond({ ...responses.noActivitySpecified(), response_type: 'ephemeral' })
             return
         }
         try {
             if (hours < 0.1) {
-                await respond({ response_type: 'ephemeral', text: slackResponses.tooFewHours() })
+                await respond({ ...responses.tooFewHours(), response_type: 'ephemeral' })
             } else {
                 await handleHoursRequest(command.user_id, hours, activity)
-                await respond({ response_type: 'ephemeral', text: slackResponses.submissionLogged() })
+                await respond({ ...responses.submissionLogged(), response_type: 'ephemeral' })
             }
         } catch (err) {
             logger.error('Failed to complete log command:\n' + err)
@@ -54,7 +54,7 @@ export async function handleLogShortcut({ shortcut, ack, client }: SlackShortcut
     await ack()
 
     await client.views.open({
-        view: log_modal.buildToObject(),
+        view: log_modal,
         trigger_id: shortcut.trigger_id
     })
 }
@@ -62,7 +62,7 @@ export async function handleOpenLogModal({ body, ack, client }: ButtonActionMidd
     await ack()
 
     await client.views.open({
-        view: log_modal.buildToObject(),
+        view: log_modal,
         trigger_id: body.trigger_id
     })
 }
@@ -80,6 +80,6 @@ export async function handleLogModal({ ack, body, view, client }: SlackViewMiddl
     if (hours > 0.1) {
         await handleHoursRequest(body.user.id, hours, activity)
     } else {
-        await client.chat.postMessage({ channel: body.user.id, text: slackResponses.tooFewHours() })
+        await client.chat.postMessage({ ...responses.tooFewHours(), channel: body.user.id })
     }
 }

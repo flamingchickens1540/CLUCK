@@ -1,4 +1,4 @@
-import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs, KnownBlock } from '@slack/bolt'
+import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs } from '@slack/bolt'
 import { Blocks, Message } from 'slack-block-builder'
 import { createHourChartForTeam, createHourChartForUsers } from '~slack/lib/chart'
 
@@ -15,7 +15,6 @@ export async function handleGraphCommand({ command, ack, respond, client }: Slac
     if (teamLabels[team]) {
         const { url } = await createHourChartForTeam(text as keyof typeof teamLabels)
         const msg = Message()
-            .ephemeral(command.channel_id.startsWith('C'))
             .blocks(
                 Blocks.Section().text(':chart_with_upwards_trend: <@' + command.user_id + '> generated a graph for ' + teamLabels[team]),
                 Blocks.Image().title('Hours Graph').imageUrl(url).altText('Hours Graph')
@@ -38,7 +37,6 @@ export async function handleGraphCommand({ command, ack, respond, client }: Slac
     const { url, success } = await createHourChartForUsers([...users])
 
     const msg = Message()
-        .ephemeral(command.channel_id.startsWith('C'))
         .blocks(
             Blocks.Section().text(':chart_with_upwards_trend: <@' + command.user_id + '> generated a graph for ' + [...users].map((u) => '<@' + u + '>').join(', ')),
             Blocks.Image()
