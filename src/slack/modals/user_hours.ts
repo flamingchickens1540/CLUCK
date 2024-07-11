@@ -1,4 +1,4 @@
-import { Blocks, ViewBlockBuilder } from 'slack-block-builder'
+import { Blocks, Elements, ViewBlockBuilder } from 'slack-block-builder'
 import { calculateHours } from '~lib/hour_operations'
 import { Prisma } from '@prisma/client'
 import { UndefinableArray } from 'slack-block-builder/dist/internal'
@@ -21,6 +21,9 @@ export async function getUserHoursBlocks(user: Prisma.MemberWhereUniqueInput): P
         Blocks.Section().fields('Summer', hours.summer.toFixed(1)),
         Blocks.Divider(),
         Blocks.Section().fields('*Total*', '*' + hours.total.toFixed(1) + '*'),
+        Blocks.Divider(),
+        Blocks.Section().fields('Qualifying', hours.qualifying.toFixed(1)),
+        Blocks.Context().elements('excludes events and summer hours'),
         Blocks.Divider(),
         Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString())
     ]

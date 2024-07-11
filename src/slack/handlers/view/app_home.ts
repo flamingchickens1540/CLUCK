@@ -1,7 +1,6 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt'
 import type { WebClient } from '@slack/web-api'
 import { Blocks, Elements, HomeTab } from 'slack-block-builder'
-import { calculateHours } from '~lib/hour_operations'
 import { ActionIDs } from '~slack/handlers'
 import { getUserHoursBlocks } from '~slack/modals/user_hours'
 
