@@ -62,15 +62,16 @@ export async function handleRejectModal({ ack, body, view, client, logger }: Sla
         })
         await slack_client.chat.postMessage({
             channel: log.Member.slack_id!,
-            text: getRejectedDm(body.user.id, log.duration!.toNumber(), log.message ?? 'Unknown', body.view.state.values.message.input.value ?? 'Unknown')
+            text: slackResponses.submissionRejectedDM({
+                slack_id: body.user.id,
+                hours: log.duration!.toNumber(),
+                activity: log.message ?? 'Unknown',
+                message: body.view.state.values.message.input.value ?? 'Unknown'
+            })
         })
         return true
     } catch (err) {
         console.error('Failed to handle reject modal:\n' + err)
         return false
     }
-}
-
-const getRejectedDm = (user: string, hours: number, activity: string, message: string) => {
-    return `:x: *<@${user}>* rejected *${formatDuration(hours)}* :x:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(activity)}\`\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(message)}\``
 }

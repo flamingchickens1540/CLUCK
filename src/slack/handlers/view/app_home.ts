@@ -17,7 +17,8 @@ export async function publishDefaultHomeView(user: string, client: WebClient) {
     const homeTab = HomeTab().blocks(
         Blocks.Actions().elements(
             Elements.Button().text('Log Hours').actionId(ActionIDs.OPEN_LOG_MODAL),
-            Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL)
+            Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL),
+            Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
         ),
         Blocks.Header().text('⏳ Your Hours'),
         Blocks.Section().fields('*Category*', '*Hours*'),

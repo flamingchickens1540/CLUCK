@@ -8,6 +8,7 @@ import { handleOpenUserInfoModal } from './view/userinfo'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
+import { getAllPendingRequestBlocks } from '~slack/lib/messages'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -16,7 +17,8 @@ export enum ActionIDs {
     ACCEPT_WITH_MSG = 'accept_msg',
     REJECT = 'reject',
     OPEN_USERINFO_MODAL = 'open_settings_modal',
-    OPEN_LOG_MODAL = 'open_log_modal'
+    OPEN_LOG_MODAL = 'open_log_modal',
+    SEND_PENDING_REQUESTS = 'send_pending_requests'
 }
 
 export enum ViewIDs {
@@ -47,6 +49,15 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.REJECT, handleRejectButton)
     app.action(ActionIDs.OPEN_USERINFO_MODAL, handleOpenUserInfoModal)
     app.action(ActionIDs.OPEN_LOG_MODAL, handleOpenLogModal)
+    app.action(ActionIDs.SEND_PENDING_REQUESTS, async ({ ack, client }) => {
+        await ack()
+        const msg = await getAllPendingRequestBlocks()
+        await client.chat.postMessage({
+            channel: config.slack.channels.approval,
+            text: 'Pending requests',
+            blocks: msg.blocks
+        })
+    })
     // app.action('jump_url', async ({ ack }) => {
     //     await ack()
     // })

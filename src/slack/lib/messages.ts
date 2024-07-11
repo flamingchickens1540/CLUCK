@@ -2,6 +2,7 @@ import { KnownBlock } from '@slack/bolt'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import config from '~config'
+import { Blocks, Elements, Message } from 'slack-block-builder'
 
 export const slackResponses = {
     tooFewHours() {
@@ -17,11 +18,14 @@ export const slackResponses = {
         return `:clock2: You submitted *${formatDuration(v.hours)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
     },
     submissionAcceptedDM(v: { slack_id: string; hours: number; activity: string; message?: string }) {
-        let msg = `:white_check_mark: *${formatDuration(v.hours)}* Accepted  :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
+        let msg = `:white_check_mark: *<@${v.slack_id}>* accepted *${formatDuration(v.hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
         if (v.message) {
             msg += `\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(v.message)}\``
         }
         return msg
+    },
+    submissionRejectedDM(v: { slack_id: string; hours: number; activity: string; message: string }) {
+        return `:x: *<@${v.slack_id}>* rejected *${formatDuration(v.hours)}* :x:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\`\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(v.message)}\``
     }
 }
 
@@ -29,48 +33,30 @@ export const slackResponses = {
  * Gets a list of pending time requests
  */
 export async function getAllPendingRequestBlocks() {
-    const output: KnownBlock[] = [
-        {
-            type: 'header',
-            text: {
-                type: 'plain_text',
-                text: ':clock1: Pending Time Requests:',
-                emoji: true
-            }
-        }
-    ]
+    // prettier-ignore
+    const output = Message().blocks(
+        Blocks.Header().text('⏳ Pending Time Requests'),
+        Blocks.Divider()
+    )
     const pendingRequests = await prisma.hourLog.findMany({
         where: { type: 'external', state: 'pending' },
-        select: { duration: true, message: true, slack_ts: true, Member: { select: { first_name: true } } }
+        select: { id: true, duration: true, message: true, slack_ts: true, Member: { select: { slack_id: true } } }
     })
-    await Promise.all(
-        pendingRequests.map(async (log) => {
-            const permalink = await slack_client.chat.getPermalink({
-                channel: config.slack.channels.approval,
-                message_ts: log.slack_ts!
-            })
-            output.push(
-                {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: `*${log.Member.first_name}* - ${formatDuration(log.duration!.toNumber())}\n\`${sanitizeCodeblock(log.message!)}\``
-                    },
-                    accessory: {
-                        type: 'button',
-                        text: {
-                            type: 'plain_text',
-                            text: 'Jump'
-                        },
-                        url: permalink.permalink,
-                        action_id: 'jump_url'
-                    }
-                },
-                { type: 'divider' }
-            )
+    for (const log of pendingRequests) {
+        const permalink = await slack_client.chat.getPermalink({
+            channel: config.slack.channels.approval,
+            message_ts: log.slack_ts!
         })
-    )
-    return output
+
+        output.blocks(
+            Blocks.Section()
+                .text(`${log.id} | *<@${log.Member.slack_id}>* - ${formatDuration(log.duration!.toNumber())}\n\`${sanitizeCodeblock(log.message!)}\``)
+                .accessory(Elements.Button().text('Jump').url(permalink.permalink).actionId('jump_url')),
+            Blocks.Divider()
+        )
+    }
+
+    return output.buildToObject()
 }
 
 export function sanitizeCodeblock(activity: string): string {

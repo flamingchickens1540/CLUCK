@@ -37,16 +37,16 @@ export async function handleAcceptWithMessageButton({ ack, body, action, client,
 
 export async function handleAcceptModal({ ack, body, view }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
-    await handleAccept(safeParseInt(view.private_metadata) ?? -1, body.view.state.values.message.input.value as enum_HourLogs_type)
+    await handleAccept(safeParseInt(view.private_metadata) ?? -1, body.user.id, body.view.state.values.message.input.value as enum_HourLogs_type)
 }
 export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
-    return async function ({ ack, action }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+    return async function ({ ack, action, body }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
         await ack()
-        await handleAccept(safeParseInt(action.value) ?? -1, prefix)
+        await handleAccept(safeParseInt(action.value) ?? -1, body.user.id, prefix)
     }
 }
 
-async function handleAccept(request_id: number, type: enum_HourLogs_type) {
+async function handleAccept(request_id: number, actor_slack_id: string, type: enum_HourLogs_type) {
     const log = await prisma.hourLog.update({ where: { id: request_id }, data: { state: 'complete', type }, include: { Member: { select: { slack_id: true } } } })
     if (!log) {
         logger.error('Could not find request info ', request_id)
@@ -68,7 +68,7 @@ async function handleAccept(request_id: number, type: enum_HourLogs_type) {
         })
         await slack_client.chat.postMessage({
             channel: log.Member.slack_id!,
-            text: slackResponses.submissionAcceptedDM({ slack_id: log.Member.slack_id!, hours: log.duration!.toNumber(), activity: log.message! })
+            text: slackResponses.submissionAcceptedDM({ slack_id: actor_slack_id, hours: log.duration!.toNumber(), activity: log.message! })
         })
         return true
     } catch (err) {
