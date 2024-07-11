@@ -58,9 +58,9 @@ export function registerSlackHandlers(app: App) {
             blocks: msg.blocks
         })
     })
-    // app.action('jump_url', async ({ ack }) => {
-    //     await ack()
-    // })
+    app.action('jump_url', async ({ ack }) => {
+        await ack()
+    })
     //
     // // Inputs
     // app.action('selected_metric', handleLeaderboardAction)

@@ -43,15 +43,21 @@ export async function getAllPendingRequestBlocks() {
         select: { id: true, duration: true, message: true, slack_ts: true, Member: { select: { slack_id: true } } }
     })
     for (const log of pendingRequests) {
-        const permalink = await slack_client.chat.getPermalink({
-            channel: config.slack.channels.approval,
-            message_ts: log.slack_ts!
-        })
-
+        const permalink = await slack_client.chat
+            .getPermalink({
+                channel: config.slack.channels.approval,
+                message_ts: log.slack_ts!
+            })
+            .catch(() => null)
+        if (!permalink) {
+            console.warn('Could not find slack message for log', log.id)
+            continue
+        }
         output.blocks(
             Blocks.Section()
-                .text(`${log.id} | *<@${log.Member.slack_id}>* - ${formatDuration(log.duration!.toNumber())}\n\`${sanitizeCodeblock(log.message!)}\``)
+                .text(`*<@${log.Member.slack_id}>* - ${formatDuration(log.duration!.toNumber())}`)
                 .accessory(Elements.Button().text('Jump').url(permalink.permalink).actionId('jump_url')),
+            Blocks.Context().elements(`${log.id} | Submitted ${new Date().toLocaleString()}`),
             Blocks.Divider()
         )
     }

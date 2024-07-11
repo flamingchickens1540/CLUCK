@@ -44,7 +44,6 @@ export async function handleRejectModal({ ack, body, view, client, logger }: Sla
     })
     if (!log) {
         logger.error('Could not find request info ', safeParseInt(view.private_metadata))
-        return false
     }
     try {
         const message = getHourSubmissionMessage({
@@ -69,9 +68,7 @@ export async function handleRejectModal({ ack, body, view, client, logger }: Sla
                 message: body.view.state.values.message.input.value ?? 'Unknown'
             })
         })
-        return true
     } catch (err) {
         console.error('Failed to handle reject modal:\n' + err)
-        return false
     }
 }
