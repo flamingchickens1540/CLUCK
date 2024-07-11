@@ -29,33 +29,66 @@ class HourAggregator {
     }
     getLabels() {
         return this.values.map((_, i) => {
-            return i % 2 == 0 ? new Date(this.start.getTime() + i * this.group_size).toLocaleDateString('en-us', { month: 'short', day: 'numeric' }) : ''
+            return i % 3 == 0 ? new Date(this.start.getTime() + i * this.group_size).toLocaleDateString('en-us', { month: 'short', day: 'numeric' }) : ''
         })
     }
 }
 
-export async function createHoursChart(slack_ids: string[]) {
+export async function createHourChartForUsers(userIds: string[]) {
     const hourLogs = await prisma.hourLog.findMany({
-        select: {
-            duration: true,
-            time_in: true
-        },
         where: {
-            state: 'complete',
             Member: {
                 slack_id: {
-                    in: slack_ids
+                    in: userIds
                 }
             }
+        },
+        select: {
+            time_in: true,
+            duration: true
         },
         orderBy: {
             time_in: 'asc'
         }
     })
+    return await createHourChart(hourLogs)
+}
+
+export async function createHourChartForTeam(team: 'primary' | 'junior' | 'all') {
+    let where: Prisma.HourLogWhereInput = {}
+    if (team != 'all') {
+        where = {
+            Member: {
+                team
+            }
+        }
+    }
+    const hourLogs = await prisma.hourLog.findMany({
+        where,
+        select: {
+            time_in: true,
+            duration: true
+        },
+        orderBy: {
+            time_in: 'asc'
+        }
+    })
+    return await createHourChart(hourLogs)
+}
+
+async function createHourChart(hourLogs: { time_in: Date; duration: Prisma.Decimal | null }[]): Promise<{
+    url: string
+    success: boolean
+}> {
+    if (hourLogs.length < 2) {
+        return { url: 'https://picsum.photos/id/22/1000/600.jpg', success: false }
+    }
     const aggregator = new HourAggregator(hourLogs[0].time_in, hourLogs[hourLogs.length - 1].time_in)
     hourLogs.forEach((log) => aggregator.add(log.time_in, log.duration!.toNumber()))
 
     const myChart = new QuickChart()
+    myChart.setWidth(1000)
+    myChart.setHeight(600)
     myChart.setConfig({
         type: 'line',
         options: {
@@ -100,5 +133,5 @@ export async function createHoursChart(slack_ids: string[]) {
             ]
         }
     })
-    return await myChart.getShortUrl()
+    return { url: await myChart.getShortUrl(), success: true }
 }
