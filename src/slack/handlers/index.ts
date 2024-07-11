@@ -9,6 +9,7 @@ import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
 import { getAllPendingRequestBlocks } from '~slack/lib/messages'
+import { handleGraphCommand } from '~slack/handlers/graph'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -35,7 +36,7 @@ export function registerSlackHandlers(app: App) {
         cmd_prefix += config.slack.app.command_prefix + '_'
     }
     app.command(cmd_prefix + 'log', handleLogCommand)
-    // app.command(cmd_prefix + 'graph', handleGraphCommand)
+    app.command(cmd_prefix + 'graph', handleGraphCommand)
     app.command(cmd_prefix + 'clearlogin', handleLogoutCommand)
     app.command(cmd_prefix + 'voidtime', handleVoidCommand)
     app.command(cmd_prefix + 'loggedin', handleGetLoggedInCommand)
