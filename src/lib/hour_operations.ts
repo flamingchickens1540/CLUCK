@@ -53,11 +53,14 @@ export async function getValidHours(user: Prisma.MemberWhereUniqueInput) {
 }
 
 export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
-    const member = await prisma.member.findUnique({ where: user })
-    if (member == null) {
-        return
+    if (user.email == null) {
+        const member = await prisma.member.findUnique({ where: user })
+        if (member == null) {
+            return
+        }
+        user.email = member.email
     }
-    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete', member_id: member.email } })
+    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete', member_id: user.email } })
     const out: Record<enum_HourLogs_type | 'total' | 'qualifying', number> = { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
     sums.forEach((sum) => {
         out[sum.type] = sum._sum.duration!.toNumber()
@@ -65,4 +68,40 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
     })
     out.qualifying = out.lab + out.external
     return out
+}
+
+export async function getWeeklyHours(user: Prisma.MemberWhereUniqueInput) {
+    if (user.email == null) {
+        const member = await prisma.member.findUnique({ where: user })
+        if (member == null) {
+            return
+        }
+        user.email = member.email
+    }
+    const logs = await prisma.hourLog.aggregate({
+        where: {
+            member_id: user.email,
+            time_out: {
+                gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
+            }
+        },
+        _sum: { duration: true }
+    })
+    return logs._sum.duration?.toNumber() ?? 0
+}
+
+export async function getMeetings(user: Prisma.MemberWhereUniqueInput) {
+    if (user.email == null) {
+        const member = await prisma.member.findUnique({ where: user })
+        if (member == null) {
+            return
+        }
+        user.email = member.email
+    }
+    return prisma.meetingAttendanceEntry.count({
+        where: {
+            member_id: user.email,
+            state: 'present'
+        }
+    })
 }

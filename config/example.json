@@ -18,5 +18,12 @@
             "certification_approval": "DXXX"
         }
     },
+    "google": {
+        "sheet_id": "",
+        "account": {
+            "private_key": "",
+            "client_email": ""
+        }
+    },
     "default_photo": "/static/img/default_member.webp"
 }

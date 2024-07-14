@@ -44,3 +44,10 @@ The slack user token needs to be authorized by an administrator, and requires ad
 `slack.app.user_token` can be left as an empty string if desired to disable the profile field functionality, otherwise it will appear next to where the bot token was after reauthorization.
 
 Make sure to also set the appropriate user and channel ids
+
+## Spreadsheet
+
+CLUCK is designed to work with a Google Sheets spreadsheet as a frontend. You can make a copy of the [template spreadsheet](https://docs.google.com/spreadsheets/d/1p18eJW29CzLn-zZKBKm-OOM6BtR-oLlrZVfNJtNPl9A/copy) and set the `google.sheet.id` field in your config file to the id in the URL.
+Then, to create the credentials, follow [Google's instructions to create a service account](https://developers.google.com/workspace/guides/create-credentials#service-account), and download the `credentials.json` file. Set the `google.account.private_key` and `google.account.client_email` entries in your config file to the matching keys in `credentials.json`.
+
+You'll need to share the spreadsheet with the email address in `client_email` as an editor to allow the bot to access it.

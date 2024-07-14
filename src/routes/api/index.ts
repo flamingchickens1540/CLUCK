@@ -4,7 +4,7 @@ import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClock
 import logger from '~lib/logger'
 import { requireReadAPI, requireWriteAPI } from '~lib/auth'
 import { emitCluckChange } from '~lib/sockets'
-import prisma, { getMemberPhoto } from '~lib/prisma'
+import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { cors } from 'hono/cors'
 import { completeHourLog } from '~lib/hour_operations'
 
@@ -27,8 +27,8 @@ router.get('/members', requireReadAPI, async (c) => {
         email: member.email,
         first_name: member.first_name,
         full_name: member.full_name,
-        photo: getMemberPhoto(member, false),
-        photo_small: getMemberPhoto(member, true)
+        photo: getMemberPhotoOrDefault(member, false),
+        photo_small: getMemberPhotoOrDefault(member, true)
     }))
     return c.json(resp)
 })

@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { safeParseInt } from '~lib/util'
-import prisma, { getMemberPhoto } from '~lib/prisma'
+import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { syncSlackMembers } from '~tasks/slack'
 
 export const router = new Hono().basePath('/members')
@@ -38,7 +38,7 @@ router
         ].map((member, i) => (
             <form method="post" name={`member-${i}`} autocomplete="off" class="grid grid-cols-subgrid col-span-7 border-t-2 border-purple-500 gap-2 p-3 bg-purple-200">
                 <div class="flex flex-row items-center justify-center gap-3">
-                    <img class={`w-10 h-10 object-cover object-top -m-1 rounded-full border-4 ${member.slack_id == null ? 'border-red-600' : 'border-green-600'}`} alt={member.slack_id == null ? 'Slack not found' : 'Slack connected'} src={getMemberPhoto(member, true)} />
+                    <img class={`w-10 h-10 object-cover object-top -m-1 rounded-full border-4 ${member.slack_id == null ? 'border-red-600' : 'border-green-600'}`} alt={member.slack_id == null ? 'Slack not found' : 'Slack connected'} src={getMemberPhotoOrDefault(member, true)} />
                     <input required placeholder="doej@catlin.edu" name="email" type="email" value={member.email} readonly={member.email != ''} class={`bg-purple-100  rounded-lg pl-2 read-only:bg-purple-200 read-only:cursor-default focus:outline-0`} />
                 </div>
                 <input required placeholder="John Doe" name="name" type="text" value={member.full_name} class="bg-purple-100  rounded-lg pl-2" />

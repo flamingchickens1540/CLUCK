@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { safeParseInt } from '~lib/util'
-import prisma, { getMemberPhoto } from '~lib/prisma'
+import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { enum_MeetingAttendances_state } from '@prisma/client'
 
 export const router = new Hono().basePath('/meetings')
@@ -49,7 +49,7 @@ router
                 <div class="grid grid-cols-subgrid border-t-2 border-cyan-500 bg-cyan-200" style={`grid-column: span ${colcount} / span ${colcount}`}>
                     <div class="sticky top-0 left-0 grid grid-cols-subgrid border-r-2 border-cyan-500 col-span-2 bg-cyan-200">
                         <div class="flex flex-row items-center justify-start ml-5 gap-3">
-                            <img class={`w-10 h-10 object-cover object-top -m-1 rounded-full border-4 ${member.slack_id == null ? 'border-red-600' : 'border-green-600'}`} alt={member.slack_id == null ? 'Slack not found' : 'Slack connected'} src={getMemberPhoto(member, true)} />
+                            <img class={`w-10 h-10 object-cover object-top -m-1 rounded-full border-4 ${member.slack_id == null ? 'border-red-600' : 'border-green-600'}`} alt={member.slack_id == null ? 'Slack not found' : 'Slack connected'} src={getMemberPhotoOrDefault(member, true)} />
                             <div class={`bg-cyan-200 rounded-lg pl-2 min-w-[40%] text-left`}>{member.email}</div>
                         </div>
                         <div class="text-center align-middle bg-cyan-100 rounded-lg p-1 m-2">{member.MeetingAttendances.filter((m) => m.state == 'present').length}</div>

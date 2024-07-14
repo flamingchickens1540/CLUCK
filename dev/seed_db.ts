@@ -6,10 +6,10 @@ const prisma = new PrismaClient()
 
 async function main() {
     await seedCerts()
-    // await seedMembers(25)
+    await seedMembers(25)
     await seedMemberCerts()
-    // await seedLabHours(500)
-    // await seedMeetings(6)
+    await seedLabHours(600)
+    await seedMeetings(6)
 }
 
 async function seedMembers(count: number) {
@@ -25,7 +25,8 @@ async function seedMembers(count: number) {
             team: Math.random() > 0.5 ? enum_Members_team.primary : enum_Members_team.junior,
             grade: faker.number.int({ min: 8, max: 12 }),
             years: faker.number.int({ min: 1, max: 4 }),
-            use_slack_photo: false
+            use_slack_photo: false,
+            fallback_photo: faker.image.urlPicsumPhotos({ width: 100, height: 100 })
         })
     }
     await prisma.member.createMany({ data: members })
