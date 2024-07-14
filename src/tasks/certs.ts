@@ -1,46 +1,59 @@
-import logger from '~lib/logger'
-import 'core-js/full/set/difference'
 import { setProfileAttribute } from '~slack/lib/profile'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import config from '~config'
+import { ordinal, sortCertLabels } from '~lib/util'
 
 const congratsMessages = [
     'Hey! Congrats @ for you new {} Cert!', // prettier don't make this one line
-    'Awww, @ just got a {} Cert... They hatch so fast [;',
+    'Awww, @ just got their # cert: {}! They hatch so fast... [;',
     '@. {}. Well done.',
     'Bawk bawk, bawk bawk @ bawk {} bawk, bawk SKREEEEE',
     'Friends! @ has earned a {}. May we all feast and be merry. :shallow_pan_of_food: ',
     'Congrats to @ on getting a {} certification!',
-    '@ just earned a {}. Did you know: Software is the bread and butter of robotics.'
+    '@ just earned a {}. Did you know: Software is the bread and butter of robotics.',
+    'Cluck-tastic! @ has just achieved a {} Cert. Egg-cellent job!'
 ]
+let announcementTimeout: NodeJS.Timeout | null = null
 
-export async function notifyCertChanged(email: string, certs: string[]) {
-    // All certs expected to be of same member
-    const member = await prisma.member.findUnique({ where: { email } })
-    if (member == null) {
-        return
+export function scheduleCertAnnouncement() {
+    if (announcementTimeout) {
+        announcementTimeout.refresh()
+    } else {
+        announcementTimeout = setTimeout(announceNewCerts, 1000 * 15) // Certs often get changed in bursts, don't run for each change
     }
-    const existingCerts = await prisma.memberCert.findMany({
-        where: { member_id: email },
-        select: { cert_id: true }
+}
+export async function announceNewCerts() {
+    const toAnnounce = await prisma.member.findMany({
+        where: { MemberCerts: { some: { announced: false } } },
+        select: {
+            slack_id: true,
+            first_name: true,
+            MemberCerts: {
+                select: { announced: true, Cert: { select: { label: true } } }
+            }
+        }
     })
-    const oldCerts = new Set(existingCerts.map((cert) => cert.cert_id))
-    const newCerts = certs.filter((x) => !oldCerts.has(x))
-    const labels = await prisma.cert.findMany({ where: { id: { in: certs } }, select: { id: true, label: true } })
-    const labelMap = new Map(labels.map(({ id, label }) => [id, label]))
-    if (newCerts.length > 0) {
-        logger.info(`Announcing new certs for ${email}`)
-        const userText = member.slack_id == null ? member.first_name : `<@${member.slack_id}>`
-        for (const cert_id of newCerts) {
-            const certLabel = labelMap.get(cert_id) ?? cert_id
+    for (const member of toAnnounce) {
+        for (const cert of member.MemberCerts) {
+            if (cert.announced) {
+                continue
+            }
             let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
-            message = message.replace('@', userText) // set user mention
-            message = message.replace('{}', `*${certLabel}*`) // set cert name in *bold*
+            message = message.replace('@', member.slack_id == null ? `*${member.first_name}*` : `<@${member.slack_id}>`) // set user mention
+            message = message.replace('{}', `*${cert.Cert.label}*`) // set cert name in *bold*
+            message = message.replace('#', ordinal(member.MemberCerts.length)) // set cert name in *bold*
             await slack_client.chat.postMessage({ channel: config.slack.channels.celebration, text: message })
         }
+        if (member.slack_id) {
+            await setProfileAttribute(
+                member.slack_id,
+                'certs',
+                member.MemberCerts.map((cert) => cert.Cert.label)
+                    .sort(sortCertLabels)
+                    .join(', ')
+            )
+        }
     }
-    if (member.slack_id) {
-        await setProfileAttribute(member.slack_id, 'certs', labels.map((cert) => cert.label).join(', '))
-    }
+    await prisma.memberCert.updateMany({ where: { announced: false }, data: { announced: true } })
 }

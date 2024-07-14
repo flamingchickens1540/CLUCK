@@ -1,23 +1,19 @@
-import { PrismaClient, Member, HourLog, enum_Members_team, Prisma, enum_MeetingAttendances_state } from '@prisma/client'
+import { PrismaClient, enum_Members_team, Prisma, enum_MeetingAttendances_state } from '@prisma/client'
 import { faker } from '@faker-js/faker'
+import { toTitleCase } from '~lib/util'
 
 const prisma = new PrismaClient()
 
 async function main() {
-    await prisma.member.deleteMany({ where: { slack_id: null } })
-    await prisma.cert.deleteMany()
-    await prisma.memberCert.deleteMany()
-    await prisma.hourLog.deleteMany()
-    await prisma.meetingAttendanceEntry.deleteMany()
-    await prisma.meetings.deleteMany()
     await seedCerts()
-    await seedMembers(15)
+    // await seedMembers(25)
     await seedMemberCerts()
-    await seedLabHours(500)
-    await seedMeetings(6)
+    // await seedLabHours(500)
+    // await seedMeetings(6)
 }
 
 async function seedMembers(count: number) {
+    await prisma.member.deleteMany({ where: { slack_id: null } })
     const members: Prisma.MemberCreateManyInput[] = []
     for (let i = 0; i < count; i++) {
         const first = faker.person.firstName()
@@ -38,24 +34,49 @@ const cert_departments: [string, string][] = [
     ['fab', 'fab'],
     ['design', 'dsn'],
     ['strategy', 'strat'],
-    ['media', 'media']
+    ['media', 'media'],
+    ['robot software', 'rsw'],
+    ['controls', 'ctrls'],
+    ['pneumatics', 'pnu'],
+    ['app software', 'asw'],
+    ['outreach', 'outrch'],
+    ['awards', 'award'],
+    ['executive', 'exec']
+]
+
+const standalone_certs: [string, string][] = [
+    ['safety captain', '_safety'],
+    ['copresident', '_copres']
 ]
 async function seedCerts() {
+    await prisma.cert.deleteMany()
     const certs: Prisma.CertCreateManyInput[] = []
     cert_departments.forEach(([name, shortname]) => {
         for (let i = 1; i <= 3; i++) {
             certs.push({
                 id: shortname.toUpperCase() + '_' + i,
-                label: shortname,
-                department: name,
-                level: i
+                label: toTitleCase(name) + ' ' + i,
+                replaces: i > 1 ? shortname.toUpperCase() + '_' + (i - 1) : null,
+                managerCert: shortname.toUpperCase() + '_MGR'
             })
         }
+        certs.push({
+            id: shortname.toUpperCase() + '_MGR',
+            label: toTitleCase(name) + ' Manager',
+            isManager: true
+        })
+    })
+    standalone_certs.forEach(([name, shortname]) => {
+        certs.push({
+            id: shortname.toUpperCase(),
+            label: toTitleCase(name)
+        })
     })
     await prisma.cert.createMany({ data: certs })
 }
 
 async function seedLabHours(count: number) {
+    await prisma.hourLog.deleteMany({ where: { type: 'lab' } })
     const members = await prisma.member.findMany()
     const randomEmail = () => {
         const i = Math.round(Math.random() * (members.length - 1))
@@ -78,12 +99,13 @@ async function seedLabHours(count: number) {
 }
 
 async function seedMemberCerts() {
+    await prisma.memberCert.deleteMany()
     const members = await prisma.member.findMany()
     const input: Prisma.MemberCertCreateManyInput[] = []
     members.forEach((member) => {
         cert_departments.forEach((dept) => {
             let level = null
-            switch (Math.round(Math.random() * 16)) {
+            switch (Math.round(Math.random() * 14)) {
                 case 0:
                 case 1:
                 case 2:
@@ -96,10 +118,18 @@ async function seedMemberCerts() {
                 case 5:
                     level = 3
             }
+            if (level == 3 && Math.random() < 0.5) {
+                input.push({
+                    member_id: member.email,
+                    cert_id: dept[1].toUpperCase() + '_MGR',
+                    announced: true
+                })
+            }
             if (level != null) {
                 input.push({
                     member_id: member.email,
-                    cert_id: dept[1].toUpperCase() + '_' + level
+                    cert_id: dept[1].toUpperCase() + '_' + level,
+                    announced: true
                 })
             }
         })
@@ -109,6 +139,9 @@ async function seedMemberCerts() {
 
 const MEETING_SPACING = 1000 * 60 * 60 * 24 * 7
 async function seedMeetings(count: number) {
+    await prisma.meetings.deleteMany()
+    await prisma.meetingAttendanceEntry.deleteMany()
+
     const newMeetings: Prisma.MeetingsCreateManyInput[] = []
     let meetingDate = Date.now() - count * MEETING_SPACING
     for (let i = 0; i < count; i++) {

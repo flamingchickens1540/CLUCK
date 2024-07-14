@@ -36,6 +36,11 @@
                 "should_escape": true
             },
             {
+                "command": "/certify",
+                "description": "[Manager Only] Give a user a certification",
+                "should_escape": true
+            },
+            {
                 "command": "/clearlogin",
                 "description": "Logs you out, giving no hours",
                 "should_escape": false

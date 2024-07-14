@@ -57,7 +57,7 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
     if (member == null) {
         return
     }
-    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete' } })
+    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete', member_id: member.email } })
     const out: Record<enum_HourLogs_type | 'total' | 'qualifying', number> = { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
     sums.forEach((sum) => {
         out[sum.type] = sum._sum.duration!.toNumber()

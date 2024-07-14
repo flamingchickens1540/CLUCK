@@ -2,6 +2,7 @@
 
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
+import globals from 'globals'
 
 export default tseslint.config(
     eslint.configs.recommended,
@@ -10,6 +11,7 @@ export default tseslint.config(
     {
         ignores: ['public/', '**/moses.js', '**/_*.ts']
     },
+    { files: ['static/js/**.js'], languageOptions: { globals: globals.browser } },
     {
         rules: {
             '@typescript-eslint/no-explicit-any': 'warn',

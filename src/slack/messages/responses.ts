@@ -19,20 +19,20 @@ export default {
     },
     submissionLoggedDM(v: { hours: number; activity: string }) {
         return Message()
-            .text(`:clock2: You submitted *${formatDuration(v.hours)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``)
+            .text(`:clock2: You submitted *${formatDuration(v.hours)}* :clock7:\n>>>:person_climbing: *Activity:*\n\`\`\`${sanitizeCodeblock(v.activity)}\`\`\``)
             .buildToObject()
     },
     submissionAcceptedDM(v: { slack_id: string; hours: number; activity: string; message?: string }) {
-        let msg = `:white_check_mark: *<@${v.slack_id}>* accepted *${formatDuration(v.hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\``
+        let msg = `:white_check_mark: *<@${v.slack_id}>* accepted *${formatDuration(v.hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`\`\`${sanitizeCodeblock(v.activity)}\`\`\``
         if (v.message) {
-            msg += `\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(v.message)}\``
+            msg += `\n:loudspeaker: *Message:*\n\`\`\`${sanitizeCodeblock(v.message)}\`\`\``
         }
         return Message().text(msg).buildToObject()
     },
     submissionRejectedDM(v: { slack_id: string; hours: number; activity: string; message: string }) {
         return Message()
             .text(
-                `:x: *<@${v.slack_id}>* rejected *${formatDuration(v.hours)}* :x:\n>>>:person_climbing: *Activity:*\n\`${sanitizeCodeblock(v.activity)}\`\n:loudspeaker: *Message:*\n\`${sanitizeCodeblock(v.message)}\``
+                `:x: *<@${v.slack_id}>* rejected *${formatDuration(v.hours)}* :x:\n>>>:person_climbing: *Activity:*\n\`\`\`${sanitizeCodeblock(v.activity)}\`\`\`\n:loudspeaker: *Message:*\n\`\`\`${sanitizeCodeblock(v.message)}\`\`\``
             )
             .buildToObject()
     }

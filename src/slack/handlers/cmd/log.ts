@@ -23,10 +23,9 @@ export function parseArgs(text: string): { hours: number; activity: string | und
     }
 }
 
-export async function handleLogCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
-    await ack()
-
+export async function handleLogCommand({ command, logger, ack, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     if (command.text.trim().length === 0) {
+        await ack()
         await client.views.open({
             view: log_modal,
             trigger_id: command.trigger_id
@@ -34,15 +33,15 @@ export async function handleLogCommand({ command, logger, ack, respond, client }
     } else {
         const { hours, activity } = parseArgs(command.text.trim())
         if (activity == '' || activity == undefined) {
-            await respond({ ...responses.noActivitySpecified(), response_type: 'ephemeral' })
+            await ack({ ...responses.noActivitySpecified(), response_type: 'ephemeral' })
             return
         }
         try {
             if (hours < 0.1) {
-                await respond({ ...responses.tooFewHours(), response_type: 'ephemeral' })
+                await ack({ ...responses.tooFewHours(), response_type: 'ephemeral' })
             } else {
+                await ack({ ...responses.submissionLogged(), response_type: 'ephemeral' })
                 await handleHoursRequest(command.user_id, hours, activity)
-                await respond({ ...responses.submissionLogged(), response_type: 'ephemeral' })
             }
         } catch (err) {
             logger.error('Failed to complete log command:\n' + err)
@@ -68,18 +67,21 @@ export async function handleOpenLogModal({ body, ack, client }: ButtonActionMidd
 }
 
 export async function handleLogModal({ ack, body, view, client }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
-    await ack()
-
     // Get the hours and task from the modal
     let hours = safeParseFloat(view.state.values.hours.hours.value) ?? parseArgs(view.state.values.hours.hours.value ?? '').hours
-    const activity = view.state.values.task.task.value ?? 'Unknown'
+    const activity = view.state.values.task.task.value
 
     // Ensure the time values are valid
     hours = isNaN(hours) ? 0 : hours
-
-    if (hours > 0.1) {
-        await handleHoursRequest(body.user.id, hours, activity)
-    } else {
-        await client.chat.postMessage({ ...responses.tooFewHours(), channel: body.user.id })
+    if (hours < 0.1) {
+        await ack({ response_action: 'errors', errors: { hours: 'Please enter a valid duration' } })
+        return
     }
+    if (activity?.trim() == '' || activity == undefined) {
+        await ack({ response_action: 'errors', errors: { task: 'Please enter an activity' } })
+        return
+    }
+
+    await ack()
+    await handleHoursRequest(body.user.id, hours, activity)
 }

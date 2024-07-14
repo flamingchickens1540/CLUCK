@@ -7,13 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Account {
   id           String   @id @db.VarChar(255)
   password     String   @db.Char(64)
   api_key      String   @db.Char(36)
   write_access Boolean
   admin_access Boolean
+  slack_id     Boolean? @unique
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @db.Timestamptz(6)
 
@@ -21,15 +21,20 @@ model Account {
   @@map("Accounts")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Cert {
-  id         String       @id @db.VarChar(15)
-  label      String       @db.VarChar(100)
-  department String       @db.VarChar(50)
-  level      Int          @db.SmallInt
-  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime     @updatedAt @db.Timestamptz(6)
-  MemberCert MemberCert[]
+  id             String              @id @db.VarChar(15)
+  label          String              @db.VarChar(100)
+  isManager      Boolean             @default(false)
+  managerCert    String?             @db.VarChar(15)
+  replaces       String?             @unique @db.VarChar(50)
+  createdAt      DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime            @updatedAt @db.Timestamptz(6)
+  ReplacedByCert Cert?               @relation("CertProgression")
+  ReplacesCert   Cert?               @relation("CertProgression", fields: [replaces], references: [id], onDelete: SetNull)
+  ManagesCerts   Cert[]              @relation("CertManagement")
+  ManagedByCert  Cert?               @relation("CertManagement", fields: [managerCert], references: [id], onDelete: SetNull)
+  Instances      MemberCert[]
+  Requests       MemberCertRequest[]
 
   @@map("Certs")
 }
@@ -56,50 +61,52 @@ model HourLog {
 }
 
 model MeetingAttendanceEntry {
-  id         Int                           @id @default(autoincrement())
   state      enum_MeetingAttendances_state
   meeting_id Int                           @db.SmallInt
   member_id  String                        @db.VarChar(50)
   createdAt  DateTime                      @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime                      @updatedAt @db.Timestamptz(6)
-  Meetings   Meetings                      @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Meeting    Meetings                      @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
   Member     Member                        @relation(fields: [member_id], references: [email], onDelete: Cascade)
 
+  @@id([meeting_id, member_id])
   @@index([meeting_id], map: "meeting_attendances_meeting_id")
   @@index([member_id], map: "meeting_attendances_member_id")
   @@map("MeetingAttendances")
 }
 
 model Meetings {
-  id                 Int                      @id @default(autoincrement()) @db.SmallInt
-  date               DateTime                 @db.Date
-  mandatory          Boolean
-  createdAt          DateTime                 @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime                 @updatedAt @db.Timestamptz(6)
-  MeetingAttendances MeetingAttendanceEntry[]
+  id          Int                      @id @default(autoincrement()) @db.SmallInt
+  date        DateTime                 @db.Date
+  mandatory   Boolean
+  createdAt   DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime                 @updatedAt @db.Timestamptz(6)
+  Attendances MeetingAttendanceEntry[]
 
   @@map("Meetings")
 }
 
 model Member {
-  email                  String                               @id @db.VarChar(50)
-  first_name             String                               @db.VarChar(50)
-  full_name              String                               @db.VarChar(100)
+  email                  String                   @id @db.VarChar(50)
+  first_name             String                   @db.VarChar(50)
+  full_name              String                   @db.VarChar(100)
   team                   enum_Members_team
-  grade                  Int                                  @db.SmallInt
-  years                  Int                                  @db.SmallInt
+  grade                  Int                      @db.SmallInt
+  years                  Int                      @db.SmallInt
   use_slack_photo        Boolean
-  slack_id               String?                              @unique @db.VarChar(15)
-  slack_photo            String?                              @db.VarChar(255)
-  slack_photo_small      String?                              @db.VarChar(255)
-  slack_leaderboard_type String?                              @db.VarChar(50)
-  slack_department       String?                              @db.VarChar(50)
-  fallback_photo         String?                              @db.VarChar(255)
-  createdAt              DateTime                             @default(now()) @db.Timestamptz(6)
-  updatedAt              DateTime                             @updatedAt @db.Timestamptz(6)
+  slack_id               String?                  @unique @db.VarChar(15)
+  slack_photo            String?                  @db.VarChar(255)
+  slack_photo_small      String?                  @db.VarChar(255)
+  slack_leaderboard_type String?                  @db.VarChar(50)
+  slack_department       String?                  @db.VarChar(50)
+  fallback_photo         String?                  @db.VarChar(255)
+  createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                 @updatedAt @db.Timestamptz(6)
   HourLogs               HourLog[]
   MeetingAttendances     MeetingAttendanceEntry[]
-  MemberCerts             MemberCert[]
+  MemberCerts            MemberCert[]
+  MemberCertRequests     MemberCertRequest[]      @relation("MemberCertRecipient")
+  MemberCertsRequested   MemberCertRequest[]      @relation("MemberCertRequester")
 
   @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
@@ -107,24 +114,43 @@ model Member {
 }
 
 model MemberCert {
-  id        Int    @id @default(autoincrement())
   cert_id   String
   member_id String
-
+  announced Boolean  @default(false)
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   Member Member @relation(fields: [member_id], references: [email], onDelete: Cascade)
   Cert   Cert   @relation(fields: [cert_id], references: [id], onDelete: Cascade)
 
+  @@id([cert_id, member_id])
   @@index([member_id], map: "membercerts_memberid")
   @@index([cert_id], map: "membercerts_certid")
   @@map("MemberCerts")
 }
 
+model MemberCertRequest {
+  id           Int                           @id @default(autoincrement())
+  cert_id      String
+  member_id    String
+  requester_id String
+  slack_ts     String?
+  state        enum_MemberCertsRequest_state
+  createdAt    DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime                      @updatedAt @db.Timestamptz(6)
+
+  Requester Member @relation("MemberCertRequester", fields: [requester_id], references: [email], onDelete: Cascade)
+  Member    Member @relation("MemberCertRecipient", fields: [member_id], references: [email], onDelete: Cascade)
+  Cert      Cert   @relation(fields: [cert_id], references: [id], onDelete: Cascade)
+
+  @@index([member_id], map: "membercertrequests_memberid")
+  @@index([cert_id], map: "membercertrequests_certid")
+  @@map("MemberCertRequests")
+}
+
 model FallbackPhoto {
-  email    String @id
-  url      String
+  email String @id
+  url   String
 
   @@map("FallbackPhotos")
 }
@@ -151,4 +177,10 @@ enum enum_MeetingAttendances_state {
 enum enum_Members_team {
   primary
   junior
+}
+
+enum enum_MemberCertsRequest_state {
+  pending
+  approved
+  rejected
 }

@@ -8,5 +8,6 @@ declare module 'hono' {
         auth_write: boolean
         auth_read: boolean
         auth_admin: boolean
+        user: string
     }
 }

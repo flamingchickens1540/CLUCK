@@ -58,7 +58,8 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
             activity: log.message!,
             hours: log.duration!.toNumber(),
             request_id: request_id.toString(),
-            state: 'approved'
+            state: 'approved',
+            type
         })
         await slack_client.chat.update({
             channel: config.slack.channels.approval,

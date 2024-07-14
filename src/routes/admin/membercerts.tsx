@@ -1,76 +1,80 @@
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import logger from '~lib/logger'
-import { notifyCertChanged } from '~tasks/certs'
+import { scheduleCertAnnouncement } from '~tasks/certs'
 
 export const router = new Hono().basePath('/membercerts')
 
+export const cert_colors = [
+    'bg-red-200 border-red-500 accent-red-400', //
+    'bg-yellow-200 border-yellow-500 accent-yellow-400',
+    'bg-green-200 border-green-500 accent-green-400',
+    'bg-blue-200 border-blue-500 accent-blue-400',
+    'bg-purple-200 border-purple-500 accent-purple-400',
+    'bg-pink-200 border-pink-500 accent-pink-400'
+]
+export const getColor = (i: number) => cert_colors[i % cert_colors.length]
 router
     .get('/', async (c) => {
         const certs = await prisma.cert.findMany({ orderBy: { id: 'asc' }, select: { id: true, label: true } })
-        const colcount = certs.length + 2
-        const rows = (await prisma.member.findMany({ orderBy: { full_name: 'asc' }, select: { email: true, full_name: true, MemberCerts: { select: { cert_id: true } } } })).map((member, i) => {
+        const colcount = certs.length + 1
+        const rows = (await prisma.member.findMany({ orderBy: { full_name: 'asc' }, select: { email: true, full_name: true, MemberCerts: { select: { cert_id: true } } } })).map((member, rowI) => {
+            let colorI = -1
             const certSet = new Set(member.MemberCerts.map((cert) => cert.cert_id))
             return (
-                <form method="post" name={`member-${i}`} autocomplete="off" class={`grid grid-cols-subgrid border-t-2 border-teal-500 bg-teal-200`} style={`grid-column: span ${colcount} / span ${colcount}`}>
-                    <div class="flex flex-row items-center justify-center gap-3">
+                <div method="post" name={`member-${rowI}`} autocomplete="off" class={`grid grid-cols-subgrid`} style={`grid-column: span ${colcount} / span ${colcount}`}>
+                    <div class={`flex flex-row items-center justify-center bg-gray-200 gap-3 sticky left-0 z-10 border-gray-500 border-r-2 ${rowI % 2 == 0 && 'brightness-[0.85]'}`}>
                         <p class={`pl-2`}>{member.full_name}</p>
                     </div>
-                    <input type="hidden" name={`${member.email}::`} value="" />
-                    {certs.map((cert) => (
-                        <div class="border-l pt-3 pb-3 border-teal-500 text-xl">
-                            <input name={`${member.email}::${cert.id}`} checked={certSet.has(cert.id)} type="checkbox" />
-                        </div>
-                    ))}
-                    <input type="submit" value={'Save'} class="bg-teal-400 hover:bg-teal-600 rounded-lg transition-colors duration-200 m-3" />
-                </form>
+                    {certs.map((cert, i) => {
+                        const isFirst = i == 0 || cert.id.split('_')[0] !== certs[i - 1].id.split('_')[0]
+                        const isLast = i >= certs.length - 1 || cert.id.split('_')[0] !== certs[i + 1].id.split('_')[0]
+                        if (isFirst) {
+                            colorI++
+                        }
+                        return (
+                            <div class={`${rowI % 2 == 0 && 'saturate-100 brightness-[0.85]'} ${isFirst ? 'border-l-2' : 'border-l'} ${isLast && 'border-r-2'} p-1 text-xl ${getColor(colorI)}`}>
+                                <input class="cert-checkbox scale-150" name={`${member.email}::${cert.id}`} checked={certSet.has(cert.id)} type="checkbox" />
+                            </div>
+                        )
+                    })}
+                </div>
             )
         })
+        let colorI = -1
         return c.render(
             <>
                 <div class="container-xl text-center text-xl">
-                    <div class="grid grid-cols-4" style={`grid-template-columns: auto repeat(${colcount - 2}, 32px) auto;`}>
-                        <div class="grid grid-cols-subgrid border-0 bg-teal-300 pt-5" style={`grid-column: span ${colcount} / span ${colcount}`}>
-                            <div>Member</div>
-                            {certs.map((cert) => (
-                                <div class="vertical-text-parent pb-1 border-l border-teal-500">
-                                    <div>{cert.label}</div>
-                                </div>
-                            ))}
+                    <div class="grid grid-cols-4" style={`grid-template-columns: minmax(200px, auto) repeat(${colcount - 1}, 32px);`}>
+                        <div class="grid grid-cols-subgrid border-0 sticky top-0 z-20" style={`grid-column: span ${colcount} / span ${colcount}`}>
+                            <div class="bg-white sticky top-0 left-0 z-30"></div>
+                            {certs.map((cert, i) => {
+                                const isFirst = i == 0 || cert.id.split('_')[0] !== certs[i - 1].id.split('_')[0]
+                                const isLast = i >= certs.length - 1 || cert.id.split('_')[0] !== certs[i + 1].id.split('_')[0]
+                                if (isFirst) {
+                                    colorI++
+                                }
+                                return (
+                                    <div class={`vertical-text-parent py-1 border-b-2 ${isFirst ? 'border-l-2' : 'border-l'} ${isLast && 'border-r-2'} ${getColor(colorI)}`}>
+                                        <div>{cert.label}</div>
+                                    </div>
+                                )
+                            })}
                         </div>
                         {rows}
                     </div>
                 </div>
-            </>
+            </>,
+            { js: 'js/membercerts' }
         )
     })
     .post(async (c) => {
-        const data = await c.req.parseBody()
-        const memberCerts: Record<string, string[]> = {}
-        for (const key in data) {
-            const [user, cert] = key.split('::', 2)
-            memberCerts[user] ??= []
-            if (cert) {
-                memberCerts[user].push(cert)
-            }
+        const { email, cert, value }: { email: string; cert: string; value: boolean } = await c.req.json()
+        if (value) {
+            await prisma.memberCert.create({ data: { member_id: email, cert_id: cert } })
+            scheduleCertAnnouncement()
+        } else {
+            await prisma.memberCert.delete({ where: { cert_id_member_id: { cert_id: cert, member_id: email } } })
         }
-        for (const member in memberCerts) {
-            const newCerts = memberCerts[member]
-            const { count: deleted } = await prisma.memberCert.deleteMany({
-                where: {
-                    cert_id: {
-                        notIn: newCerts
-                    },
-                    member_id: member
-                }
-            })
-            logger.info(`Removed ${deleted} certs from ${member}`)
-            await notifyCertChanged(member, newCerts)
-            const { count: created } = await prisma.memberCert.createMany({
-                data: newCerts.map((cert) => ({ member_id: member, cert_id: cert })),
-                skipDuplicates: true
-            })
-            logger.info(`Created ${created} certs for ${member}`)
-        }
-        return c.redirect(c.req.url, 302)
+        return c.text('OK', 200)
     })

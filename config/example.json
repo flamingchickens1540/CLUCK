@@ -14,7 +14,8 @@
         "channels": {
             "celebration": "CXXXX",
             "void": "CXXX",
-            "approval": "DXXX"
+            "approval": "DXXX",
+            "certification_approval": "DXXX"
         }
     },
     "default_photo": "/static/img/default_member.webp"

@@ -4,18 +4,17 @@ import { completeHourLog, HourError } from '~lib/hour_operations'
 import prisma from '~lib/prisma'
 
 export async function handleVoidCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
-    await ack()
     const void_channel_members = (await client.conversations.members({ channel: config.slack.channels.void })).members!
 
     if (!void_channel_members.includes(command.user_id)) {
-        await respond({ response_type: 'ephemeral', text: 'Must be a copresident to run this command' })
+        await ack({ response_type: 'ephemeral', text: 'Must be a copresident to run this command' })
         return
     }
 
     try {
         const target_match = command.text.match(/<@([\w\d]+)\|.+>/)
         if (target_match == null) {
-            await respond({
+            await ack({
                 response_type: 'ephemeral',
                 text: `Please provide the user in the form of a mention (like <@${command.user_id}>)`
             })
@@ -24,12 +23,13 @@ export async function handleVoidCommand({ command, logger, ack, respond, client 
         const target_id = target_match![1]
 
         if (void_channel_members.includes(target_id)) {
-            await respond({
+            await ack({
                 response_type: 'ephemeral',
                 text: `Target must not be in <#${config.slack.channels.void}>!`
             })
             return
         }
+        await ack()
         const target_member = await prisma.member.findFirst({ where: { slack_id: target_id } })
         if (target_member == null) {
             await respond({ response_type: 'ephemeral', text: `Could not find user with id '${target_id}'` })

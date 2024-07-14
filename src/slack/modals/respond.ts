@@ -8,7 +8,7 @@ export function getRespondMessageModal(action: 'Accept' | 'Reject', request: { i
         .privateMetaData(request.id.toString())
         .callbackId(action == "Accept" ? ViewIDs.MODAL_ACCEPT : ViewIDs.MODAL_REJECT)
         .title(`${action} Time Request`)
-        .submit(`${action} and Send`)
+        .submit(`${action}`)
         .close("Cancel")
         .blocks(
             Blocks.Section()
@@ -16,7 +16,7 @@ export function getRespondMessageModal(action: 'Accept' | 'Reject', request: { i
             Blocks.Divider(),
             Blocks.Input()
                 .blockId("message")
-                .element(Elements.TextInput().actionId("input"))
+                .element(Elements.TextInput().multiline().actionId("input"))
                 .label("Message")
         )
     if (action == 'Accept') {
@@ -28,8 +28,13 @@ export function getRespondMessageModal(action: 'Accept' | 'Reject', request: { i
                     Elements.StaticSelect()
                         .actionId('selector')
                         .placeholder('Select a category...')
-                        .initialOption(Bits.Option().text('Regular').value('external'))
-                        .options(Bits.Option().text('Regular').value('external'), Bits.Option().text('Summer ☀️').value('summer'), Bits.Option().text('Event').value('event'))
+                        .initialOption(Bits.Option().text('External').value('external'))
+                        .options(
+                            Bits.Option().text('External').value('external'),
+                            Bits.Option().text('Summer ☀️').value('summer'),
+                            Bits.Option().text('Event').value('event'),
+                            Bits.Option().text('Lab').value('lab')
+                        )
                 )
         )
     }

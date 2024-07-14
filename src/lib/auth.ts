@@ -59,6 +59,7 @@ const validateAuth = async (c: Context<BlankEnv, never, object>) => {
     c.set('auth_read', permissions.read)
     c.set('auth_write', permissions.write)
     c.set('auth_admin', permissions.admin)
+    c.set('user', permissions.id)
 }
 
 export const requireReadLogin: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
