@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="en-us">
-<head>
-    <title>Members</title>
+    <head>
+        <title>Members</title>
 
-    <!--    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">-->
-</head>
+        <!--    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">-->
+    </head>
 
-<body style="background-color: #404050">
-    <div id="mygrid" class="ag-theme-quartz-dark" style="position:absolute;top:0;left:0;right:0;bottom:0;padding:1rem"></div>
-
-    <script src="./index.ts"></script>
-</body>
-
+    <body style="background-color: #404050">
+    <div style="display:flex;flex-direction:column;position: absolute; top: 0; left: 0; right: 0;bottom:0;padding: 1rem; gap:1rem">
+        <div id="mygrid" class="ag-theme-quartz-dark" style="height:100%"></div>
+        <div style="display:flex;flex-direction: row;gap:1rem">
+            <button id="btn-add-member">Add Member</button>
+        </div>
+    </div>
+        <script src="./index.ts"></script>
+    </body>
 </html>

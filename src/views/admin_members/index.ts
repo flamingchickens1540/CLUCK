@@ -1,23 +1,18 @@
 import Prisma from '@prisma/client'
 import * as ag from 'ag-grid-community'
-import { RowDataUpdatedEvent } from 'ag-grid-community'
+import { CellValueChangedEvent, GridApi, RowDataUpdatedEvent, RowValueChangedEvent } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { ordinal, safeParseInt, toTitleCase } from '~lib/util'
 console.log('AAA')
 ;(async () => {
     console.log('starting')
-    const resp = await fetch('/api/admin/members')
-    const members = (await resp.json()) as Prisma.Member[]
-
-    const inputRow = {}
-
+    let gridApi: GridApi
     // Grid Options: Contains all of the Data Grid configurations
     const gridOptions: ag.GridOptions<Prisma.Member> = {
-        pinnedBottomRowData: [inputRow],
+        getRowId: (params) => params.data.email,
+        pinnedBottomRowData: [{}],
 
-        // Row Data: The data to be displayed.
-        rowData: members,
         // Column Definitions: Defines the columns to be displayed.
         columnDefs: [
             {
@@ -69,16 +64,43 @@ console.log('AAA')
 
         defaultColDef: {
             valueFormatter: (params) =>
-                params.node?.isRowPinned() && (params.value == null || params.value == '') ? (params.colDef.headerName ?? toTitleCase(params.colDef.field!)) + '...' : params.value
+                params.node?.isRowPinned() && (params.value == null || params.value == '') && params.colDef
+                    ? (params.colDef.headerName ?? toTitleCase(params.colDef.field!)) + '...'
+                    : params.value
         },
         getRowStyle: ({ node }) => (node.rowPinned ? { 'font-weight': '300', 'color': '#a0a0a0', 'font-style': 'italic' } : undefined),
 
-        onCellEditingStopped: (params) => {
-            const row = gridOptions.pinnedBottomRowData![0]
+        async onCellValueChanged(event) {
+            if (event.rowPinned) {
+                console.log(event.data)
+            } else {
+                if (event.column.getColDef().field == 'email') {
+                    return
+                }
+                const res = await fetch('/api/admin/members', { method: 'PUT', body: JSON.stringify(event.data) })
+                const member = await res.json()
+                gridApi.applyTransaction({ update: [member] })
+            }
         }
     }
 
+    document.getElementById('btn-add-member')?.addEventListener('click', async () => {
+        const bottomRow = gridApi.getPinnedBottomRow(0)!
+        const res = await fetch('/api/admin/members', { method: 'POST', body: JSON.stringify(bottomRow.data) })
+        const response_data = await res.json()
+        if (response_data.success) {
+            gridApi.applyTransaction({ add: [response_data.data] })
+            bottomRow.setData({})
+        } else {
+            alert('Invalid data')
+        }
+    })
+
     console.log(gridOptions)
     // Your Javascript code to create the Data Grid
-    ag.createGrid(document.querySelector('#mygrid')!, gridOptions)
+    gridApi = ag.createGrid(document.querySelector('#mygrid')!, gridOptions)
+
+    fetch('/api/admin/members').then(async (resp) => {
+        gridApi.setGridOption('rowData', await resp.json())
+    })
 })()
