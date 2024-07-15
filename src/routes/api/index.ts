@@ -7,9 +7,10 @@ import { emitCluckChange } from '~lib/sockets'
 import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { cors } from 'hono/cors'
 import { completeHourLog } from '~lib/hour_operations'
-
+import { router as admin_api_router } from './admin'
 const router = new Hono()
 
+router.route('/', admin_api_router)
 router.get('/members', requireReadAPI, async (c) => {
     const members = await prisma.member.findMany({
         select: {

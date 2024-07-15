@@ -9,39 +9,40 @@ if (!(await fs.stat('./public')).isDirectory()) {
     await fs.mkdir('./public')
 }
 
-const views = await fs.readdir('src/views')
+const views: Record<string, string> = {
+    grid: '/grid/',
+    admin_members: '/demo/admin/members/'
+}
+
 const contexts: esbuild.BuildContext[] = []
-for (const view of views) {
-    const id = path.basename(view)
-    const viewpath = path.join('src/views', view)
-    if ((await fs.stat(viewpath)).isDirectory()) {
-        contexts.push(
-            await esbuild.context({
-                entryPoints: [path.join('src/views', view, 'index.html')],
-                outdir: `public/${id}`,
-                assetNames: `assets/[name]`,
-                chunkNames: `assets/[name]`,
-                plugins: [
-                    sassPlugin(),
-                    htmlPlugin({ minifyOptions: { minifySvg: false } }),
-                    {
-                        name: 'rebuild-notify',
-                        setup(build) {
-                            build.onEnd((result) => {
-                                logger.debug(`build ended with ${result.errors.length} errors`)
-                                // HERE: somehow restart the server from here, e.g., by sending a signal that you trap and react to inside the server.
-                            })
-                        }
+for (const id in views) {
+    console.log(path.join('public/', views[id]), path.join('src/views', id, 'index.html'))
+    contexts.push(
+        await esbuild.context({
+            entryPoints: [path.join('src/views', id, 'index.html')],
+            outdir: path.join('public/', views[id]),
+            assetNames: `assets/[name]`,
+            chunkNames: `assets/[name]`,
+            plugins: [
+                sassPlugin(),
+                htmlPlugin({ minifyOptions: { minifySvg: false } }),
+                {
+                    name: 'rebuild-notify',
+                    setup(build) {
+                        build.onEnd((result) => {
+                            logger.debug(`build ended with ${result.errors.length} errors`)
+                            // HERE: somehow restart the server from here, e.g., by sending a signal that you trap and react to inside the server.
+                        })
                     }
-                ],
-                bundle: true,
-                minify: true,
-                sourcemap: 'inline',
-                external: ['/static/*']
-            })
-        )
-        logger.info('Loaded build context for ' + id)
-    }
+                }
+            ],
+            bundle: true,
+            minify: true,
+            sourcemap: 'inline',
+            external: ['/static/*']
+        })
+    )
+    logger.info('Loaded build context for ' + id)
 }
 const watch = process.argv.includes('--watch')
 // const endPromise = Promise.all(
@@ -57,10 +58,10 @@ const watch = process.argv.includes('--watch')
 // )
 if (watch) {
     logger.info('Watching...')
-    await contexts[0].watch()
+    await Promise.all(contexts.map((ctx) => ctx.watch()))
     logger.info('Done...')
 } else {
     logger.info('Building...')
-    // await endPromise
+    await Promise.all(contexts.map((ctx) => ctx.rebuild().then(ctx.dispose)))
     logger.info('Build complete')
 }
