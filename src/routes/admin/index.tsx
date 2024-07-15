@@ -3,6 +3,7 @@ import { router as member_route } from './members'
 import { router as cert_route } from './certs'
 import { router as membercert_route } from './membercerts'
 import { router as meeting_route } from './meetings'
+import { router as memberfield_route } from './memberfields'
 import { requireAdminLogin } from '~lib/auth'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 import { toTitleCase } from '~lib/util'
@@ -15,12 +16,14 @@ router.route('/', member_route)
 router.route('/', cert_route)
 router.route('/', membercert_route)
 router.route('/', meeting_route)
+router.route('/', memberfield_route)
 
 const pages = {
     members: ['Members', 'Add new members and sync slack accounts'],
     certs: ['Cert Setup', 'Create and edit cert names and levels'],
     membercerts: ['Cert Assignments', 'Manage certifications for team members'],
-    meetings: ['Meetings', 'Record and view meeting attendance']
+    meetings: ['Meetings', 'Record and view meeting attendance'],
+    memberfields: ['Additional Fields', 'Add and edit additional fields for members to appear in the spreadsheet']
 }
 
 router.get('/', (c) => {

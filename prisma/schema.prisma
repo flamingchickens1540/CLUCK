@@ -87,26 +87,29 @@ model Meetings {
 }
 
 model Member {
-  email                  String                   @id @db.VarChar(50)
-  first_name             String                   @db.VarChar(50)
-  full_name              String                   @db.VarChar(100)
+  email                  String            @id @db.VarChar(50)
+  first_name             String            @db.VarChar(50)
+  full_name              String            @db.VarChar(100)
   team                   enum_Members_team
-  grade                  Int                      @db.SmallInt
-  years                  Int                      @db.SmallInt
+  grade                  Int               @db.SmallInt
+  years                  Int               @db.SmallInt
   use_slack_photo        Boolean
-  slack_id               String?                  @unique @db.VarChar(15)
-  slack_photo            String?                  @db.VarChar(255)
-  slack_photo_small      String?                  @db.VarChar(255)
-  slack_leaderboard_type String?                  @db.VarChar(50)
-  slack_department       String?                  @db.VarChar(50)
-  fallback_photo         String?                  @db.VarChar(255)
-  createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
-  updatedAt              DateTime                 @updatedAt @db.Timestamptz(6)
-  HourLogs               HourLog[]
-  MeetingAttendances     MeetingAttendanceEntry[]
-  MemberCerts            MemberCert[]
-  MemberCertRequests     MemberCertRequest[]      @relation("MemberCertRecipient")
-  MemberCertsRequested   MemberCertRequest[]      @relation("MemberCertRequester")
+  slack_id               String?           @unique @db.VarChar(15)
+  slack_photo            String?           @db.VarChar(255)
+  slack_photo_small      String?           @db.VarChar(255)
+  slack_leaderboard_type String?           @db.VarChar(50)
+  slack_department       String?           @db.VarChar(50)
+  fallback_photo         String?           @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  HourLogs             HourLog[]
+  MeetingAttendances   MeetingAttendanceEntry[]
+  MemberCerts          MemberCert[]
+  MemberCertRequests   MemberCertRequest[]      @relation("MemberCertRecipient")
+  MemberCertsRequested MemberCertRequest[]      @relation("MemberCertRequester")
+  AdditionalMemberData AdditionalMemberData[]
 
   @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
@@ -153,6 +156,30 @@ model FallbackPhoto {
   url   String
 
   @@map("FallbackPhotos")
+}
+
+model AdditionalMemberField {
+  id                   Int                              @id @default(autoincrement())
+  type                 enum_AdditionalMemberFields_type
+  label                String                           @db.VarChar()
+  AdditionalMemberData AdditionalMemberData[]
+}
+
+model AdditionalMemberData {
+  member_id String @db.VarChar()
+  field_id  Int
+  value     String @db.VarChar()
+
+  Member Member                @relation(fields: [member_id], references: [email], onDelete: Cascade)
+  Field  AdditionalMemberField @relation(fields: [field_id], references: [id], onDelete: Cascade)
+
+  @@id([member_id, field_id])
+  @@unique([member_id, field_id])
+}
+
+enum enum_AdditionalMemberFields_type {
+  string
+  boolean
 }
 
 enum enum_HourLogs_state {

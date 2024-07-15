@@ -5,6 +5,7 @@ import prisma, { getMemberPhoto } from '~lib/prisma'
 import { calculateHours, getMeetings, getWeeklyHours } from '~lib/hour_operations'
 import { ordinal } from '~lib/util'
 import logger from '~lib/logger'
+import { Prisma } from '@prisma/client'
 
 /**
  * Load or request or authorization to call APIs.
@@ -57,14 +58,15 @@ export async function updateSheet() {
         'Certifications'
     ] as const
     const columns = Object.fromEntries(headers.map((h, i) => [h, i])) as Record<(typeof headers)[number], number>
-
+    const additional_fields = await prisma.additionalMemberField.findMany({ orderBy: { key: 'asc' } })
     const rows: (string | number)[][] = []
-    rows.push(headers as unknown as string[])
+    const headerrow = [...headers, ...additional_fields.map((f) => f.label)]
+    rows.push(headerrow)
 
     let hourReqMet = 0
     for (const m of members) {
         const hours = (await calculateHours({ email: m.email }))!
-        const row = new Array(headers.length).fill('')
+        const row = new Array(headerrow.length).fill('')
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)
         row[columns.Grade] = ordinal(m.grade)
@@ -79,6 +81,9 @@ export async function updateSheet() {
         row[columns.WeeklyHours] = await getWeeklyHours({ email: m.email })
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email].join(', ')
+        additional_fields.map((f, i) => {
+            row[headers.length + i] = (m.extended_fields as Prisma.JsonObject)?.[f.key] ?? ''
+        })
         rows.push(row)
 
         if (hours.qualifying >= 50) {
