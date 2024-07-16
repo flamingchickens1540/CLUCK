@@ -30,7 +30,7 @@ for (const id in views) {
                     name: 'rebuild-notify',
                     setup(build) {
                         build.onEnd((result) => {
-                            logger.debug(`build ended with ${result.errors.length} errors`)
+                            logger.info(`build ended with ${result.errors.length} errors`)
                             // HERE: somehow restart the server from here, e.g., by sending a signal that you trap and react to inside the server.
                         })
                     }
@@ -58,7 +58,7 @@ const watch = process.argv.includes('--watch')
 // )
 if (watch) {
     logger.info('Watching...')
-    await Promise.all(contexts.map((ctx) => ctx.watch()))
+    await contexts[1].watch({})
     logger.info('Done...')
 } else {
     logger.info('Building...')

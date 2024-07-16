@@ -41,9 +41,11 @@ router
         })
     })
     .put(async (c) => {
-        const data = (await c.req.json()) as Partial<Member>
+        const data = (await c.req.json()) as Partial<Member> & { id?: string }
+        const id = data.id
+        delete data['id']
         if (data.grade && data.grade < 0) {
             data.grade = 0
         }
-        return c.json(await prisma.member.update({ data, where: { email: data.email } }))
+        return c.json(await prisma.member.update({ data, where: { email: id } }))
     })
