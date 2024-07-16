@@ -12,7 +12,7 @@ export async function initNewMemberTable(mainTable: GridApi) {
     // Grid Options: Contains all of the Data Grid configurations
     const gridOptions: ag.GridOptions<Prisma.Member> = {
         // Column Definitions: Defines the columns to be displayed.
-        columnDefs: getColumns(true),
+        columnDefs: getColumns({ include_photo: false }),
         rowData: [getDefaultRow()],
         headerHeight: 0,
         defaultColDef: {

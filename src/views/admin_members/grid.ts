@@ -1,9 +1,10 @@
 import Prisma from '@prisma/client'
 import * as ag from 'ag-grid-community'
 import { safeParseInt, toTitleCase } from '~lib/util'
+import { getMemberPhoto } from '~lib/util'
 
-export function getColumns(edit_email: boolean = false): ag.ColDef<Prisma.Member>[] {
-    return [
+export function getColumns(params: { include_photo: boolean }) {
+    const out: ag.ColDef<Prisma.Member>[] = [
         {
             field: 'email',
             editable: true
@@ -43,4 +44,38 @@ export function getColumns(edit_email: boolean = false): ag.ColDef<Prisma.Member
             headerName: 'Slack Photo Approved'
         }
     ]
+    if (params.include_photo) {
+        out.unshift({
+            headerName: 'A',
+            valueGetter: (params) => getMemberPhoto(params.data as never) ?? '',
+            editable: false,
+            cellRenderer: ProfilePhotoComponent,
+            initialWidth: 100
+        })
+    }
+
+    return out
+}
+
+export class ProfilePhotoComponent implements ag.ICellRendererComp<Prisma.Member> {
+    private eGui!: HTMLElement
+
+    getGui(): HTMLElement {
+        return this.eGui
+    }
+    destroy?(): void {
+        throw new Error('Method not implemented.')
+    }
+    refresh(): boolean {
+        throw new Error('Method not implemented.')
+    }
+    // ...
+    init(props: ag.ICellRendererParams) {
+        // create the cell
+        this.eGui = document.createElement('div')
+        if (props.value) {
+            this.eGui.innerHTML = `<img src="${props.value}" class="object-scale-down h-full w-full" alt="Profile Photo">`
+        }
+    }
+    // ...
 }

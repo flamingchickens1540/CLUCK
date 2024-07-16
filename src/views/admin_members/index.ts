@@ -5,16 +5,13 @@ import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { getColumns } from '~views/admin_members/grid'
 import { initNewMemberTable } from '~views/admin_members/new_member'
-console.log('AAA')
 ;(async () => {
-    console.log('starting')
-
     // Grid Options: Contains all of the Data Grid configurations
     const gridOptions: ag.GridOptions<Prisma.Member> = {
         getRowId: (params) => params.data.email,
 
         // Column Definitions: Defines the columns to be displayed.
-        columnDefs: getColumns(),
+        columnDefs: getColumns({ include_photo: true }),
 
         async onCellValueChanged(event) {
             const payload: Prisma.Member & { id?: string } = event.data
@@ -33,6 +30,13 @@ console.log('AAA')
 
     fetch('/api/admin/members').then(async (resp) => {
         gridApi.setGridOption('rowData', await resp.json())
+    })
+
+    document.getElementById('btn-sync-slack')?.addEventListener('click', async () => {
+        await fetch('/api/members/refresh', { method: 'GET' })
+        fetch('/api/admin/members').then(async (resp) => {
+            gridApi.setGridOption('rowData', await resp.json())
+        })
     })
 
     await initNewMemberTable(gridApi)
