@@ -3,7 +3,7 @@ import * as ag from 'ag-grid-community'
 import { safeParseInt, toTitleCase } from '~lib/util'
 import { getMemberPhoto } from '~lib/util'
 
-export function getColumns(params: { include_photo: boolean }) {
+export function getColumns(params: { photo_column_formatter?: unknown }) {
     const out: ag.ColDef<Prisma.Member>[] = [
         {
             field: 'email',
@@ -44,12 +44,12 @@ export function getColumns(params: { include_photo: boolean }) {
             headerName: 'Slack Photo Approved'
         }
     ]
-    if (params.include_photo) {
+    if (params.photo_column_formatter) {
         out.unshift({
             headerName: '',
             valueGetter: (params) => getMemberPhoto(params.data as never) ?? '',
             editable: false,
-            cellRenderer: ProfilePhotoComponent,
+            cellRenderer: params.photo_column_formatter,
             initialWidth: 100
         })
     }
@@ -59,6 +59,8 @@ export function getColumns(params: { include_photo: boolean }) {
 
 export class ProfilePhotoComponent implements ag.ICellRendererComp<Prisma.Member> {
     private eGui!: HTMLElement
+    private eImage!: HTMLImageElement
+    private eBlank!: HTMLDivElement
 
     getGui(): HTMLElement {
         return this.eGui
@@ -66,22 +68,44 @@ export class ProfilePhotoComponent implements ag.ICellRendererComp<Prisma.Member
     destroy?(): void {
         this.eGui.remove()
     }
-    refresh(): boolean {
-        throw new Error('Method not implemented.')
+    refresh(params: ag.ICellRendererParams): boolean {
+        this.eImage.src = params.value
+        if (params.value) {
+            this.eBlank.style.display = 'none'
+            this.eImage.style.display = 'block'
+        } else {
+            this.eImage.style.display = 'none'
+            this.eBlank.style.display = 'block'
+        }
+
+        return true
     }
     // ...
-    init(props: ag.ICellRendererParams) {
+    init(params: ag.ICellRendererParams) {
         // create the cell
 
         this.eGui = document.createElement('div')
         this.eGui.className = 'h-full w-full overflow-hidden'
-        const img = document.createElement(props.value ? 'img' : 'div')
-        if ('src' in img && 'alt' in img) {
-            img.src = props.value
-            img.alt = 'Profile Photo'
+
+        const childClass = 'rounded-sm mx-auto object-contain h-full aspect-square border-[3px] ' + (params.data.slack_id != null ? 'border-green-500' : 'border-red-500')
+        this.eImage = document.createElement('img')
+
+        this.eImage.src = params.value
+        this.eImage.alt = 'Profile Photo'
+        this.eImage.className = childClass
+
+        this.eBlank = document.createElement('div')
+        this.eBlank.className = childClass
+
+        if (params.value) {
+            this.eBlank.style.display = 'none'
+            this.eImage.style.display = 'block'
+        } else {
+            this.eImage.style.display = 'none'
+            this.eBlank.style.display = 'block'
         }
-        img.className = 'mx-auto object-contain h-full aspect-square border-[3px] ' + (props.data.slack_id != null ? 'border-green-500' : 'border-red-500')
-        this.eGui.appendChild(img)
+        this.eGui.appendChild(this.eImage)
+        this.eGui.appendChild(this.eBlank)
     }
     // ...
 }

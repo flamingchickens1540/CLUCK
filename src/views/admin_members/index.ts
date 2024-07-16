@@ -3,7 +3,7 @@ import * as ag from 'ag-grid-community'
 import { CellValueChangedEvent, GridApi, RowDataUpdatedEvent, RowValueChangedEvent } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
-import { getColumns } from '~views/admin_members/grid'
+import { getColumns, ProfilePhotoComponent } from '~views/admin_members/grid'
 import { initNewMemberTable } from '~views/admin_members/new_member'
 ;(async () => {
     // Grid Options: Contains all of the Data Grid configurations
@@ -11,7 +11,7 @@ import { initNewMemberTable } from '~views/admin_members/new_member'
         getRowId: (params) => params.data.email,
 
         // Column Definitions: Defines the columns to be displayed.
-        columnDefs: getColumns({ include_photo: true }),
+        columnDefs: getColumns({ photo_column_formatter: ProfilePhotoComponent }),
 
         async onCellValueChanged(event) {
             const payload: Prisma.Member & { id?: string } = event.data
