@@ -46,7 +46,7 @@ export function getColumns(params: { include_photo: boolean }) {
     ]
     if (params.include_photo) {
         out.unshift({
-            headerName: 'A',
+            headerName: '',
             valueGetter: (params) => getMemberPhoto(params.data as never) ?? '',
             editable: false,
             cellRenderer: ProfilePhotoComponent,
@@ -64,7 +64,7 @@ export class ProfilePhotoComponent implements ag.ICellRendererComp<Prisma.Member
         return this.eGui
     }
     destroy?(): void {
-        throw new Error('Method not implemented.')
+        this.eGui.remove()
     }
     refresh(): boolean {
         throw new Error('Method not implemented.')
@@ -72,10 +72,16 @@ export class ProfilePhotoComponent implements ag.ICellRendererComp<Prisma.Member
     // ...
     init(props: ag.ICellRendererParams) {
         // create the cell
+
         this.eGui = document.createElement('div')
-        if (props.value) {
-            this.eGui.innerHTML = `<img src="${props.value}" class="object-scale-down h-full w-full" alt="Profile Photo">`
+        this.eGui.className = 'h-full w-full overflow-hidden'
+        const img = document.createElement(props.value ? 'img' : 'div')
+        if ('src' in img && 'alt' in img) {
+            img.src = props.value
+            img.alt = 'Profile Photo'
         }
+        img.className = 'mx-auto object-contain h-full aspect-square border-[3px] ' + (props.data.slack_id != null ? 'border-green-500' : 'border-red-500')
+        this.eGui.appendChild(img)
     }
     // ...
 }
