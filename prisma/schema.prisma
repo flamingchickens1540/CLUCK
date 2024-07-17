@@ -109,7 +109,6 @@ model Member {
   MemberCerts          MemberCert[]
   MemberCertRequests   MemberCertRequest[]      @relation("MemberCertRecipient")
   MemberCertsRequested MemberCertRequest[]      @relation("MemberCertRequester")
-  AdditionalMemberData AdditionalMemberData[]
 
   @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
@@ -158,29 +157,6 @@ model FallbackPhoto {
   @@map("FallbackPhotos")
 }
 
-model AdditionalMemberField {
-  id                   Int                              @id @default(autoincrement())
-  type                 enum_AdditionalMemberFields_type
-  label                String                           @db.VarChar()
-  AdditionalMemberData AdditionalMemberData[]
-}
-
-model AdditionalMemberData {
-  member_id String @db.VarChar()
-  field_id  Int
-  value     String @db.VarChar()
-
-  Member Member                @relation(fields: [member_id], references: [email], onDelete: Cascade)
-  Field  AdditionalMemberField @relation(fields: [field_id], references: [id], onDelete: Cascade)
-
-  @@id([member_id, field_id])
-  @@unique([member_id, field_id])
-}
-
-enum enum_AdditionalMemberFields_type {
-  string
-  boolean
-}
 
 enum enum_HourLogs_state {
   complete
