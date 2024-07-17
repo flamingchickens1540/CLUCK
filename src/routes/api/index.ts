@@ -1,6 +1,6 @@
 import { Context, Hono } from 'hono'
 import { syncSlackMembers } from '~tasks/slack'
-import { APIClockLabRequest, APIMember, APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockResponse } from '~types'
+import { APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockLabRequest, APIClockResponse, APIMember } from '~types'
 import logger from '~lib/logger'
 import { requireReadAPI, requireWriteAPI } from '~lib/auth'
 import { emitCluckChange } from '~lib/sockets'
@@ -8,6 +8,7 @@ import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { cors } from 'hono/cors'
 import { completeHourLog } from '~lib/hour_operations'
 import { router as admin_api_router } from './admin'
+
 const router = new Hono()
 
 router.route('/', admin_api_router)
@@ -41,7 +42,7 @@ router.get('/members/refresh', requireReadAPI, async (c) => {
 
 router.use('/members/fallback_photos', cors({ origin: ['https://portals.veracross.com'] }))
 router.post('/members/fallback_photos', requireWriteAPI, async (c) => {
-    console.time('fallback')
+    logger.info('Updating fallback photos')
     const body: Record<string, string> = await c.req.json()
     await prisma.fallbackPhoto.deleteMany({})
     const { count } = await prisma.fallbackPhoto.createMany({ data: Object.entries(body).map(([k, v]) => ({ email: k.toLowerCase(), url: v })) })
@@ -49,7 +50,6 @@ router.post('/members/fallback_photos', requireWriteAPI, async (c) => {
     for (const member of members) {
         await prisma.member.update({ where: { email: member.email }, data: { fallback_photo: body[member.email] } })
     }
-    console.timeEnd('fallback')
     return c.text(`Updated ${count} fallback photos`)
 })
 function clockJson(c: Context, payload: APIClockResponse) {

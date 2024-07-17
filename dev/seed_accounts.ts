@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { createUser } from '~lib/auth'
+import logger from '~lib/logger'
 
 const prisma = new PrismaClient()
 
@@ -12,7 +13,7 @@ await main()
         await prisma.$disconnect()
     })
     .catch(async (e) => {
-        console.error(e)
+        logger.error(e)
         await prisma.$disconnect()
         process.exit(1)
     })

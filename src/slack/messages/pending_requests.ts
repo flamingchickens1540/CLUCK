@@ -3,6 +3,7 @@ import { slack_client } from '~slack'
 import config from '~config'
 import { formatDuration } from '~slack/lib/messages'
 import { Blocks, Elements, Message } from 'slack-block-builder'
+import logger from '~lib/logger'
 
 export async function getPendingRequests() {
     const output = Message().channel(config.slack.channels.approval).blocks(Blocks.Header().text('⏳ Pending Time Requests'), Blocks.Divider())
@@ -18,7 +19,7 @@ export async function getPendingRequests() {
             })
             .catch(() => null)
         if (!permalink) {
-            console.warn('Could not find slack message for log', log.id)
+            logger.warn('Could not find slack message for log', log.id)
             continue
         }
         output.blocks(

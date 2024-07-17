@@ -1,6 +1,7 @@
-import { PrismaClient, enum_Members_team, Prisma, enum_MeetingAttendances_state } from '@prisma/client'
+import { enum_MeetingAttendances_state, enum_Members_team, Prisma, PrismaClient } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import { toTitleCase } from '~lib/util'
+import logger from '~lib/logger'
 
 const prisma = new PrismaClient()
 
@@ -184,7 +185,7 @@ await main()
         await prisma.$disconnect()
     })
     .catch(async (e) => {
-        console.error(e)
+        logger.error(e)
         await prisma.$disconnect()
         process.exit(1)
     })

@@ -17,7 +17,6 @@ const views: Record<string, string> = {
 
 const contexts: esbuild.BuildContext[] = []
 for (const id in views) {
-    console.log(path.join('public/', views[id]), path.join('src/views', id, 'index.html'))
     contexts.push(
         await esbuild.context({
             entryPoints: [path.join('src/views', id, 'index.html')],

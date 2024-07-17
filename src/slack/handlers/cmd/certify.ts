@@ -39,7 +39,6 @@ export async function handleCertifyModal({ ack, body, view }: SlackViewMiddlewar
 
 export async function handleCertReject({ ack, action, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
-    console.log(action.action_ts)
     const cert_req_id = safeParseInt(action.value)
     if (cert_req_id == null) {
         return

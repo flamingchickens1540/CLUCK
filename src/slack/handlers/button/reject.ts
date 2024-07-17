@@ -68,6 +68,6 @@ export async function handleRejectModal({ ack, body, view, logger }: SlackViewMi
             channel: log.Member.slack_id!
         })
     } catch (err) {
-        console.error('Failed to handle reject modal:\n' + err)
+        logger.error('Failed to handle reject modal:\n' + err)
     }
 }

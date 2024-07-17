@@ -2,6 +2,7 @@ import { Cert, Member, Prisma } from '@prisma/client'
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
+import logger from '~lib/logger'
 
 export const router = new Hono()
 
@@ -15,7 +16,6 @@ router
     })
     .post(async (c) => {
         const data = (await c.req.json()) as Partial<Member>
-        console.log(data)
         const email = data.email?.trim()
         const full_name = data.full_name?.trim()
         const years = safeParseInt(data.years)
@@ -55,13 +55,12 @@ router
         return c.json(await prisma.cert.findMany())
     })
     .put(async (c) => {
+        const data = (await c.req.json()) as Partial<Cert>
         try {
-            const data = (await c.req.json()) as Partial<Cert>
-            console.log(data)
             return c.json(await prisma.cert.update({ data, where: { id: data.id } }))
-        } catch (e: unknown) {
-            console.log(e)
-            return c.json({ error: e }, 400)
+        } catch (err) {
+            logger.warn({ msg: 'Error on PUT /admin/certs', err, data })
+            return c.json({ error: err }, 400)
         }
     })
     .post(async (c) => {
@@ -70,15 +69,13 @@ router
         if (data.id == null || data.label == null || data.isManager == null) {
             return c.json({ error: 'Invalid data' }, 400)
         }
-
-        console.log(data)
         try {
             return c.json({
                 data: await prisma.cert.create({ data }),
                 success: true
             })
-        } catch (e: unknown) {
-            console.log(e)
-            return c.json({ error: e }, 400)
+        } catch (err) {
+            logger.warn({ msg: 'Error on POST /admin/certs', err, data })
+            return c.json({ error: err }, 400)
         }
     })

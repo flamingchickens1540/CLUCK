@@ -35,7 +35,6 @@ export async function buildGrid() {
             }
             let button = click.target as HTMLDivElement
             if (button.classList.contains('buttonText')) {
-                console.warn('child clicked')
                 button = button.parentElement as HTMLDivElement
             }
 

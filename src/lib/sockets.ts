@@ -8,7 +8,7 @@ export function startWS() {
     }
     io = new SocketIOServer(3001, {
         cors: {
-            origin: 'http://localhost:3000'
+            origin: ['http://localhost:3000', 'https://cluck.team1540.org']
         }
     })
 

@@ -83,7 +83,7 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
         })
         return true
     } catch (err) {
-        console.error('Failed to handle accept modal:\n' + err)
+        logger.error('Failed to handle accept modal:\n' + err)
         return false
     }
 }
