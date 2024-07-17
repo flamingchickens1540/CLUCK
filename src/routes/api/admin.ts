@@ -64,3 +64,21 @@ router
             return c.json({ error: e }, 400)
         }
     })
+    .post(async (c) => {
+        const data = (await c.req.json()) as Prisma.CertCreateInput
+
+        if (data.id == null || data.label == null || data.isManager == null) {
+            return c.json({ error: 'Invalid data' }, 400)
+        }
+
+        console.log(data)
+        try {
+            return c.json({
+                data: await prisma.cert.create({ data }),
+                success: true
+            })
+        } catch (e: unknown) {
+            console.log(e)
+            return c.json({ error: e }, 400)
+        }
+    })
