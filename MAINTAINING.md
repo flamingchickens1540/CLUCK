@@ -35,6 +35,8 @@ function loadNext() {
 
 loadNext()
 ```
+
 ## Adding Member Fields
+
 Make sure to update [the db model](prisma/schema.prisma), [the spreadsheet mapping](src/spreadsheet/index.ts), and the [member dashboard](src/views/admin_members).
-See commit 8ad6039408a7baaadb490a22bb74d631ebcdb073 for reference
+See commit [8ad6039](https://github.com/rutmanz/CLUCK/commit/8ad6039408a7baaadb490a22bb74d631ebcdb073) for reference
