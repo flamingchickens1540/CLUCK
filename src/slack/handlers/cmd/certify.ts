@@ -1,14 +1,13 @@
-import { AllMiddlewareArgs, SlackCommandMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import { getCertifyModal } from '~slack/modals/certify'
 import { createCertRequest } from '~lib/cert_operations'
-import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import { ActionMiddleware, CommandMiddleware, ViewMiddleware } from '~slack/lib/types'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
 
 import { getCertRequestMessage } from '~slack/messages/certify'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 
-export async function handleCertifyCommand({ command, ack, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleCertifyCommand: CommandMiddleware = async ({ command, ack, client }) => {
     await ack()
 
     await client.views.open({
@@ -17,7 +16,7 @@ export async function handleCertifyCommand({ command, ack, client }: SlackComman
     })
 }
 
-export async function handleCertifyModal({ ack, body, view }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export const handleSubmitCertifyModal: ViewMiddleware = async ({ ack, body, view }) => {
     // Get the hours and task from the modal
     const members = view.state.values.users.users.selected_users
     const cert = view.state.values.cert.cert.selected_option?.value
@@ -37,7 +36,7 @@ export async function handleCertifyModal({ ack, body, view }: SlackViewMiddlewar
     }
 }
 
-export async function handleCertReject({ ack, action, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export const handleCertReject: ActionMiddleware = async ({ ack, action, client }) => {
     await ack()
     const cert_req_id = safeParseInt(action.value)
     if (cert_req_id == null) {
@@ -58,7 +57,7 @@ export async function handleCertReject({ ack, action, client }: ButtonActionMidd
     await client.chat.update(getCertRequestMessage({ slack_id: null }, req, req.Cert, 'rejected', req.slack_ts!))
 }
 
-export async function handleCertApprove({ ack, action, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export const handleCertApprove: ActionMiddleware = async ({ ack, action, client }) => {
     await ack()
     const cert_req_id = safeParseInt(action.value)
     if (cert_req_id == null) {

@@ -1,9 +1,9 @@
 import type { App } from '@slack/bolt'
-import { getAcceptButtonHandler, handleAcceptWithMessageButton, handleAcceptModal } from './button/accept'
+import { getAcceptButtonHandler, handleAcceptWithMessageButton, handleSubmitAcceptModal } from './button/accept'
 import { handleAppHomeOpened } from './view/app_home'
-import { handleLogCommand, handleLogModal, handleLogShortcut, handleOpenLogModal } from './cmd/log'
+import { handleLogCommand, handleLogShortcut } from './cmd/log'
 import { handleLogoutCommand } from './cmd/logout'
-import { handleRejectButton, handleRejectModal } from './button/reject'
+import { handleRejectButton, handleSubmitRejectModal } from './button/reject'
 import { handleOpenUserInfoModal } from './view/userinfo'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
@@ -11,7 +11,8 @@ import config from '~config'
 import { getPendingRequests } from '~slack/messages/pending_requests'
 import { handleGraphCommand } from '~slack/handlers/graph'
 import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/cmd/hours'
-import { handleCertApprove, handleCertifyCommand, handleCertifyModal, handleCertReject } from '~slack/handlers/cmd/certify'
+import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
+import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -32,7 +33,6 @@ export enum ViewIDs {
     MODAL_REJECT = 'reject_modal',
     MODAL_ACCEPT = 'accept_modal',
     MODAL_LOG = 'time_submission',
-    MODAL_SETTINGS = 'save_settings',
     MODAL_CERTIFY = 'certify_modal'
 }
 
@@ -74,15 +74,12 @@ export function registerSlackHandlers(app: App) {
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
-    //
-    // // Inputs
-    // app.action('selected_metric', handleLeaderboardAction)
-    //
+
     // // Modals
-    app.view('reject_modal', handleRejectModal)
-    app.view('accept_modal', handleAcceptModal)
-    app.view('time_submission', handleLogModal)
-    app.view(ViewIDs.MODAL_CERTIFY, handleCertifyModal)
+    app.view(ViewIDs.MODAL_REJECT, handleSubmitRejectModal)
+    app.view(ViewIDs.MODAL_ACCEPT, handleSubmitAcceptModal)
+    app.view(ViewIDs.MODAL_LOG, handleSubmitLogModal)
+    app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
     //
     // // Events
     app.event('app_home_opened', handleAppHomeOpened)

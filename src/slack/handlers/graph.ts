@@ -1,9 +1,9 @@
-import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs } from '@slack/bolt'
 import { Blocks, Message } from 'slack-block-builder'
 import { createHourChartForTeam, createHourChartForUsers } from '~slack/lib/chart'
 import { formatList } from '~slack/lib/messages'
+import { CommandMiddleware } from '~slack/lib/types'
 
-export async function handleGraphCommand({ command, ack, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleGraphCommand: CommandMiddleware = async ({ command, ack, respond }) => {
     await ack()
     const text = command.text.trim()
     const teamLabels = {

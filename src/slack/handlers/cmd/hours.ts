@@ -1,9 +1,8 @@
-import { AllMiddlewareArgs, SlackCommandMiddlewareArgs } from '@slack/bolt'
 import { Blocks, Modal } from 'slack-block-builder'
 import { getUserHoursBlocks, getUserPendingHoursBlocks } from '~slack/modals/user_hours'
-import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import { ActionMiddleware, CommandMiddleware } from '~slack/lib/types'
 
-export async function handleShowHoursCommand({ command, ack, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleShowHoursCommand: CommandMiddleware = async ({ command, ack, client }) => {
     await ack()
 
     await client.views.open({
@@ -15,7 +14,7 @@ export async function handleShowHoursCommand({ command, ack, client }: SlackComm
     })
 }
 
-export async function handleShowPendingHours({ body, ack, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export const handleShowPendingHours: ActionMiddleware = async ({ body, ack, client }) => {
     await ack()
     const modal = Modal()
         .title('Hours')

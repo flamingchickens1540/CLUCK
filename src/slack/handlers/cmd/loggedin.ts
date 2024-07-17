@@ -1,7 +1,7 @@
-import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
 import prisma from '~lib/prisma'
+import { CommandMiddleware } from '~slack/lib/types'
 
-export async function handleGetLoggedInCommand({ logger, ack, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleGetLoggedInCommand: CommandMiddleware = async ({ logger, ack, respond }) => {
     await ack()
     try {
         const users = await prisma.hourLog.findMany({

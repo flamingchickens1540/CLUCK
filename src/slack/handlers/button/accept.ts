@@ -1,5 +1,4 @@
-import type { AllMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
+import { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
@@ -10,7 +9,7 @@ import config from '~config'
 import { getHourSubmissionMessage } from '~slack/messages/new_request'
 import responses from '~slack/messages/responses'
 
-export async function handleAcceptWithMessageButton({ ack, body, action, client, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export const handleAcceptWithMessageButton: ActionMiddleware = async ({ ack, body, action, client, logger }) => {
     await ack()
     const requestInfo = await prisma.hourLog.findUnique({
         where: { id: safeParseInt(action.value) },
@@ -35,13 +34,13 @@ export async function handleAcceptWithMessageButton({ ack, body, action, client,
     }
 }
 
-export async function handleAcceptModal({ ack, body, view }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export const handleSubmitAcceptModal: ViewMiddleware = async ({ ack, body, view }) => {
     await ack()
     await handleAccept(safeParseInt(view.private_metadata) ?? -1, body.user.id, body.view.state.values.message.input.value as enum_HourLogs_type)
 }
 
-export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
-    return async function ({ ack, action, body }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export function getAcceptButtonHandler(prefix: enum_HourLogs_type): ActionMiddleware {
+    return async ({ ack, action, body }) => {
         await ack()
         await handleAccept(safeParseInt(action.value) ?? -1, body.user.id, prefix)
     }

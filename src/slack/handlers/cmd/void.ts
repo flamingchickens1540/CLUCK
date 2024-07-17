@@ -1,9 +1,9 @@
-import type { SlackCommandMiddlewareArgs, AllMiddlewareArgs } from '@slack/bolt'
 import config from '~config'
 import { completeHourLog, HourError } from '~lib/hour_operations'
 import prisma from '~lib/prisma'
+import { CommandMiddleware } from '~slack/lib/types'
 
-export async function handleVoidCommand({ command, logger, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleVoidCommand: CommandMiddleware = async ({ command, logger, ack, respond, client }) => {
     const void_channel_members = (await client.conversations.members({ channel: config.slack.channels.void })).members!
 
     if (!void_channel_members.includes(command.user_id)) {

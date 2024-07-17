@@ -1,8 +1,8 @@
-import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs } from '@slack/bolt'
 import prisma from '~lib/prisma'
 import { completeHourLog, HourError } from '~lib/hour_operations'
+import { CommandMiddleware } from '~slack/lib/types'
 
-export async function handleLogoutCommand({ command, logger, ack, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleLogoutCommand: CommandMiddleware = async ({ command, logger, ack, respond }) => {
     await ack()
     const member = await prisma.member.findUnique({ where: { slack_id: command.user_id } })
     if (member) {

@@ -1,11 +1,8 @@
-import type { AllMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
-import type { WebClient } from '@slack/web-api'
-
 import log_modal from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
-import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import responses from '~slack/messages/responses'
+import { CommandMiddleware, ShortcutMiddleware } from '~slack/lib/types'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/
@@ -23,7 +20,7 @@ export function parseArgs(text: string): { hours: number; activity: string | und
     }
 }
 
-export async function handleLogCommand({ command, logger, ack, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export const handleLogCommand: CommandMiddleware = async ({ command, logger, ack, client }) => {
     if (command.text.trim().length === 0) {
         await ack()
         await client.views.open({
@@ -49,46 +46,11 @@ export async function handleLogCommand({ command, logger, ack, client }: SlackCo
     }
 }
 
-export async function handleLogShortcut({
-    shortcut,
-    ack,
-    client
-}: SlackShortcutMiddlewareArgs & {
-    client: WebClient
-}) {
+export const handleLogShortcut: ShortcutMiddleware = async ({ shortcut, ack, client }) => {
     await ack()
 
     await client.views.open({
         view: log_modal,
         trigger_id: shortcut.trigger_id
     })
-}
-
-export async function handleOpenLogModal({ body, ack, client }: ButtonActionMiddlewareArgs & { client: WebClient }) {
-    await ack()
-
-    await client.views.open({
-        view: log_modal,
-        trigger_id: body.trigger_id
-    })
-}
-
-export async function handleLogModal({ ack, body, view }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
-    // Get the hours and task from the modal
-    let hours = safeParseFloat(view.state.values.hours.hours.value) ?? parseArgs(view.state.values.hours.hours.value ?? '').hours
-    const activity = view.state.values.task.task.value
-
-    // Ensure the time values are valid
-    hours = isNaN(hours) ? 0 : hours
-    if (hours < 0.1) {
-        await ack({ response_action: 'errors', errors: { hours: 'Please enter a valid duration' } })
-        return
-    }
-    if (activity?.trim() == '' || activity == undefined) {
-        await ack({ response_action: 'errors', errors: { task: 'Please enter an activity' } })
-        return
-    }
-
-    await ack()
-    await handleHoursRequest(body.user.id, hours, activity)
 }

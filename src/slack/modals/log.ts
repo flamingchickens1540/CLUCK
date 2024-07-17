@@ -1,9 +1,10 @@
 import { Blocks, Elements, Modal } from 'slack-block-builder'
+import { ViewIDs } from '~slack/handlers'
 
 //prettier-ignore
 export const log_modal = Modal()
     .title('Log External Hours')
-    .callbackId('time_submission')
+    .callbackId(ViewIDs.MODAL_LOG)
     .submit('Log')
     .close('Cancel')
     .blocks(
