@@ -97,9 +97,8 @@ model Member {
   slack_id               String?           @unique @db.VarChar(15)
   slack_photo            String?           @db.VarChar(255)
   slack_photo_small      String?           @db.VarChar(255)
-  slack_leaderboard_type String?           @db.VarChar(50)
-  slack_department       String?           @db.VarChar(50)
   fallback_photo         String?           @db.VarChar(255)
+  frc_registered         Boolean           @default(false)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

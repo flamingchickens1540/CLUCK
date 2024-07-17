@@ -1,7 +1,6 @@
 import Prisma from '@prisma/client'
 import * as ag from 'ag-grid-community'
-import { safeParseInt, toTitleCase } from '~lib/util'
-import { getMemberPhoto } from '~lib/util'
+import { getMemberPhoto, safeParseInt, toTitleCase } from '~lib/util'
 
 export function getColumns(params: { photo_column_formatter?: unknown }) {
     const out: ag.ColDef<Prisma.Member>[] = [
@@ -41,7 +40,14 @@ export function getColumns(params: { photo_column_formatter?: unknown }) {
         {
             field: 'use_slack_photo',
             editable: true,
-            headerName: 'Slack Photo Approved'
+            headerName: 'Slack Photo Approved',
+            initialWidth: 100
+        },
+        {
+            field: 'frc_registered',
+            editable: true,
+            headerName: 'FRC Registered',
+            initialWidth: 100
         }
     ]
     if (params.photo_column_formatter) {

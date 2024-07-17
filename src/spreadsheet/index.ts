@@ -1,11 +1,10 @@
 import { JWT } from 'google-auth-library'
 import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
-import prisma, { getMemberPhoto } from '~lib/prisma'
+import prisma from '~lib/prisma'
+import { getMemberPhoto, ordinal } from '~lib/util'
 import { calculateHours, getMeetings, getWeeklyHours } from '~lib/hour_operations'
-import { ordinal } from '~lib/util'
 import logger from '~lib/logger'
-import { Prisma } from '@prisma/client'
 
 /**
  * Load or request or authorization to call APIs.
@@ -55,18 +54,17 @@ export async function updateSheet() {
         'TotalHours',
         'WeeklyHours',
         'Photo',
-        'Certifications'
+        'Certifications',
+        'FirstRegistered'
     ] as const
     const columns = Object.fromEntries(headers.map((h, i) => [h, i])) as Record<(typeof headers)[number], number>
-    const additional_fields = await prisma.additionalMemberField.findMany({ orderBy: { key: 'asc' } })
     const rows: (string | number)[][] = []
-    const headerrow = [...headers, ...additional_fields.map((f) => f.label)]
-    rows.push(headerrow)
+    rows.push(headers as unknown as string[])
 
     let hourReqMet = 0
     for (const m of members) {
         const hours = (await calculateHours({ email: m.email }))!
-        const row = new Array(headerrow.length).fill('')
+        const row = new Array(headers.length).fill('')
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)
         row[columns.Grade] = ordinal(m.grade)
@@ -81,9 +79,7 @@ export async function updateSheet() {
         row[columns.WeeklyHours] = await getWeeklyHours({ email: m.email })
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email].join(', ')
-        additional_fields.map((f, i) => {
-            row[headers.length + i] = (m.extended_fields as Prisma.JsonObject)?.[f.key] ?? ''
-        })
+        row[columns.FirstRegistered] = m.frc_registered
         rows.push(row)
 
         if (hours.qualifying >= 50) {
