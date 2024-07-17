@@ -13,22 +13,20 @@ export async function getUserDataModal(input: Prisma.MemberWhereUniqueInput) {
     }
     // prettier-ignore
     return Modal()
-        .title("Your Information")
+        .title('Your Information')
         .blocks(
             Blocks.Section()
-                .text(" ")
+                .text(' ')
                 .accessory(Elements.Img().imageUrl(getMemberPhotoOrDefault(member)).altText('Profile Picture')),
             Blocks.Divider(),
-            ...createFieldSection("Join Date", 'createdAt', v => v.toLocaleDateString()),
-            ...createFieldSection("Email", 'email', v => v!),
-            ...createFieldSection("Slack ID", 'slack_id', v => v!),
-            ...createFieldSection("First Name", 'first_name', v => v!),
-            ...createFieldSection("Full Name", 'full_name', v => v!),
-            ...createFieldSection("Grade", 'grade', v => v.toString()),
-            ...createFieldSection("Experience", 'years', v => v+" years"),
-            ...createFieldSection("Slack Photo Approved", 'use_slack_photo', v => v ? "Yes" : "No"),
+            ...createFieldSection('Join Date', 'createdAt', v => v.toLocaleDateString()),
+            ...createFieldSection('Email', 'email', v => v!),
+            ...createFieldSection('Slack ID', 'slack_id', v => v!),
+            ...createFieldSection('First Name', 'first_name', v => v!),
+            ...createFieldSection('Full Name', 'full_name', v => v!),
+            ...createFieldSection('Grade', 'grade', v => v.toString()),
+            ...createFieldSection('Experience', 'years', v => v + ' years'),
+            ...createFieldSection('Slack Photo Approved', 'use_slack_photo', v => v ? 'Yes' : 'No'),
             Blocks.Context().elements('Last modified ' + member.updatedAt.toLocaleString())
-
-
         )
 }

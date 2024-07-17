@@ -78,6 +78,7 @@ async function refreshLoggedIn() {
         loggedIn.forEach((member) => membersIn.add(member.email))
         noconnect.style.setProperty('visibility', 'hidden')
     } catch (err) {
+        console.warn(err)
         noconnect.style.setProperty('visibility', 'visible')
         return
     }

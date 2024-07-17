@@ -49,7 +49,13 @@ export async function handleLogCommand({ command, logger, ack, client }: SlackCo
     }
 }
 
-export async function handleLogShortcut({ shortcut, ack, client }: SlackShortcutMiddlewareArgs & { client: WebClient }) {
+export async function handleLogShortcut({
+    shortcut,
+    ack,
+    client
+}: SlackShortcutMiddlewareArgs & {
+    client: WebClient
+}) {
     await ack()
 
     await client.views.open({
@@ -57,6 +63,7 @@ export async function handleLogShortcut({ shortcut, ack, client }: SlackShortcut
         trigger_id: shortcut.trigger_id
     })
 }
+
 export async function handleOpenLogModal({ body, ack, client }: ButtonActionMiddlewareArgs & { client: WebClient }) {
     await ack()
 
@@ -66,7 +73,7 @@ export async function handleOpenLogModal({ body, ack, client }: ButtonActionMidd
     })
 }
 
-export async function handleLogModal({ ack, body, view, client }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export async function handleLogModal({ ack, body, view }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     // Get the hours and task from the modal
     let hours = safeParseFloat(view.state.values.hours.hours.value) ?? parseArgs(view.state.values.hours.hours.value ?? '').hours
     const activity = view.state.values.task.task.value

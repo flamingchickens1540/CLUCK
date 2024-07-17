@@ -1,11 +1,10 @@
-import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
+import type { AllMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
 import { slack_client } from '~slack'
 import config from '~config'
-
 import { getHourSubmissionMessage } from '~slack/messages/new_request'
 import responses from '~slack/messages/responses'
 
@@ -34,7 +33,7 @@ export async function handleRejectButton({ ack, body, action, client, logger }: 
     }
 }
 
-export async function handleRejectModal({ ack, body, view, client, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export async function handleRejectModal({ ack, body, view, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
     const log = await prisma.hourLog.update({
         where: { id: safeParseInt(view.private_metadata) },

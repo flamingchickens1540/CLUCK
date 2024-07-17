@@ -2,7 +2,7 @@ import type { AllMiddlewareArgs } from '@slack/bolt'
 import type { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import { getUserDataModal } from '~slack/modals/user_info'
 
-export async function handleOpenUserInfoModal({ ack, client, body, logger, respond }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
+export async function handleOpenUserInfoModal({ ack, client, body, logger }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
     try {
         await client.views.open({

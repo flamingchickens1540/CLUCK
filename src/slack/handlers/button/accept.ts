@@ -1,4 +1,4 @@
-import type { AllMiddlewareArgs, KnownBlock, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
+import type { AllMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import { ButtonActionMiddlewareArgs } from '~slack/lib/types'
 import { getRespondMessageModal } from '~slack/modals/respond'
 import prisma from '~lib/prisma'
@@ -39,6 +39,7 @@ export async function handleAcceptModal({ ack, body, view }: SlackViewMiddleware
     await ack()
     await handleAccept(safeParseInt(view.private_metadata) ?? -1, body.user.id, body.view.state.values.message.input.value as enum_HourLogs_type)
 }
+
 export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
     return async function ({ ack, action, body }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
         await ack()
@@ -47,7 +48,11 @@ export function getAcceptButtonHandler(prefix: enum_HourLogs_type) {
 }
 
 async function handleAccept(request_id: number, actor_slack_id: string, type: enum_HourLogs_type) {
-    const log = await prisma.hourLog.update({ where: { id: request_id }, data: { state: 'complete', type }, include: { Member: { select: { slack_id: true } } } })
+    const log = await prisma.hourLog.update({
+        where: { id: request_id },
+        data: { state: 'complete', type },
+        include: { Member: { select: { slack_id: true } } }
+    })
     if (!log) {
         logger.error('Could not find request info ', request_id)
         return false
@@ -67,7 +72,11 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
             text: message.text,
             blocks: message.blocks
         })
-        const dm = responses.submissionAcceptedDM({ slack_id: actor_slack_id, hours: log.duration!.toNumber(), activity: log.message! })
+        const dm = responses.submissionAcceptedDM({
+            slack_id: actor_slack_id,
+            hours: log.duration!.toNumber(),
+            activity: log.message!
+        })
         await slack_client.chat.postMessage({
             ...dm,
             channel: log.Member.slack_id!

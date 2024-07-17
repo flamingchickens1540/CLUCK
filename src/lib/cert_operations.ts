@@ -1,9 +1,6 @@
-import { Cert, Prisma } from '@prisma/client'
-import { Blocks, Elements, Message } from 'slack-block-builder'
+import { Prisma } from '@prisma/client'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
-import config from '~config'
-import { ActionIDs } from '~slack/handlers'
 import { getCertRequestMessage } from '~slack/messages/certify'
 
 enum CertOperationsError {
@@ -12,6 +9,7 @@ enum CertOperationsError {
     USER_NOT_MANAGER = 'You are not a manager for this cert',
     USER_NOT_FOUND = 'User not found'
 }
+
 export async function canGiveCert(
     user: Prisma.MemberWhereUniqueInput,
     cert: { managerCert: string | null }
@@ -38,7 +36,10 @@ export async function canGiveCert(
 }
 
 export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, recipient_slack_ids: string[], cert_id: Prisma.CertWhereUniqueInput) {
-    const cert = await prisma.cert.findUnique({ where: cert_id, select: { id: true, managerCert: true, replaces: true, label: true } })
+    const cert = await prisma.cert.findUnique({
+        where: cert_id,
+        select: { id: true, managerCert: true, replaces: true, label: true }
+    })
     if (!cert) {
         return { success: false, error: CertOperationsError.CERT_NOT_FOUND }
     }
@@ -69,7 +70,10 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
                     cert_id: cert.id,
                     state: 'pending'
                 })),
-            select: { id: true, Member: { select: { slack_id: true, slack_photo_small: true, fallback_photo: true, full_name: true } } }
+            select: {
+                id: true,
+                Member: { select: { slack_id: true, slack_photo_small: true, fallback_photo: true, full_name: true } }
+            }
         })
         for (const r of resp) {
             const msg = await slack_client.chat.postMessage(getCertRequestMessage(giving_member, r, cert, 'pending'))

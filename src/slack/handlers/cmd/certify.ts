@@ -22,7 +22,10 @@ export async function handleCertifyModal({ ack, body, view }: SlackViewMiddlewar
     const members = view.state.values.users.users.selected_users
     const cert = view.state.values.cert.cert.selected_option?.value
     if (members == null || members.length == 0 || cert == null) {
-        await ack({ response_action: 'errors', errors: { users: 'Please select a user', cert: 'Please select a certification' } })
+        await ack({
+            response_action: 'errors',
+            errors: { users: 'Please select a user', cert: 'Please select a certification' }
+        })
         return
     } else {
         const { success, error } = await createCertRequest({ slack_id: body.user.id }, members, { id: cert })
@@ -55,6 +58,7 @@ export async function handleCertReject({ ack, action, client }: ButtonActionMidd
 
     await client.chat.update(getCertRequestMessage({ slack_id: null }, req, req.Cert, 'rejected', req.slack_ts!))
 }
+
 export async function handleCertApprove({ ack, action, client }: ButtonActionMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
     const cert_req_id = safeParseInt(action.value)

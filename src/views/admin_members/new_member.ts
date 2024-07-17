@@ -8,8 +8,6 @@ import { getColumns } from '~views/admin_members/grid'
 
 const getDefaultRow = () => ({ team: 'primary', use_slack_photo: false }) as never
 export async function initNewMemberTable(mainTable: GridApi) {
-    console.log('starting')
-
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Member> {
         private eGui!: HTMLElement
         private eButton!: HTMLElement
@@ -20,12 +18,11 @@ export async function initNewMemberTable(mainTable: GridApi) {
         destroy?(): void {
             this.eGui.remove()
         }
-        refresh(params: ag.ICellRendererParams): boolean {
+        refresh(): boolean {
             return true
         }
-        // ...
-        init(params: ag.ICellRendererParams) {
-            // create the cell
+
+        init() {
             this.eGui = document.createElement('div')
             this.eGui.className = 'w-full h-full flex items-center justify-center'
             this.eButton = document.createElement('button')
@@ -45,11 +42,9 @@ export async function initNewMemberTable(mainTable: GridApi) {
             })
             this.eGui.appendChild(this.eButton)
         }
-        // ...
     }
-    // Grid Options: Contains all of the Data Grid configurations
+
     const gridOptions: ag.GridOptions<Prisma.Member> = {
-        // Column Definitions: Defines the columns to be displayed.
         columnDefs: getColumns({ photo_column_formatter: ButtonComponent }),
         rowData: [getDefaultRow()],
         headerHeight: 0,
@@ -58,9 +53,8 @@ export async function initNewMemberTable(mainTable: GridApi) {
         defaultColDef: {
             valueFormatter: (params) => (params.value == null || params.value == '' ? (params.colDef.headerName ?? toTitleCase(params.colDef.field!)) + '...' : params.value)
         },
-        getRowStyle: ({ node }) => ({ 'font-weight': '300', 'color': '#a0a0a0', 'font-style': 'italic' })
+        getRowStyle: () => ({ 'font-weight': '300', 'color': '#a0a0a0', 'font-style': 'italic' })
     }
 
-    // Your Javascript code to create the Data Grid
     const grid = ag.createGrid(document.querySelector('#new-member-grid')!, gridOptions)
 }

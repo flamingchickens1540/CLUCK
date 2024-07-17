@@ -2,7 +2,8 @@ import Prisma from '@prisma/client'
 import * as ag from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
-;(async () => {
+
+async function main() {
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Cert> {
         private eGui!: HTMLElement
         private eButton!: HTMLElement
@@ -13,7 +14,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
         destroy?(): void {
             this.eGui.remove()
         }
-        refresh(params: ag.ICellRendererParams): boolean {
+        refresh(): boolean {
             return true
         }
         // ...
@@ -127,4 +128,5 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
         gridApi.getColumnDef('managerCert')!.cellEditorParams!.values = [null, ...certs.filter((c) => c.isManager).map((c) => c.id)]
         gridApi.getColumnDef('replaces')!.cellEditorParams!.values = [null, ...certs.filter((c) => !c.isManager).map((c) => c.id)]
     })
-})()
+}
+main()

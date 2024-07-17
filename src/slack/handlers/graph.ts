@@ -3,12 +3,12 @@ import { Blocks, Message } from 'slack-block-builder'
 import { createHourChartForTeam, createHourChartForUsers } from '~slack/lib/chart'
 import { formatList } from '~slack/lib/messages'
 
-export async function handleGraphCommand({ command, ack, respond, client }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
+export async function handleGraphCommand({ command, ack, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs) {
     await ack()
     const text = command.text.trim()
     const teamLabels = {
         all: 'all members',
-        primary: 'Primary Team',
+        primary: 'Senior Team',
         junior: 'Junior Team'
     }
     const team = text as keyof typeof teamLabels

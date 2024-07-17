@@ -1,4 +1,4 @@
-import { Blocks, Elements, ViewBlockBuilder, EasyPaginator } from 'slack-block-builder'
+import { Blocks, Elements, ViewBlockBuilder } from 'slack-block-builder'
 import { calculateHours } from '~lib/hour_operations'
 import { Prisma } from '@prisma/client'
 import { UndefinableArray } from 'slack-block-builder/dist/internal'

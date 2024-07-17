@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
-import logger from '~lib/logger'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 
 export const router = new Hono().basePath('/membercerts')
