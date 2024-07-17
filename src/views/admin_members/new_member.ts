@@ -6,7 +6,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { toTitleCase } from '~lib/util'
 import { getColumns } from '~views/admin_members/grid'
 
-const getDefaultRow = () => ({ team: 'primary', use_slack_photo: false, frc_registered: false }) as never
+const getDefaultRow = () => ({ team: 'primary', use_slack_photo: false }) as never
 export async function initNewMemberTable(mainTable: GridApi) {
     console.log('starting')
 

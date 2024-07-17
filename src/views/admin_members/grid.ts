@@ -42,12 +42,6 @@ export function getColumns(params: { photo_column_formatter?: unknown }) {
             editable: true,
             headerName: 'Slack Photo Approved',
             initialWidth: 100
-        },
-        {
-            field: 'frc_registered',
-            editable: true,
-            headerName: 'FRC Registered',
-            initialWidth: 100
         }
     ]
     if (params.photo_column_formatter) {
