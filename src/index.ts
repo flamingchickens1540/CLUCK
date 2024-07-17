@@ -10,7 +10,7 @@ import admin_router from './routes/admin'
 import api_router from './routes/api'
 import account_router from './routes/auth'
 
-import { requireReadLogin } from '~lib/auth'
+import { requireAdminLogin, requireReadLogin } from '~lib/auth'
 import logger from '~lib/logger'
 import { startWS } from '~lib/sockets'
 
@@ -20,6 +20,7 @@ app.use(renderer)
 app.use(compress())
 app.use(appendTrailingSlash())
 
+app.use('/admin/', requireAdminLogin)
 app.use('/grid/', requireReadLogin)
 app.get('/grid', (c) => c.redirect('/grid/', 301))
 

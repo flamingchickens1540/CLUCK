@@ -20,7 +20,7 @@ import { initNewMemberTable } from '~views/admin_members/new_member'
             } else {
                 payload.id = event.data.email
             }
-            const res = await fetch('/api/admin/members', { method: 'PUT', body: JSON.stringify(event.data) })
+            const res = await fetch('/api/admin/members', { method: 'PUT', body: JSON.stringify(payload) })
             const member = await res.json()
             gridApi.applyTransaction({ update: [member] })
         }

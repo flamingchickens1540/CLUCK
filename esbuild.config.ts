@@ -11,7 +11,8 @@ if (!(await fs.stat('./public')).isDirectory()) {
 
 const views: Record<string, string> = {
     grid: '/grid/',
-    admin_members: '/demo/admin/members/'
+    admin_members: '/admin/members/',
+    admin_certs: '/admin/certs/'
 }
 
 const contexts: esbuild.BuildContext[] = []
@@ -30,7 +31,7 @@ for (const id in views) {
                     name: 'rebuild-notify',
                     setup(build) {
                         build.onEnd((result) => {
-                            logger.info(`build ended with ${result.errors.length} errors`)
+                            logger.info(`${id} ended with ${result.errors.length} errors`)
                             // HERE: somehow restart the server from here, e.g., by sending a signal that you trap and react to inside the server.
                         })
                     }
@@ -59,6 +60,7 @@ const watch = process.argv.includes('--watch')
 if (watch) {
     logger.info('Watching...')
     await contexts[1].watch({})
+    await contexts[2].watch({})
     logger.info('Done...')
 } else {
     logger.info('Building...')

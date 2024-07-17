@@ -1,4 +1,4 @@
-import { Member, Prisma } from '@prisma/client'
+import { Cert, Member, Prisma } from '@prisma/client'
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
@@ -48,4 +48,19 @@ router
             data.grade = 0
         }
         return c.json(await prisma.member.update({ data, where: { email: id } }))
+    })
+
+router
+    .get('/admin/certs', async (c) => {
+        return c.json(await prisma.cert.findMany())
+    })
+    .put(async (c) => {
+        try {
+            const data = (await c.req.json()) as Partial<Cert>
+            console.log(data)
+            return c.json(await prisma.cert.update({ data, where: { id: data.id } }))
+        } catch (e: unknown) {
+            console.log(e)
+            return c.json({ error: e }, 400)
+        }
     })

@@ -1,19 +1,15 @@
 import { Hono } from 'hono'
-import { router as member_route } from './members'
 import { router as cert_route } from './certs'
 import { router as membercert_route } from './membercerts'
 import { router as meeting_route } from './meetings'
 import { router as memberfield_route } from './memberfields'
-import { requireAdminLogin } from '~lib/auth'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 import { toTitleCase } from '~lib/util'
 
 export const router = new Hono()
 
-router.use(trimTrailingSlash())
-router.use(requireAdminLogin)
-router.route('/', member_route)
-router.route('/', cert_route)
+// router.use(trimTrailingSlash())
+// router.route('/', cert_route)
 router.route('/', membercert_route)
 router.route('/', meeting_route)
 router.route('/', memberfield_route)
@@ -35,7 +31,7 @@ router.get('/', (c) => {
             </div>
             <div class="flex-grow flex-shrink flex flex-col justify-center align-middle">
                 {Object.entries(pages).map(([path, [name, desc]], i) => (
-                    <a href={'/admin/' + path} class="cursor-pointer w-full border rounded-xl shadow-md hover:shadow-lg hover:border-indigo-300 hover:shadow-indigo-300 transition-all duration-300 mt-5 block p-3" style={`z-index:${i}`}>
+                    <a href={'/admin/' + path + '/'} class="cursor-pointer w-full border rounded-xl shadow-md hover:shadow-lg hover:border-indigo-300 hover:shadow-indigo-300 transition-all duration-300 mt-5 block p-3" style={`z-index:${i}`}>
                         <span class="text-xl">{name}</span>
                         <p class="text-gray-500">{desc}</p>
                     </a>
