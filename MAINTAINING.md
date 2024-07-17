@@ -38,5 +38,6 @@ loadNext()
 
 ## Adding Member Fields
 
+Additional fields not used by CLUCK can be added to the spreadsheet directly. See the [registered column](https://docs.google.com/spreadsheets/d/1p18eJW29CzLn-zZKBKm-OOM6BtR-oLlrZVfNJtNPl9A/edit?gid=568325748#gid=568325748&range=B2:B46) and ['extra' sheet](https://docs.google.com/spreadsheets/d/1p18eJW29CzLn-zZKBKm-OOM6BtR-oLlrZVfNJtNPl9A/edit?gid=2140052736#gid=2140052736) in the template spreadsheet for an example
+
 Make sure to update [the db model](prisma/schema.prisma), [the spreadsheet mapping](src/spreadsheet/index.ts), and the [member dashboard](src/views/admin_members).
-See commit [8ad6039](https://github.com/rutmanz/CLUCK/commit/8ad6039408a7baaadb490a22bb74d631ebcdb073) for reference
