@@ -11,10 +11,10 @@ function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean) 
         try {
             await task()
         } catch (e) {
-            logger.error({ name: task.name, error: e }, 'Error running scheduled task')
-        } finally {
-            logger.info({ name: task.name }, 'Scheduled task ran')
+            logger.error(e, 'Error running scheduled task: ' + task.name)
+            return
         }
+        logger.info('Scheduled task ran: ' + task.name)
     }
     if (runOnInit) {
         cb()

@@ -78,7 +78,7 @@ export async function updateSheet() {
         row[columns.TotalHours] = max50Hours(hours.total)
         row[columns.WeeklyHours] = await getWeeklyHours({ email: m.email })
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
-        row[columns.Certifications] = certMap[m.email].join(', ')
+        row[columns.Certifications] = certMap[m.email]?.join(', ')
         rows.push(row)
 
         if (hours.qualifying >= 50) {

@@ -9,7 +9,7 @@ export default tseslint.config(
     ...tseslint.configs.recommended,
     { files: ['src/**/*.ts'] },
     {
-        ignores: ['public/', '**/moses.js', '**/_*.ts']
+        ignores: ['public/', '**/moses.js', '**/_*.ts', 'build/']
     },
     { files: ['static/js/**.js'], languageOptions: { globals: globals.browser } },
     {

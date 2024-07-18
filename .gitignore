@@ -36,4 +36,5 @@ _*.ts
 /.idea
 /public/
 
-dev/*.manifest.json
+/dev/*.manifest.json
+/build/
