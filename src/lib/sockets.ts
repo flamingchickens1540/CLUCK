@@ -2,6 +2,7 @@ import { Server as SocketIOServer } from 'socket.io'
 import { Server as HttpServer } from 'http'
 
 import { WSCluckChange } from '~types'
+import logger from '~lib/logger'
 
 let io: SocketIOServer | null = null
 export function startWS(server: HttpServer) {
@@ -9,11 +10,9 @@ export function startWS(server: HttpServer) {
         return
     }
     io = new SocketIOServer(server, {
-        path: '/ws',
-        cors: {
-            origin: ['http://localhost:3000', 'https://cluck.team1540.org']
-        }
+        path: '/ws'
     })
+    logger.info('Websocket server started')
 
     io.on('connection', (socket) => {
         socket.emit('hello', 'world')

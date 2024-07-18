@@ -28,5 +28,6 @@
             "client_email": ""
         }
     },
+    "port": 3000,
     "default_photo": "/static/img/default_member.webp"
 }

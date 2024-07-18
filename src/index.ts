@@ -16,8 +16,8 @@ import account_router from '~routes/auth'
 import { requireAdminLogin, requireReadLogin } from '~lib/auth'
 import logger from '~lib/logger'
 import { startWS } from '~lib/sockets'
-import { syncSlackMembers } from '~tasks/slack'
 import { scheduleTasks } from '~tasks'
+import config from '~config'
 
 const app = new Hono()
 
@@ -45,13 +45,8 @@ app.route('/auth', account_router)
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/*', serveStatic({ root: './public' }))
 
-const port = 3000
-
-const server = serve({ fetch: app.fetch, port }, (info) => {
+const server = serve({ fetch: app.fetch, port: config.port }, (info) => {
     logger.info(`Server is running: http://${info.address}:${info.port}`)
+    startWS(server as HttpServer)
     scheduleTasks()
-    if (process.env.NODE_ENV === 'prod') {
-        syncSlackMembers()
-        startWS(server as HttpServer)
-    }
 })

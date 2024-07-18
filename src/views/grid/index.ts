@@ -137,7 +137,7 @@ export async function refreshMemberListAndRerun() {
 
 setInterval(refreshMemberListAndRerun, 60 * 60 * 1000)
 
-const socket = socket_io('//localhost:3000', { path: '/ws' })
+const socket = socket_io({ path: '/ws' })
 socket.on('cluck_change', (data: WSCluckChange) => {
     const element = document.getElementById(data.email)
     if (element) {
