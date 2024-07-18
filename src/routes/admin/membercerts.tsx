@@ -15,7 +15,7 @@ export const cert_colors = [
 export const getColor = (i: number) => cert_colors[i % cert_colors.length]
 router
     .get('/', async (c) => {
-        const certs = await prisma.cert.findMany({ orderBy: { id: 'asc' }, select: { id: true, label: true } })
+        const certs = await prisma.cert.findMany({ orderBy: [{ department: 'asc' }, { id: 'asc' }], select: { id: true, label: true, department: true, isManager: true } })
         const colcount = certs.length + 1
         const rows = (await prisma.member.findMany({ orderBy: { full_name: 'asc' }, select: { email: true, full_name: true, MemberCerts: { select: { cert_id: true } } } })).map((member, rowI) => {
             let colorI = -1
@@ -26,8 +26,8 @@ router
                         <p class={`pl-2`}>{member.full_name}</p>
                     </div>
                     {certs.map((cert, i) => {
-                        const isFirst = i == 0 || cert.id.split('_')[0] !== certs[i - 1].id.split('_')[0]
-                        const isLast = i >= certs.length - 1 || cert.id.split('_')[0] !== certs[i + 1].id.split('_')[0]
+                        const isFirst = i == 0 || cert.department !== certs[i - 1].department
+                        const isLast = i >= certs.length - 1 || cert.department !== certs[i + 1].department
                         if (isFirst) {
                             colorI++
                         }
@@ -48,14 +48,14 @@ router
                         <div class="grid grid-cols-subgrid border-0 sticky top-0 z-20" style={`grid-column: span ${colcount} / span ${colcount}`}>
                             <div class="bg-white sticky top-0 left-0 z-30"></div>
                             {certs.map((cert, i) => {
-                                const isFirst = i == 0 || cert.id.split('_')[0] !== certs[i - 1].id.split('_')[0]
-                                const isLast = i >= certs.length - 1 || cert.id.split('_')[0] !== certs[i + 1].id.split('_')[0]
+                                const isFirst = i == 0 || cert.department !== certs[i - 1].department
+                                const isLast = i >= certs.length - 1 || cert.department !== certs[i + 1].department
                                 if (isFirst) {
                                     colorI++
                                 }
                                 return (
                                     <div class={`vertical-text-parent py-1 border-b-2 ${isFirst ? 'border-l-2' : 'border-l'} ${isLast && 'border-r-2'} ${getColor(colorI)}`}>
-                                        <div>{cert.label}</div>
+                                        <div class={cert.isManager ? 'font-medium' : 'font-light'}>{cert.label}</div>
                                     </div>
                                 )
                             })}

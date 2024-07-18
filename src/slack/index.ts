@@ -8,7 +8,7 @@ const slack_app = new bolt.App({
     signingSecret: config.slack.app.signing_secret,
     socketMode: true,
     appToken: config.slack.app.app_token,
-    logger: createBoltLogger({ logger: logger.child({}) })
+    logger: createBoltLogger()
 })
 
 export const slack_client = slack_app.client

@@ -24,7 +24,7 @@ const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
 
 export const createBoltLogger = (): BoltLogger => ({
     setLevel(level) {
-        logger.level = level
+        return
     },
     getLevel() {
         return pinoToBoltLevel[logger.level]
@@ -49,10 +49,7 @@ export const createBoltLogger = (): BoltLogger => ({
 function logSlack(logFn: LogFn, msgs: unknown[]) {
     if (msgs.length === 0) {
         return
-    } else if (msgs.length === 1) {
-        logFn({}, msgs[0] as string | undefined)
-    } else {
-        logFn({ msg: msgs.slice(1) }, msgs[0] as string | undefined)
     }
+    logFn({ name: 'slack' }, msgs.join(' '))
 }
 export default logger
