@@ -21,18 +21,42 @@ model Account {
   @@map("Accounts")
 }
 
+model Department {
+  id          String   @id @db.VarChar(50)
+  name        String   @db.VarChar(100)
+  slack_group String?  @db.VarChar(50)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+  Certs       Cert[]
+
+  Members DepartmentAssociation[]
+
+  @@map("Departments")
+}
+
+model DepartmentAssociation {
+  department_id String
+  member_id     String
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  Department Department @relation(fields: [department_id], references: [id], onDelete: Cascade)
+  Member     Member     @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@id([department_id, member_id])
+  @@map("DepartmentAssociations")
+}
+
 model Cert {
   id             String              @id @db.VarChar(15)
   label          String              @db.VarChar(100)
   isManager      Boolean             @default(false)
-  managerCert    String?             @db.VarChar(15)
+  department     String?             @db.VarChar()
   replaces       String?             @unique @db.VarChar(50)
   createdAt      DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime            @updatedAt @db.Timestamptz(6)
   ReplacedByCert Cert?               @relation("CertProgression")
   ReplacesCert   Cert?               @relation("CertProgression", fields: [replaces], references: [id], onDelete: SetNull)
-  ManagesCerts   Cert[]              @relation("CertManagement")
-  ManagedByCert  Cert?               @relation("CertManagement", fields: [managerCert], references: [id], onDelete: SetNull)
+  Department     Department?         @relation(fields: [department], references: [id], onDelete: SetNull)
   Instances      MemberCert[]
   Requests       MemberCertRequest[]
 
@@ -87,17 +111,17 @@ model Meetings {
 }
 
 model Member {
-  email                  String            @id @db.VarChar(50)
-  first_name             String            @db.VarChar(50)
-  full_name              String            @db.VarChar(100)
-  team                   enum_Members_team
-  grade                  Int               @db.SmallInt
-  years                  Int               @db.SmallInt
-  use_slack_photo        Boolean
-  slack_id               String?           @unique @db.VarChar(15)
-  slack_photo            String?           @db.VarChar(255)
-  slack_photo_small      String?           @db.VarChar(255)
-  fallback_photo         String?           @db.VarChar(255)
+  email             String            @id @db.VarChar(50)
+  first_name        String            @db.VarChar(50)
+  full_name         String            @db.VarChar(100)
+  team              enum_Members_team
+  grade             Int               @db.SmallInt
+  years             Int               @db.SmallInt
+  use_slack_photo   Boolean
+  slack_id          String?           @unique @db.VarChar(15)
+  slack_photo       String?           @db.VarChar(255)
+  slack_photo_small String?           @db.VarChar(255)
+  fallback_photo    String?           @db.VarChar(255)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -107,6 +131,7 @@ model Member {
   MemberCerts          MemberCert[]
   MemberCertRequests   MemberCertRequest[]      @relation("MemberCertRecipient")
   MemberCertsRequested MemberCertRequest[]      @relation("MemberCertRequester")
+  Departments          DepartmentAssociation[]
 
   @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
@@ -154,7 +179,6 @@ model FallbackPhoto {
 
   @@map("FallbackPhotos")
 }
-
 
 enum enum_HourLogs_state {
   complete

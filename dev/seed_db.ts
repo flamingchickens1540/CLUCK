@@ -6,8 +6,11 @@ import logger from '~lib/logger'
 const prisma = new PrismaClient()
 
 async function main() {
+    await seedDepartments()
     await seedCerts()
     await seedMembers(25)
+
+    await seedDepartmentAssociations()
     await seedMemberCerts()
     await seedLabHours(600)
     await seedMeetings(6)
@@ -50,6 +53,38 @@ const standalone_certs: [string, string][] = [
     ['safety captain', '_safety'],
     ['copresident', '_copres']
 ]
+
+async function seedDepartments() {
+    await prisma.department.deleteMany()
+    const departments: Prisma.DepartmentCreateManyInput[] = []
+    cert_departments.forEach(([name, shortname]) => {
+        departments.push({
+            id: shortname,
+            name: toTitleCase(name)
+        })
+    })
+    await prisma.department.createMany({ data: departments })
+}
+
+async function seedDepartmentAssociations() {
+    const departments = await prisma.department.findMany()
+    const members = await prisma.member.findMany()
+    const input: Prisma.DepartmentAssociationCreateManyInput[] = []
+    members.forEach((member) => {
+        const dept = departments[Math.floor(Math.random() * departments.length)]
+        input.push({
+            member_id: member.email,
+            department_id: dept.id
+        })
+        const dept2 = departments[Math.floor(Math.random() * departments.length)]
+        input.push({
+            member_id: member.email,
+            department_id: dept2.id
+        })
+    })
+    await prisma.departmentAssociation.createMany({ data: input })
+}
+
 async function seedCerts() {
     await prisma.cert.deleteMany()
     const certs: Prisma.CertCreateManyInput[] = []
@@ -59,13 +94,14 @@ async function seedCerts() {
                 id: shortname.toUpperCase() + '_' + i,
                 label: toTitleCase(name) + ' ' + i,
                 replaces: i > 1 ? shortname.toUpperCase() + '_' + (i - 1) : null,
-                managerCert: shortname.toUpperCase() + '_MGR'
+                department: shortname
             })
         }
         certs.push({
             id: shortname.toUpperCase() + '_MGR',
             label: toTitleCase(name) + ' Manager',
-            isManager: true
+            isManager: true,
+            department: shortname
         })
     })
     standalone_certs.forEach(([name, shortname]) => {

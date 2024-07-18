@@ -24,6 +24,7 @@ function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean) 
 
 export function scheduleTasks() {
     const isProd = process.env.NODE_ENV === 'prod'
+    logger.info(isProd)
     scheduleTask(updateSheet, 60 * 30, isProd) // Update spreadsheet every half-hour
     scheduleTask(syncSlackMembers, 60 * 60, isProd) // Update slack members every hour, can also be run manually on admin dashboard
     setInterval(scheduleCertAnnouncement, 60 * 60, true) // Just in case the cert announcement isn't automatically run on changes

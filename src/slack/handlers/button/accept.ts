@@ -75,7 +75,8 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
         const dm = responses.submissionAcceptedDM({
             slack_id: actor_slack_id,
             hours: log.duration!.toNumber(),
-            activity: log.message!
+            activity: log.message!,
+            type
         })
         await slack_client.chat.postMessage({
             ...dm,

@@ -1,15 +1,15 @@
 import { Logger as BoltLogger, LogLevel as BoltLogLevel } from '@slack/logger'
-import pino, { LevelWithSilentOrString, LogFn, Logger as PinoLogger } from 'pino'
+import pino, { LevelWithSilentOrString, LogFn } from 'pino'
 import pretty from 'pino-pretty'
 
 const logger = pino(
+    { level: 'trace' },
     pretty({
         colorize: true,
         levelFirst: false,
         ignore: 'pid,hostname'
     })
 )
-logger.level = process.env.NODE_ENV === 'prod' ? 'info' : 'debug'
 
 const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
     fatal: BoltLogLevel.ERROR,
@@ -22,7 +22,7 @@ const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
     silent: BoltLogLevel.ERROR
 }
 
-export const createBoltLogger = (params: { logger: PinoLogger }): BoltLogger => ({
+export const createBoltLogger = (): BoltLogger => ({
     setLevel(level) {
         logger.level = level
     },

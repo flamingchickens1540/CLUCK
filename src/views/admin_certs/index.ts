@@ -4,6 +4,8 @@ import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 
 async function main() {
+    const departmentLookup = new Map<string, string>()
+
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Cert> {
         private eGui!: HTMLElement
         private eButton!: HTMLElement
@@ -35,12 +37,8 @@ async function main() {
                         gridApi.applyTransaction({ add: [response_data.data] })
                         const row = gridApi.getRowNode(response_data.data.id)
                         row?.setSelected(true)
-                        bottomRow.setData({ id: '', label: '', isManager: false, managerCert: null, replaces: null })
-                        if (response_data.data.isManager) {
-                            gridApi.getColumnDef('managerCert')?.cellEditorParams?.values?.push(response_data.data.id)
-                        } else {
-                            gridApi.getColumnDef('replaces')?.cellEditorParams?.values?.push(response_data.data.id)
-                        }
+                        bottomRow.setData({ id: '', label: '', isManager: false, department: null, replaces: null })
+                        gridApi.getColumnDef('replaces')?.cellEditorParams?.values?.push(response_data.data.id)
                     } else {
                         alert('Invalid data')
                     }
@@ -76,12 +74,11 @@ async function main() {
             headerName: 'Manager?'
         },
         {
-            colId: 'managerCert',
-            field: 'managerCert',
+            colId: 'department',
+            field: 'department',
             editable: true,
             cellEditor: 'agSelectCellEditor',
-            headerName: 'Managed By',
-            headerTooltip: 'Allows managers to submit over slack',
+            headerName: 'Department',
             cellEditorParams: {
                 values: []
             }
@@ -101,7 +98,7 @@ async function main() {
 
         // Column Definitions: Defines the columns to be displayed.
         columnDefs: colDefs,
-        pinnedBottomRowData: [{ id: '', label: '', isManager: false, managerCert: null, replaces: null }],
+        pinnedBottomRowData: [{ id: '', label: '', isManager: false, department: null, replaces: null }],
 
         defaultColDef: {
             valueFormatter: (params) =>
@@ -123,9 +120,11 @@ async function main() {
     // Your Javascript code to create the Data Grid
     const gridApi = ag.createGrid(document.querySelector('#mygrid')!, gridOptions)
     fetch('/api/admin/certs').then(async (resp) => {
+        const deps_resp = await fetch('/api/admin/departments')
+        const deps: Prisma.Department[] = await deps_resp.json()
         const certs: Prisma.Cert[] = await resp.json()
         gridApi.setGridOption('rowData', certs)
-        gridApi.getColumnDef('managerCert')!.cellEditorParams!.values = [null, ...certs.filter((c) => c.isManager).map((c) => c.id)]
+        gridApi.getColumnDef('department')!.cellEditorParams!.values = [null, ...deps.map((c) => c.id)]
         gridApi.getColumnDef('replaces')!.cellEditorParams!.values = [null, ...certs.filter((c) => !c.isManager).map((c) => c.id)]
     })
 }

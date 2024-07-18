@@ -5,9 +5,9 @@ import fs from 'fs/promises'
 import path from 'path'
 import logger from '~lib/logger'
 
-if (!(await fs.stat('./public')).isDirectory()) {
+fs.stat('./public').catch(async () => {
     await fs.mkdir('./public')
-}
+})
 
 const views: Record<string, string> = {
     grid: '/grid/',

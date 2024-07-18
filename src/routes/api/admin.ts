@@ -50,6 +50,10 @@ router
         return c.json(await prisma.member.update({ data, where: { email: id } }))
     })
 
+router.get('/admin/departments', async (c) => {
+    return c.json(await prisma.department.findMany())
+})
+
 router
     .get('/admin/certs', async (c) => {
         return c.json(await prisma.cert.findMany())

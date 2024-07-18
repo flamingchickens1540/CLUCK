@@ -5,38 +5,37 @@ import prisma from '~lib/prisma'
 import config from '~config'
 
 export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
-    const userCerts = await prisma.member.findUnique({
+    const manager = await prisma.member.findUnique({
         where: user,
         select: {
             MemberCerts: {
                 where: { Cert: { isManager: true } },
                 select: {
                     Cert: {
-                        select: { id: true }
+                        select: {
+                            id: true,
+                            Department: { select: { name: true, id: true, Certs: { select: { id: true, label: true } } } }
+                        }
                     }
                 }
             }
         }
     })
-    if (!userCerts) {
+    if (!manager) {
         return Modal().title(':(').blocks(Blocks.Header().text('No member found')).buildToObject()
     }
-    const managedCerts = await prisma.cert.findMany({
-        where: { managerCert: { in: userCerts.MemberCerts.map((mc) => mc.Cert.id) } },
-        orderBy: { label: 'asc' }
-    })
-    if (managedCerts.length == 0) {
+    const managedDepartments = manager.MemberCerts.map((c) => c.Cert.Department)
+    if (managedDepartments.length == 0) {
         return Modal().title(':(').blocks(Blocks.Header().text('Must be a manager')).buildToObject()
     }
-    let lastDept = ''
-    const optionGroups: OptionGroupBuilder[] = []
-    managedCerts.forEach((c) => {
-        if (c.id.split('_')[0] != lastDept) {
-            lastDept = c.id.split('_')[0]
-            optionGroups.push(Bits.OptionGroup().label(lastDept))
-        }
-        optionGroups[optionGroups.length - 1].options(Bits.Option().text(c.label).value(c.id))
-    })
+
+    const optionGroups: OptionGroupBuilder[] = managedDepartments
+        .filter((d) => d != null)
+        .map((d) => {
+            return Bits.OptionGroup()
+                .label(d.name)
+                .options(d.Certs.map((c) => Bits.Option().text(c.label).value(c.id)))
+        })
 
     return Modal()
         .title('Certify')
@@ -46,7 +45,7 @@ export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
             Blocks.Input()
                 .label('Certification')
                 .blockId('cert')
-                .element(Elements.StaticSelect().actionId('cert').placeholder('Select the certification to certify').optionGroups(optionGroups))
+                .element(Elements.StaticSelect().actionId('cert').placeholder('Select the certification to give').optionGroups(optionGroups))
         )
         .submit('Submit')
         .close('Cancel')

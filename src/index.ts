@@ -18,6 +18,7 @@ import logger from '~lib/logger'
 import { startWS } from '~lib/sockets'
 import { scheduleTasks } from '~tasks'
 import config from '~config'
+import { startSlack } from '~slack'
 
 const app = new Hono()
 
@@ -45,8 +46,10 @@ app.route('/auth', account_router)
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/*', serveStatic({ root: './public' }))
 
-const server = serve({ fetch: app.fetch, port: config.port }, (info) => {
+const server = serve({ fetch: app.fetch, port: config.port }, async (info) => {
     logger.info(`Server is running: http://${info.address}:${info.port}`)
-    startWS(server as HttpServer)
+
+    await startSlack()
     scheduleTasks()
+    startWS(server as HttpServer)
 })

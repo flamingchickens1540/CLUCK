@@ -10,14 +10,14 @@ enum CertOperationsError {
     USER_NOT_FOUND = 'User not found'
 }
 
-export async function canGiveCert(user: Prisma.MemberWhereUniqueInput, cert: { managerCert: string | null }) {
-    if (cert.managerCert == null) {
+export async function canGiveCert(user: Prisma.MemberWhereUniqueInput, cert: { department: string | null }) {
+    if (cert.department == null) {
         return { success: false, error: CertOperationsError.CERT_NOT_MANAGED }
     }
     const managecert = await prisma.memberCert.findFirst({
         where: {
             Member: user,
-            cert_id: cert.managerCert
+            Cert: { department: cert.department, isManager: true }
         }
     })
 
@@ -30,7 +30,7 @@ export async function canGiveCert(user: Prisma.MemberWhereUniqueInput, cert: { m
 export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, recipient_slack_ids: string[], cert_id: Prisma.CertWhereUniqueInput) {
     const cert = await prisma.cert.findUnique({
         where: cert_id,
-        select: { id: true, managerCert: true, replaces: true, label: true }
+        select: { id: true, department: true, replaces: true, label: true }
     })
     if (!cert) {
         return { success: false, error: CertOperationsError.CERT_NOT_FOUND }
