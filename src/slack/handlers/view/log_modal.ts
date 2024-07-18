@@ -1,5 +1,5 @@
 import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import log_modal from '~slack/modals/log'
+import { getLogModal } from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
 import { parseArgs } from '~slack/handlers/cmd/log'
@@ -8,7 +8,7 @@ export const handleOpenLogModal: ActionMiddleware = async ({ body, ack, client }
     await ack()
 
     await client.views.open({
-        view: log_modal,
+        view: getLogModal(),
         trigger_id: body.trigger_id
     })
 }

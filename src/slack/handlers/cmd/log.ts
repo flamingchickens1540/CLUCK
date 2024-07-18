@@ -1,4 +1,4 @@
-import log_modal from '~slack/modals/log'
+import { getLogModal } from '~slack/modals/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
 import responses from '~slack/messages/responses'
@@ -24,7 +24,7 @@ export const handleLogCommand: CommandMiddleware = async ({ command, logger, ack
     if (command.text.trim().length === 0) {
         await ack()
         await client.views.open({
-            view: log_modal,
+            view: getLogModal(),
             trigger_id: command.trigger_id
         })
     } else {
@@ -50,7 +50,7 @@ export const handleLogShortcut: ShortcutMiddleware = async ({ shortcut, ack, cli
     await ack()
 
     await client.views.open({
-        view: log_modal,
+        view: getLogModal(),
         trigger_id: shortcut.trigger_id
     })
 }

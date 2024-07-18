@@ -58,6 +58,7 @@ const watch = process.argv.includes('--watch')
 // )
 if (watch) {
     logger.info('Watching...')
+    await contexts[0].watch({})
     await contexts[1].watch({})
     await contexts[2].watch({})
     logger.info('Done...')

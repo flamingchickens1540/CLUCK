@@ -1,3 +1,5 @@
+import type { Server as HttpServer } from 'http'
+
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
@@ -17,6 +19,10 @@ import { startWS } from '~lib/sockets'
 import { syncSlackMembers } from '~tasks/slack'
 
 const app = new Hono()
+
+// Don't interfere with socket.io
+app.use('/ws/*', async (c, next) => {})
+
 app.use(renderer)
 
 app.use(compress())
@@ -34,16 +40,17 @@ app.get('/grid', (c) => c.redirect('/grid/', 301))
 app.route('/admin', admin_router)
 app.route('/api', api_router)
 app.route('/auth', account_router)
+
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/*', serveStatic({ root: './public' }))
 
 const port = 3000
 
-startWS()
 if (process.env.NODE_ENV === 'prod') {
     await syncSlackMembers()
 }
 
-serve({ fetch: app.fetch, port }, (info) => {
+const server = serve({ fetch: app.fetch, port }, (info) => {
     logger.info(`Server is running: http://${info.address}:${info.port}`)
 })
+startWS(server as HttpServer)

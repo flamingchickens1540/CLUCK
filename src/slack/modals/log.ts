@@ -2,7 +2,7 @@ import { Blocks, Elements, Modal } from 'slack-block-builder'
 import { ViewIDs } from '~slack/handlers'
 
 //prettier-ignore
-export const log_modal = Modal()
+export const getLogModal =() => Modal()
     .title('Log External Hours')
     .callbackId(ViewIDs.MODAL_LOG)
     .submit('Log')
@@ -23,5 +23,3 @@ export const log_modal = Modal()
                 .multiline())
             .label('🧗 Activity')
     ).buildToObject()
-
-export default log_modal

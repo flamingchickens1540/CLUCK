@@ -1,12 +1,15 @@
 import { Server as SocketIOServer } from 'socket.io'
+import { Server as HttpServer } from 'http'
+
 import { WSCluckChange } from '~types'
 
 let io: SocketIOServer | null = null
-export function startWS() {
+export function startWS(server: HttpServer) {
     if (io != null) {
         return
     }
-    io = new SocketIOServer(3001, {
+    io = new SocketIOServer(server, {
+        path: '/ws',
         cors: {
             origin: ['http://localhost:3000', 'https://cluck.team1540.org']
         }
