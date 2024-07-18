@@ -1,5 +1,5 @@
 import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import { getLogModal } from '~slack/modals/log'
+import { getLogModal } from '~slack/blocks/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
 import { parseArgs } from '~slack/handlers/cmd/log'

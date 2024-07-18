@@ -1,10 +1,8 @@
-import { getCertifyModal } from '~slack/modals/certify'
+import { getCertifyModal, getCertRequestMessage } from '~slack/blocks/certify'
 import { createCertRequest } from '~lib/cert_operations'
 import { ActionMiddleware, CommandMiddleware, ViewMiddleware } from '~slack/lib/types'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
-
-import { getCertRequestMessage } from '~slack/messages/certify'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 
 export const handleCertifyCommand: CommandMiddleware = async ({ command, ack, client }) => {

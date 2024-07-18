@@ -1,5 +1,5 @@
 import { Blocks, Modal } from 'slack-block-builder'
-import { getUserHoursBlocks, getUserPendingHoursBlocks } from '~slack/modals/user_hours'
+import { getUserHoursBlocks, getUserPendingHoursBlocks } from '~slack/blocks/user_hours'
 import { ActionMiddleware, CommandMiddleware } from '~slack/lib/types'
 
 export const handleShowHoursCommand: CommandMiddleware = async ({ command, ack, client }) => {

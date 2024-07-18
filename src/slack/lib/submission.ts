@@ -2,8 +2,8 @@ import prisma from '~lib/prisma'
 import { Prisma } from '@prisma/client'
 import config from '~config'
 import { slack_client } from '~slack'
-import { getHourSubmissionMessage } from '~slack/messages/new_request'
-import responses from '~slack/messages/responses'
+import { getHourSubmissionMessage } from '~slack/blocks/new_request'
+import responses from '~slack/blocks/responses'
 
 export async function handleHoursRequest(slack_id: string, hours: number, activity: string) {
     const request: Prisma.HourLogCreateInput = {

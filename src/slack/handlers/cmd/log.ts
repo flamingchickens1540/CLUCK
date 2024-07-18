@@ -1,7 +1,7 @@
-import { getLogModal } from '~slack/modals/log'
+import { getLogModal } from '~slack/blocks/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
-import responses from '~slack/messages/responses'
+import responses from '~slack/blocks/responses'
 import { CommandMiddleware, ShortcutMiddleware } from '~slack/lib/types'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {

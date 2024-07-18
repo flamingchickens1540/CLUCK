@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
-import { getCertRequestMessage } from '~slack/messages/certify'
+import { getCertRequestMessage } from '~slack/blocks/certify'
 
 enum CertOperationsError {
     CERT_NOT_FOUND = 'This cert cannot be found',
@@ -10,15 +10,7 @@ enum CertOperationsError {
     USER_NOT_FOUND = 'User not found'
 }
 
-export async function canGiveCert(
-    user: Prisma.MemberWhereUniqueInput,
-    cert: { managerCert: string | null }
-): Promise<
-    | {
-          success: true
-      }
-    | { success: false; error: CertOperationsError }
-> {
+export async function canGiveCert(user: Prisma.MemberWhereUniqueInput, cert: { managerCert: string | null }) {
     if (cert.managerCert == null) {
         return { success: false, error: CertOperationsError.CERT_NOT_MANAGED }
     }

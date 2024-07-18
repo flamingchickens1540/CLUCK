@@ -12,7 +12,7 @@ export async function getUserHoursBlocks(user: Prisma.MemberWhereUniqueInput): P
     }
     return [
         Blocks.Header().text('⏳ Your Hours'),
-        Blocks.Actions().elements(Elements.Button().text('Show Pending').actionId(ActionIDs.SHOW_PENDING_REQUESTS)),
+        Blocks.Actions().elements(Elements.Button().text('Show Pending').actionId(ActionIDs.SHOW_OWN_PENDING_REQUESTS)),
         Blocks.Section().fields('*Category*', '*Hours*'),
         Blocks.Divider(),
         Blocks.Section().fields('Lab', hours.lab.toFixed(1)),

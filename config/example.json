@@ -16,6 +16,9 @@
             "void": "CXXX",
             "approval": "DXXX",
             "certification_approval": "DXXX"
+        },
+        "users": {
+            "admins": ["UXXX"]
         }
     },
     "google": {

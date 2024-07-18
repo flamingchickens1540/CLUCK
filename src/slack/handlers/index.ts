@@ -8,11 +8,11 @@ import { handleOpenUserInfoModal } from './view/userinfo'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
-import { getPendingRequests } from '~slack/messages/pending_requests'
 import { handleGraphCommand } from '~slack/handlers/graph'
 import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/cmd/hours'
 import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
 import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
+import { handleOpenPendingRequestsModal, handleSendPendingRequests } from '~slack/handlers/view/pending_requests'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -23,7 +23,8 @@ export enum ActionIDs {
     REJECT = 'reject',
     OPEN_USERINFO_MODAL = 'open_settings_modal',
     OPEN_LOG_MODAL = 'open_log_modal',
-    SHOW_PENDING_REQUESTS = 'show_pending_requests',
+    OPEN_PENDING_REQUESTS_MODAL = 'open_pending_requests_modal',
+    SHOW_OWN_PENDING_REQUESTS = 'show_own_pending_requests',
     SEND_PENDING_REQUESTS = 'send_pending_requests',
     CERT_APPROVE = 'cert_approve',
     CERT_REJECT = 'cert_reject'
@@ -62,15 +63,9 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.OPEN_LOG_MODAL, handleOpenLogModal)
     app.action(ActionIDs.CERT_REJECT, handleCertReject)
     app.action(ActionIDs.CERT_APPROVE, handleCertApprove)
-    app.action(ActionIDs.SHOW_PENDING_REQUESTS, handleShowPendingHours)
-    app.action(ActionIDs.SEND_PENDING_REQUESTS, async ({ ack, client }) => {
-        await ack()
-        const msg = await getPendingRequests()
-        await client.chat.postMessage({
-            ...msg,
-            channel: config.slack.channels.approval
-        })
-    })
+    app.action(ActionIDs.SHOW_OWN_PENDING_REQUESTS, handleShowPendingHours)
+    app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequests)
+    app.action(ActionIDs.OPEN_PENDING_REQUESTS_MODAL, handleOpenPendingRequestsModal)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })

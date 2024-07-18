@@ -1,13 +1,14 @@
 import { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import { getRespondMessageModal } from '~slack/modals/respond'
+import { getRespondMessageModal } from '~slack/blocks/respond'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
 import logger from '~lib/logger'
 import { enum_HourLogs_type } from '@prisma/client'
 import { slack_client } from '~slack'
 import config from '~config'
-import { getHourSubmissionMessage } from '~slack/messages/new_request'
-import responses from '~slack/messages/responses'
+import { getHourSubmissionMessage } from '~slack/blocks/new_request'
+import responses from '~slack/blocks/responses'
+import { getAppHome } from '~slack/blocks/app_home'
 
 export const handleAcceptWithMessageButton: ActionMiddleware = async ({ ack, body, action, client, logger }) => {
     await ack()
@@ -79,6 +80,10 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
         await slack_client.chat.postMessage({
             ...dm,
             channel: log.Member.slack_id!
+        })
+        await slack_client.views.publish({
+            user_id: actor_slack_id,
+            view: await getAppHome(actor_slack_id)
         })
         return true
     } catch (err) {

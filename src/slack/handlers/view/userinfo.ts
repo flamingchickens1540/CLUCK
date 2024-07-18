@@ -1,5 +1,5 @@
 import type { ActionMiddleware } from '~slack/lib/types'
-import { getUserDataModal } from '~slack/modals/user_info'
+import { getUserDataModal } from '~slack/blocks/user_info'
 
 export const handleOpenUserInfoModal: ActionMiddleware = async ({ ack, client, body, logger }) => {
     await ack()
