@@ -8,11 +8,11 @@ import { handleOpenUserInfoModal } from './view/userinfo'
 import { handleVoidCommand } from './cmd/void'
 import { handleGetLoggedInCommand } from './cmd/loggedin'
 import config from '~config'
-import { handleGraphCommand } from '~slack/handlers/graph'
+import { handleGraphCommand } from '~slack/handlers/cmd/graph'
 import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/cmd/hours'
 import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
 import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
-import { handleOpenPendingRequestsModal, handleSendPendingRequests } from '~slack/handlers/view/pending_requests'
+import { handleSendPendingRequests } from '~slack/handlers/button/pending_requests'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -23,7 +23,6 @@ export enum ActionIDs {
     REJECT = 'reject',
     OPEN_USERINFO_MODAL = 'open_settings_modal',
     OPEN_LOG_MODAL = 'open_log_modal',
-    OPEN_PENDING_REQUESTS_MODAL = 'open_pending_requests_modal',
     SHOW_OWN_PENDING_REQUESTS = 'show_own_pending_requests',
     SEND_PENDING_REQUESTS = 'send_pending_requests',
     CERT_APPROVE = 'cert_approve',
@@ -51,8 +50,8 @@ export function registerSlackHandlers(app: App) {
     app.command(cmd_prefix + 'hours', handleShowHoursCommand)
     app.command(cmd_prefix + 'certify', handleCertifyCommand)
     app.shortcut('log_hours', handleLogShortcut)
-    //
-    // // Buttons
+
+    // Buttons
     app.action(ActionIDs.ACCEPT, getAcceptButtonHandler('external'))
     app.action(ActionIDs.ACCEPT_SUMMER, getAcceptButtonHandler('summer'))
     app.action(ActionIDs.ACCEPT_EVENT, getAcceptButtonHandler('event'))
@@ -65,17 +64,15 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.CERT_APPROVE, handleCertApprove)
     app.action(ActionIDs.SHOW_OWN_PENDING_REQUESTS, handleShowPendingHours)
     app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequests)
-    app.action(ActionIDs.OPEN_PENDING_REQUESTS_MODAL, handleOpenPendingRequestsModal)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
 
-    // // Modals
+    // Modal Submission
     app.view(ViewIDs.MODAL_REJECT, handleSubmitRejectModal)
     app.view(ViewIDs.MODAL_ACCEPT, handleSubmitAcceptModal)
     app.view(ViewIDs.MODAL_LOG, handleSubmitLogModal)
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
-    //
-    // // Events
+    // Events
     app.event('app_home_opened', handleAppHomeOpened)
 }
