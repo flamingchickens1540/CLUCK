@@ -1,4 +1,4 @@
-import { getLogModal } from '~slack/blocks/log'
+import { getLogModal } from '~slack/blocks/member/log'
 import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/submission'
 import responses from '~slack/blocks/responses'

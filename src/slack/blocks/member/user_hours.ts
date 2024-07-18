@@ -5,7 +5,7 @@ import { UndefinableArray } from 'slack-block-builder/dist/internal'
 import { ActionIDs } from '~slack/handlers'
 import prisma from '~lib/prisma'
 
-export async function getUserHoursBlocks(user: Prisma.MemberWhereUniqueInput): Promise<UndefinableArray<ViewBlockBuilder>> {
+export async function getUserHourSummaryBlocks(user: Prisma.MemberWhereUniqueInput): Promise<UndefinableArray<ViewBlockBuilder>> {
     const hours = await calculateHours(user)
     if (!hours) {
         return [Blocks.Header().text('No hours found')]
@@ -30,7 +30,7 @@ export async function getUserHoursBlocks(user: Prisma.MemberWhereUniqueInput): P
     ]
 }
 
-export async function getUserPendingHoursBlocks(user: Prisma.MemberWhereUniqueInput): Promise<ViewBlockBuilder[]> {
+export async function getUserPendingRequestBlocks(user: Prisma.MemberWhereUniqueInput): Promise<ViewBlockBuilder[]> {
     const hours = await prisma.hourLog.findMany({
         where: {
             Member: user,

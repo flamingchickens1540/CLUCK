@@ -4,7 +4,7 @@ import config from '~config'
 import { formatDuration } from '~slack/lib/messages'
 import { Blocks, Elements, Message } from 'slack-block-builder'
 import logger from '~lib/logger'
-import { HourSubmissionBlocksInput } from '~slack/blocks/new_request'
+import { HourSubmissionBlocksInput } from '~slack/blocks/admin/hour_submission'
 
 export async function getPendingHourSubmissionData(): Promise<HourSubmissionBlocksInput[]> {
     const pendingRequests = await prisma.hourLog.findMany({

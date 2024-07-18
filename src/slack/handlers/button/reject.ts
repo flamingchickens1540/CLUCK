@@ -1,11 +1,11 @@
 import type { AllMiddlewareArgs, SlackViewMiddlewareArgs, ViewSubmitAction } from '@slack/bolt'
 import type { ActionMiddleware } from '~slack/lib/types'
-import { getRespondMessageModal } from '~slack/blocks/respond'
+import { getRespondMessageModal } from '~slack/blocks/admin/respond'
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
 import { slack_client } from '~slack'
 import config from '~config'
-import { getHourSubmissionMessage } from '~slack/blocks/new_request'
+import { getHourSubmissionMessage } from '~slack/blocks/admin/hour_submission'
 import responses from '~slack/blocks/responses'
 import { getAppHome } from '~slack/blocks/app_home'
 

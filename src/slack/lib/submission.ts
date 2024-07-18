@@ -2,7 +2,7 @@ import prisma from '~lib/prisma'
 import { Prisma } from '@prisma/client'
 import config from '~config'
 import { slack_client } from '~slack'
-import { getHourSubmissionMessage } from '~slack/blocks/new_request'
+import { getHourSubmissionMessage } from '~slack/blocks/admin/hour_submission'
 import responses from '~slack/blocks/responses'
 
 export async function handleHoursRequest(slack_id: string, hours: number, activity: string) {

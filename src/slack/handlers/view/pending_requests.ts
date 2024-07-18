@@ -1,5 +1,5 @@
 import { ActionMiddleware } from '~slack/lib/types'
-import { getPendingRequestMessage } from '~slack/blocks/pending_requests'
+import { getPendingRequestMessage } from '~slack/blocks/admin/pending_requests'
 import config from '~config'
 
 export const handleSendPendingRequests: ActionMiddleware = async ({ ack, client, body }) => {
