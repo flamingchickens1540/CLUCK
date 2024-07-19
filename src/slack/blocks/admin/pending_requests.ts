@@ -33,7 +33,7 @@ export async function getPendingRequestMessage({ team_id, app_id }: { team_id: s
             })
             .catch(() => null)
         if (!permalink) {
-            logger.warn('Could not find slack message for log', log.id)
+            logger.warn({ id: log.id }, 'Could not find slack message for log')
             continue
         }
         output.blocks(

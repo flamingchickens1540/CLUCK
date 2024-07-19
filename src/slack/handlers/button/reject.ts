@@ -34,23 +34,29 @@ export const handleRejectButton: ActionMiddleware = async ({ ack, body, action, 
     }
 }
 
-export async function handleSubmitRejectModal({ ack, body, view, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
+export async function handleSubmitRejectModal({ respond, ack, body, view, logger }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs) {
     await ack()
+
+    const response = body.view.state.values?.message?.input?.value
+
     const log = await prisma.hourLog.update({
         where: { id: safeParseInt(view.private_metadata) },
-        data: { state: 'cancelled' },
+        data: { state: 'cancelled', response },
         include: { Member: { select: { slack_id: true } } }
     })
     if (!log) {
+        await respond({ response_type: 'ephemeral', text: 'Could not find request info' })
         logger.error('Could not find request info ', safeParseInt(view.private_metadata))
     }
+
     try {
         const message = getHourSubmissionMessage({
             slack_id: log.Member.slack_id!,
             activity: log.message!,
             hours: log.duration!.toNumber(),
             request_id: log.id.toString(),
-            state: 'rejected'
+            state: 'rejected',
+            response
         })
         await slack_client.chat.update({
             channel: config.slack.channels.approval,
@@ -61,8 +67,9 @@ export async function handleSubmitRejectModal({ ack, body, view, logger }: Slack
         const dm = responses.submissionRejectedDM({
             slack_id: body.user.id,
             hours: log.duration!.toNumber(),
-            activity: log.message ?? 'Unknown',
-            message: body.view.state.values.message.input.value ?? 'Unknown'
+            activity: log.message!,
+            message: response ?? 'Unknown',
+            request_id: log.id
         })
         await slack_client.chat.postMessage({
             ...dm,
@@ -73,6 +80,7 @@ export async function handleSubmitRejectModal({ ack, body, view, logger }: Slack
             view: await getAppHome(body.user.id)
         })
     } catch (err) {
-        logger.error('Failed to handle reject modal:\n' + err)
+        await respond({ response_type: 'ephemeral', text: 'Failed to handle reject modal' })
+        logger.error({ err }, 'Failed to handle reject modal')
     }
 }

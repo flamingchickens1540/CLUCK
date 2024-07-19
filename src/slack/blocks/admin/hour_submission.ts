@@ -4,11 +4,23 @@ import { ActionIDs } from '~slack/handlers'
 import { enum_HourLogs_type } from '@prisma/client'
 import { toTitleCase } from '~lib/util'
 
+export const getSubmissionContextBlock = ({ request_id, state, type }: { request_id: string; state: 'pending' | 'approved' | 'rejected'; type?: enum_HourLogs_type }) => {
+    switch (state) {
+        case 'pending':
+            return Blocks.Context().elements(`${request_id} | ⏳ Submitted ${new Date().toLocaleString()}`)
+        case 'approved':
+            return Blocks.Context().elements(`${request_id} | ✅ Approved ${new Date().toLocaleString()} | ${toTitleCase(type ?? 'external')}`)
+        case 'rejected':
+            return Blocks.Context().elements(`${request_id} | ❌ Rejected ${new Date().toLocaleString()}`)
+    }
+}
+
 export type HourSubmissionBlocksInput = {
     request_id: string
     slack_id: string
     hours: number
     activity: string
+    response?: string | null
     state: 'pending' | 'approved' | 'rejected'
     type?: enum_HourLogs_type
 }
@@ -18,6 +30,9 @@ export function getHourSubmissionBlocks(v: HourSubmissionBlocksInput) {
         Blocks.Header().text('Time Submission'),
         Blocks.Section().text(`>>>*<@${v.slack_id}>* submitted *${formatDuration(v.hours)}* for activity\n\`\`\`${sanitizeCodeblock(v.activity)}\`\`\``)
     )
+    if (v.response) {
+        blocks.push(Blocks.Section().text(`>>>*Response:*\n\`\`\`${sanitizeCodeblock(v.response)}\`\`\``))
+    }
     if (v.state == 'pending') {
         blocks.push(
             Blocks.Actions().elements(
@@ -27,14 +42,11 @@ export function getHourSubmissionBlocks(v: HourSubmissionBlocksInput) {
                 Elements.Button().text('📆').actionId(ActionIDs.ACCEPT_EVENT).value(v.request_id),
                 Elements.Button().text('🔨').actionId(ActionIDs.ACCEPT_LAB).value(v.request_id),
                 Elements.Button().text('Accept w/ Message').actionId(ActionIDs.ACCEPT_WITH_MSG).value(v.request_id)
-            ),
-            Blocks.Context().elements(`${v.request_id} | ⏳ Submitted ${new Date().toLocaleString()}`)
+            )
         )
-    } else if (v.state == 'approved') {
-        blocks.push(Blocks.Context().elements(`${v.request_id} | ✅ Approved as ${toTitleCase(v.type ?? 'external')} ${new Date().toLocaleString()}`))
-    } else {
-        blocks.push(Blocks.Context().elements(`${v.request_id} | ❌ Rejected ${new Date().toLocaleString()}`))
     }
+    blocks.push(getSubmissionContextBlock(v))
+
     return blocks
 }
 

@@ -3,7 +3,7 @@ import pino, { LevelWithSilentOrString, LogFn } from 'pino'
 import pretty from 'pino-pretty'
 
 const logger = pino(
-    { level: 'trace' },
+    { level: 'info' },
     pretty({
         colorize: true,
         levelFirst: false,
@@ -49,7 +49,14 @@ export const createBoltLogger = (): BoltLogger => ({
 function logSlack(logFn: LogFn, msgs: unknown[]) {
     if (msgs.length === 0) {
         return
+    } else if (msgs.length == 1) {
+        logFn({ name: 'slack' }, msgs[0] as string)
+    } else {
+        try {
+            logFn({ name: 'slack', ...(msgs[0] as object) }, msgs.slice(1).join(', '))
+        } catch {
+            logFn({ name: 'slack' }, msgs.join(', '))
+        }
     }
-    logFn({ name: 'slack' }, msgs.join(' '))
 }
 export default logger

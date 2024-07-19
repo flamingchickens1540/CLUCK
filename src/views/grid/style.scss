@@ -136,6 +136,8 @@ body[data-gridstyle='void'] {
 
     left: 0;
     right: 0;
+    display: inline-block;
+
     &.labelTop {
         top: 0;
         vertical-align: top;
@@ -145,7 +147,6 @@ body[data-gridstyle='void'] {
         vertical-align: bottom;
     }
 
-    display: inline-block;
     &.labelLeft {
         // left
         right: auto;

@@ -26,7 +26,7 @@ export async function handleHoursRequest(slack_id: string, hours: number, activi
     const msg = await slack_client.chat.postMessage({ channel: config.slack.channels.approval, text: message.text, blocks: message.blocks })
 
     await slack_client.chat.postMessage({
-        ...responses.submissionLoggedDM({ hours, activity }),
+        ...responses.submissionLoggedDM({ hours, activity, id: entry.id }),
         channel: slack_id
     })
 

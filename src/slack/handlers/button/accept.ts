@@ -17,7 +17,7 @@ export const handleAcceptWithMessageButton: ActionMiddleware = async ({ ack, bod
         select: { id: true, message: true, duration: true, Member: { select: { first_name: true } } }
     })
     if (!requestInfo) {
-        logger.error('Could not find request info')
+        logger.error({ action, name: 'handleAcceptWithMessageButton' }, 'Could not find request info')
         return
     }
     try {
@@ -31,30 +31,35 @@ export const handleAcceptWithMessageButton: ActionMiddleware = async ({ ack, bod
             }).buildToObject()
         })
     } catch (err) {
-        logger.error('Failed to handle accept button:\n' + err)
+        logger.error({ err, info: requestInfo }, 'Failed to handle accept button')
     }
 }
 
 export const handleSubmitAcceptModal: ViewMiddleware = async ({ ack, body, view }) => {
     await ack()
-    await handleAccept(safeParseInt(view.private_metadata) ?? -1, body.user.id, body.view.state.values.message.input.value as enum_HourLogs_type)
+    await handleAccept(
+        safeParseInt(view.private_metadata) ?? -1,
+        body.user.id,
+        body.view.state.values.type_selector.selector.selected_option?.value as enum_HourLogs_type,
+        body.view.state.values.message.input.value as string
+    )
 }
 
 export function getAcceptButtonHandler(prefix: enum_HourLogs_type): ActionMiddleware {
     return async ({ ack, action, body }) => {
         await ack()
-        await handleAccept(safeParseInt(action.value) ?? -1, body.user.id, prefix)
+        await handleAccept(safeParseInt(action.value) ?? -1, body.user.id, prefix, null)
     }
 }
 
-async function handleAccept(request_id: number, actor_slack_id: string, type: enum_HourLogs_type) {
+async function handleAccept(request_id: number, actor_slack_id: string, type: enum_HourLogs_type, response: string | null) {
     const log = await prisma.hourLog.update({
         where: { id: request_id },
-        data: { state: 'complete', type },
+        data: { state: 'complete', type, response },
         include: { Member: { select: { slack_id: true } } }
     })
     if (!log) {
-        logger.error('Could not find request info ', request_id)
+        logger.error({ request_id }, 'Could not find request info')
         return false
     }
     try {
@@ -64,6 +69,7 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
             hours: log.duration!.toNumber(),
             request_id: request_id.toString(),
             state: 'approved',
+            response,
             type
         })
         await slack_client.chat.update({
@@ -76,6 +82,8 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
             slack_id: actor_slack_id,
             hours: log.duration!.toNumber(),
             activity: log.message!,
+            message: log.response,
+            request_id,
             type
         })
         await slack_client.chat.postMessage({
@@ -88,7 +96,7 @@ async function handleAccept(request_id: number, actor_slack_id: string, type: en
         })
         return true
     } catch (err) {
-        logger.error('Failed to handle accept modal:\n' + err)
+        logger.error({ err, log }, 'Failed to handle accept modal')
         return false
     }
 }

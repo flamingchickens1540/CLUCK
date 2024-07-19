@@ -73,6 +73,7 @@ model HourLog {
   type      enum_HourLogs_type
   state     enum_HourLogs_state
   message   String?             @db.VarChar(2000)
+  response  String?             @db.VarChar(2000)
   slack_ts  String?             @db.VarChar()
   createdAt DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt DateTime            @updatedAt @db.Timestamptz(6)
