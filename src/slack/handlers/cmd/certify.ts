@@ -4,6 +4,8 @@ import { ActionMiddleware, CommandMiddleware, ViewMiddleware } from '~slack/lib/
 import prisma from '~lib/prisma'
 import { safeParseInt } from '~lib/util'
 import { scheduleCertAnnouncement } from '~tasks/certs'
+import { slack_client } from '~slack'
+import { getAppHome } from '~slack/blocks/app_home'
 
 export const handleCertifyCommand: CommandMiddleware = async ({ command, ack, client }) => {
     await ack()
@@ -34,7 +36,7 @@ export const handleSubmitCertifyModal: ViewMiddleware = async ({ ack, body, view
     }
 }
 
-export const handleCertReject: ActionMiddleware = async ({ ack, action, client }) => {
+export const handleCertReject: ActionMiddleware = async ({ ack, action, client, body }) => {
     await ack()
     const cert_req_id = safeParseInt(action.value)
     if (cert_req_id == null) {
@@ -48,14 +50,20 @@ export const handleCertReject: ActionMiddleware = async ({ ack, action, client }
             id: true,
             slack_ts: true,
             Cert: true,
-            Member: true
+            Member: true,
+            Requester: true,
+            state: true
         }
     })
 
-    await client.chat.update(getCertRequestMessage({ slack_id: null }, req, req.Cert, 'rejected', req.slack_ts!))
+    await client.chat.update(getCertRequestMessage(req))
+    await slack_client.views.publish({
+        user_id: body.user.id,
+        view: await getAppHome(body.user.id)
+    })
 }
 
-export const handleCertApprove: ActionMiddleware = async ({ ack, action, client }) => {
+export const handleCertApprove: ActionMiddleware = async ({ ack, action, client, body }) => {
     await ack()
     const cert_req_id = safeParseInt(action.value)
     if (cert_req_id == null) {
@@ -69,7 +77,9 @@ export const handleCertApprove: ActionMiddleware = async ({ ack, action, client 
             id: true,
             slack_ts: true,
             Cert: true,
-            Member: true
+            Member: true,
+            Requester: true,
+            state: true
         }
     })
     if (!req) {
@@ -96,6 +106,10 @@ export const handleCertApprove: ActionMiddleware = async ({ ack, action, client 
             // If the cert doesn't exist, that's fine
         }
     }
-    await client.chat.update(getCertRequestMessage({ slack_id: null }, req, req.Cert, 'approved', req.slack_ts!))
+    await client.chat.update(getCertRequestMessage(req))
     scheduleCertAnnouncement()
+    await slack_client.views.publish({
+        user_id: body.user.id,
+        view: await getAppHome(body.user.id)
+    })
 }

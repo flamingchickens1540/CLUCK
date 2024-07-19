@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { Bits, Blocks, Elements, Message, Modal, OptionGroupBuilder } from 'slack-block-builder'
+import { Bits, BlockBuilder, Blocks, Elements, Message, Modal, OptionGroupBuilder } from 'slack-block-builder'
 import { ActionIDs, ViewIDs } from '~slack/handlers'
 import prisma from '~lib/prisma'
 import config from '~config'
@@ -52,50 +52,61 @@ export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
         .buildToObject()
 }
 
-export function getCertRequestMessage(
-    giving_member: { slack_id: null | string },
-    r: { id: number; Member: { full_name: string; slack_id: string | null; slack_photo_small: string | null; fallback_photo: string | null } },
-    cert: { label: string },
-    state: 'pending' | 'approved' | 'rejected',
-    ts?: string
-) {
-    const msg = Message().channel(config.slack.channels.certification_approval).ts(ts)
-
+export function getCertRequestBlocks(r: {
+    id: number
+    state: 'pending' | 'approved' | 'rejected'
+    Requester: { slack_id: string | null }
+    Member: { full_name: string; slack_id: string | null; slack_photo_small: string | null; fallback_photo: string | null }
+    Cert: { label: string }
+}): { blocks: BlockBuilder[]; text: string } {
     let text: string
     let footer: string
-    switch (state) {
+    const blocks: BlockBuilder[] = []
+    switch (r.state) {
         case 'approved':
-            text = `Approved \`${cert.label}\` cert for <@${r.Member.slack_id}>`
+            text = `Approved \`${r.Cert.label}\` cert for <@${r.Member.slack_id}>`
             footer = '✅ Approved'
             break
         case 'rejected':
-            text = `Rejected \`${cert.label}\` cert for <@${r.Member.slack_id}>`
+            text = `Rejected \`${r.Cert.label}\` cert for <@${r.Member.slack_id}>`
             footer = '❌ Rejected'
             break
         default:
-            text = `\`${cert.label}\` cert requested for <@${r.Member.slack_id}> by <@${giving_member.slack_id}>`
+            text = `\`${r.Cert.label}\` cert requested for <@${r.Member.slack_id}> by <@${r.Requester.slack_id}>`
             footer = '⏳ Submitted'
     }
-    msg.text(text)
-    msg.blocks(Blocks.Section().text(text))
+    blocks.push(Blocks.Section().text(text))
 
-    if (state == 'pending') {
-        msg.blocks(
+    if (r.state == 'pending') {
+        blocks.push(
             Blocks.Actions().elements(
                 Elements.Button().primary().text('Approve').actionId(ActionIDs.CERT_APPROVE).value(r.id.toString()),
                 Elements.Button().danger().text('Reject').actionId(ActionIDs.CERT_REJECT).value(r.id.toString())
             )
         )
     }
-    msg.blocks(
+    blocks.push(
         Blocks.Context().elements(
             Elements.Img()
                 .altText(r.Member.full_name)
                 .imageUrl(r.Member.slack_photo_small ?? r.Member.fallback_photo ?? ''),
             `${r.id} | ${footer} ${new Date().toLocaleString()}`
-        ),
-        Blocks.Divider()
+        )
     )
+    return { blocks, text }
+}
 
+export function getCertRequestMessage(r: {
+    id: number
+    state: 'pending' | 'approved' | 'rejected'
+    slack_ts: string | null
+    Requester: { slack_id: string | null }
+    Member: { full_name: string; slack_id: string | null; slack_photo_small: string | null; fallback_photo: string | null }
+    Cert: { label: string }
+}) {
+    const msg = Message().channel(config.slack.channels.certification_approval).ts(r.slack_ts!)
+
+    const { blocks, text } = getCertRequestBlocks(r)
+    msg.text(text).blocks(blocks)
     return msg.buildToObject()
 }

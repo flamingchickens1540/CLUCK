@@ -5,13 +5,22 @@ import { getUserHourSummaryBlocks } from '~slack/blocks/member/user_hours'
 import { getUserCertBlocks } from '~slack/blocks/member/user_certs'
 import { Blocks, Elements, HomeTab } from 'slack-block-builder'
 import config from '~config'
+import { getCertRequestBlocks } from '~slack/blocks/certify'
+import prisma from '~lib/prisma'
 
 export async function getAppHome(user_id: string) {
     const homeTab = HomeTab()
     if (config.slack.users.admins.includes(user_id)) {
-        const requests = await getPendingHourSubmissionData()
+        const pending_requests = await getPendingHourSubmissionData()
+        const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
+
         homeTab.blocks(
-            requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]),
+            Blocks.Header().text('Pending Hour Submissions'),
+            pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]),
+            Blocks.Divider(),
+            Blocks.Header().text('Pending Certification Requests'),
+            pending_certs.flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]),
+
             Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString())
         )
     } else {

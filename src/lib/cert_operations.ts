@@ -64,11 +64,15 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
                 })),
             select: {
                 id: true,
-                Member: { select: { slack_id: true, slack_photo_small: true, fallback_photo: true, full_name: true } }
+                slack_ts: true,
+                Cert: true,
+                Member: true,
+                Requester: true,
+                state: true
             }
         })
         for (const r of resp) {
-            const msg = await slack_client.chat.postMessage(getCertRequestMessage(giving_member, r, cert, 'pending'))
+            const msg = await slack_client.chat.postMessage(getCertRequestMessage(r))
             await prisma.memberCertRequest.update({ where: { id: r.id }, data: { slack_ts: msg.ts } })
         }
     })

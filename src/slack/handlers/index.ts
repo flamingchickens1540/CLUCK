@@ -75,4 +75,28 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
+
+    app.action(/./, async ({ body, logger, action }) => {
+        const details: Record<string, string> = {
+            type: body.type,
+            user: body.user.id
+        }
+        if ('value' in action) {
+            details.value = action.value
+        }
+        if ('action_id' in action) {
+            details.action_id = action.action_id
+        }
+        logger.debug(details, 'Slack action triggered')
+    })
+
+    app.command(/./, async ({ body, logger, command }) => {
+        const details: Record<string, string> = {
+            type: body.type,
+            user: body.user.id,
+            command: command.command,
+            text: command.text
+        }
+        logger.debug(details, 'Slack command triggered')
+    })
 }

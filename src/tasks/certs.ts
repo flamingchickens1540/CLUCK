@@ -31,14 +31,16 @@ export async function announceNewCerts() {
             slack_id: true,
             first_name: true,
             MemberCerts: {
-                where: { announced: false },
-                select: { Cert: { select: { label: true } } }
+                select: { announced: true, Cert: { select: { label: true } } }
             }
         }
     })
     logger.debug({ toAnnounce }, 'Announcing new certs')
     for (const member of toAnnounce) {
         for (const cert of member.MemberCerts) {
+            if (cert.announced) {
+                continue
+            }
             let message = congratsMessages[Math.floor(Math.random() * congratsMessages.length)] // get random message
             message = message.replace('@', member.slack_id == null ? `*${member.first_name}*` : `<@${member.slack_id}>`) // set user mention
             message = message.replace('{}', `*${cert.Cert.label}*`) // set cert name in *bold*
