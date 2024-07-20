@@ -2,8 +2,8 @@ import config from '~config'
 import logger from '~lib/logger'
 import { WebClient } from '@slack/web-api'
 
-const token = config.slack.app.user_token
-const profile_client: WebClient | null = token ? new WebClient(token) : null
+const token = config.slack.app.user_token ?? config.slack.app.bot_token
+export const profile_client: WebClient = new WebClient(token)
 
 export async function setProfileAttribute(user: string, field: keyof typeof config.slack.profile, value: string): Promise<boolean> {
     if (!token) {

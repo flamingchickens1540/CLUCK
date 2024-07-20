@@ -50,9 +50,35 @@ router
         return c.json(await prisma.member.update({ data, where: { email: id } }))
     })
 
-router.get('/admin/departments', async (c) => {
-    return c.json(await prisma.department.findMany())
-})
+router
+    .get('/admin/departments', async (c) => {
+        return c.json(await prisma.department.findMany())
+    })
+    .put(async (c) => {
+        const data = (await c.req.json()) as Partial<Prisma.DepartmentUpdateInput> & { id: string }
+        try {
+            return c.json(await prisma.department.update({ data, where: { id: data.id } }))
+        } catch (err) {
+            logger.warn({ msg: 'Error on PUT /admin/departments', err, data })
+            return c.json({ error: err }, 400)
+        }
+    })
+    .post(async (c) => {
+        const data = (await c.req.json()) as Prisma.DepartmentCreateInput
+        if (data.id == null || data.name == null) {
+            return c.json({ error: 'Invalid data' }, 400)
+        }
+        data.slack_group = null // Will be created automatically
+        try {
+            return c.json({
+                data: await prisma.department.create({ data }),
+                success: true
+            })
+        } catch (err) {
+            logger.warn({ msg: 'Error on POST /admin/departments', err, data })
+            return c.json({ error: err }, 400)
+        }
+    })
 
 router
     .get('/admin/certs', async (c) => {

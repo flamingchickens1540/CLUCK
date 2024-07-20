@@ -12,7 +12,8 @@ fs.stat('./public').catch(async () => {
 const views: Record<string, string> = {
     grid: '/grid/',
     admin_members: '/admin/members/',
-    admin_certs: '/admin/certs/'
+    admin_certs: '/admin/certs/',
+    admin_departments: '/admin/departments/'
 }
 
 const contexts: esbuild.BuildContext[] = []
@@ -58,9 +59,9 @@ const watch = process.argv.includes('--watch')
 // )
 if (watch) {
     logger.info('Watching...')
-    await contexts[0].watch({})
-    await contexts[1].watch({})
-    await contexts[2].watch({})
+    for (const context of contexts) {
+        await context.watch({})
+    }
     logger.info('Done...')
 } else {
     logger.info('Building...')
