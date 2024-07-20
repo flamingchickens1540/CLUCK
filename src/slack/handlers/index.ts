@@ -13,6 +13,7 @@ import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/
 import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
 import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
 import { handleSendPendingRequests } from '~slack/handlers/button/pending_requests'
+import { handleDepartmentsCommand, handleDepartmentsModalSubmit } from '~slack/handlers/cmd/departments'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -33,7 +34,8 @@ export enum ViewIDs {
     MODAL_REJECT = 'reject_modal',
     MODAL_ACCEPT = 'accept_modal',
     MODAL_LOG = 'time_submission',
-    MODAL_CERTIFY = 'certify_modal'
+    MODAL_CERTIFY = 'certify_modal',
+    MODAL_DEPARTMENTS = 'departments_modal'
 }
 
 export function registerSlackHandlers(app: App) {
@@ -49,6 +51,7 @@ export function registerSlackHandlers(app: App) {
     app.command(cmd_prefix + 'loggedin', handleGetLoggedInCommand)
     app.command(cmd_prefix + 'hours', handleShowHoursCommand)
     app.command(cmd_prefix + 'certify', handleCertifyCommand)
+    app.command(cmd_prefix + 'departments', handleDepartmentsCommand)
     app.shortcut('log_hours', handleLogShortcut)
 
     // Buttons
@@ -73,13 +76,14 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_ACCEPT, handleSubmitAcceptModal)
     app.view(ViewIDs.MODAL_LOG, handleSubmitLogModal)
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
+    app.view(ViewIDs.MODAL_DEPARTMENTS, handleDepartmentsModalSubmit)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
 
     app.action(/./, async ({ body, logger, action }) => {
         const details: Record<string, string> = {
-            type: body.type,
-            user: body.user.id
+            type: body?.type,
+            user: body?.user?.id
         }
         if ('value' in action) {
             details.value = action.value
@@ -92,10 +96,10 @@ export function registerSlackHandlers(app: App) {
 
     app.command(/./, async ({ body, logger, command }) => {
         const details: Record<string, string> = {
-            type: body.type,
-            user: body.user.id,
-            command: command.command,
-            text: command.text
+            type: body?.type,
+            user: body?.user?.id,
+            command: command?.command,
+            text: command?.text
         }
         logger.debug(details, 'Slack command triggered')
     })

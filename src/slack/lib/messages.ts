@@ -21,7 +21,9 @@ export function formatDuration(hrs: number, mins?: number): string {
 }
 
 export function formatList(names: string[]): string {
-    if (names.length === 1) {
+    if (names.length === 0) {
+        return ''
+    } else if (names.length === 1) {
         return names[0]
     } else if (names.length === 2) {
         return `${names[0]} and ${names[1]}`

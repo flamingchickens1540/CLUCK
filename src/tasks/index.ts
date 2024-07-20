@@ -2,11 +2,12 @@ import { updateSheet } from '~spreadsheet'
 import { syncSlackMembers } from '~tasks/slack'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 import logger from '~lib/logger'
+import { scheduleUpdateSlackUsergroups } from '~tasks/slack_groups'
 
 const tasks: NodeJS.Timeout[] = []
 
 type Func = (() => void) | (() => Promise<void>)
-function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean) {
+function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, offset_seconds: number) {
     const cb = async () => {
         try {
             await task()
@@ -19,14 +20,16 @@ function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean) 
     if (runOnInit) {
         cb()
     }
-    tasks.push(setInterval(cb, interval_seconds * 1000))
+    setTimeout(() => tasks.push(setInterval(cb, interval_seconds * 1000)), offset_seconds * 1000)
 }
 
 export function scheduleTasks() {
+    // Offset is to combat Slack's rate limits
     const isProd = process.env.NODE_ENV === 'prod'
-    scheduleTask(updateSheet, 60 * 30, isProd) // Update spreadsheet every half-hour
-    scheduleTask(syncSlackMembers, 60 * 60, isProd) // Update slack members every hour, can also be run manually on admin dashboard
-    scheduleTask(scheduleCertAnnouncement, 60 * 60, true) // Just in case the cert announcement isn't automatically run on changes
+    scheduleTask(updateSheet, 60 * 30, isProd, 0) // Update spreadsheet every half-hour
+    scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // Update slack members every hour, can also be run manually on admin dashboard
+    scheduleTask(scheduleCertAnnouncement, 60 * 60, true, 60) // Just in case the cert announcement isn't automatically run on changes
+    scheduleTask(scheduleUpdateSlackUsergroups, 60 * 60, true, 120) // Just in case
 }
 
 export function cancelTasks() {

@@ -3,7 +3,7 @@ import logger from '~lib/logger'
 import AsyncLock from 'async-lock'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
-import { Member as SlackMember } from '@slack/web-api/dist/response/UsersListResponse'
+import { Member as SlackMember } from '@slack/web-api/dist/types/response/UsersListResponse'
 
 const lock = new AsyncLock({ maxExecutionTime: 3000, maxPending: 0 })
 
