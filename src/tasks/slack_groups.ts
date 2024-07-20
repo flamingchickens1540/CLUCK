@@ -13,6 +13,9 @@ export function scheduleUpdateSlackUsergroups() {
 }
 
 async function updateSlackUsergroups() {
+    if (profile_client == null) {
+        return
+    }
     const departments = await prisma.department.findMany({ include: { Members: { select: { Member: { select: { slack_id: true } } } } } })
     for (const department of departments) {
         if (department.slack_group == null) {

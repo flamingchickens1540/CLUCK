@@ -1,0 +1,18 @@
+{
+    "display_information": {
+        "name": "CLUCK User Updater",
+        "description": "A Slack app that updates user profiles with the latest information from the CLUCK database.",
+        "background_color": "#2b323d"
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": ["users:read"],
+            "user": ["users.profile:read", "users.profile:write", "usergroups:write"]
+        }
+    },
+    "settings": {
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": true,
+        "token_rotation_enabled": false
+    }
+}
