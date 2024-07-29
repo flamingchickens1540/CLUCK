@@ -40,10 +40,12 @@ export const handleDepartmentsModalSubmit: ViewMiddleware = async ({ ack, body, 
     const depts = await prisma.department.findMany({ where: { id: { in: department_ids } }, select: { slack_group: true, name: true } })
     await setProfileAttribute(body.user.id, 'department', formatList(depts.map((d) => d.name)) || 'None')
 
-    await client.chat.postEphemeral({
-        user: body.user.id,
-        channel: body.view.private_metadata,
-        text: 'Successfully updated your departments: ' + formatList(depts.map((d) => d.name)) || 'None'
-    })
+    await client.chat
+        .postEphemeral({
+            user: body.user.id,
+            channel: body.view.private_metadata,
+            text: 'Successfully updated your departments: ' + formatList(depts.map((d) => d.name)) || 'None'
+        })
+        .catch(() => {})
     scheduleUpdateSlackUsergroups()
 }

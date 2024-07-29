@@ -71,16 +71,18 @@ async function seedDepartmentAssociations() {
     const members = await prisma.member.findMany()
     const input: Prisma.DepartmentAssociationCreateManyInput[] = []
     members.forEach((member) => {
-        const dept = departments[Math.floor(Math.random() * departments.length)]
-        input.push({
-            member_id: member.email,
-            department_id: dept.id
-        })
-        const dept2 = departments[Math.floor(Math.random() * departments.length)]
-        input.push({
-            member_id: member.email,
-            department_id: dept2.id
-        })
+        if (member.slack_id == null) {
+            const dept = departments[Math.floor(Math.random() * departments.length)]
+            input.push({
+                member_id: member.email,
+                department_id: dept.id
+            })
+            const dept2 = departments[Math.floor(Math.random() * departments.length)]
+            input.push({
+                member_id: member.email,
+                department_id: dept2.id
+            })
+        }
     })
     await prisma.departmentAssociation.createMany({ data: input })
 }

@@ -79,7 +79,6 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_DEPARTMENTS, handleDepartmentsModalSubmit)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
-
     app.action(/./, async ({ body, logger, action }) => {
         const details: Record<string, string> = {
             type: body?.type,

@@ -6,13 +6,16 @@
     },
     "oauth_config": {
         "scopes": {
-            "bot": ["users:read"],
-            "user": ["users.profile:read", "users.profile:write", "usergroups:write"]
+            "user": [
+                "usergroups:write",
+                "users.profile:read",
+                "users.profile:write"
+            ]
         }
     },
     "settings": {
         "org_deploy_enabled": false,
-        "socket_mode_enabled": true,
+        "socket_mode_enabled": false,
         "token_rotation_enabled": false
     }
 }

@@ -1,15 +1,21 @@
 import { Logger as BoltLogger, LogLevel as BoltLogLevel } from '@slack/logger'
 import pino, { LevelWithSilentOrString, LogFn } from 'pino'
-import pretty from 'pino-pretty'
 
-const logger = pino(
-    { level: 'info' },
-    pretty({
-        colorize: true,
-        levelFirst: false,
-        ignore: 'pid,hostname'
-    })
-)
+const transport = pino.transport({
+    targets: [
+        {
+            level: 'debug',
+            target: 'pino-pretty',
+            options: {
+                colorize: true,
+                levelFirst: false,
+                ignore: 'pid,hostname'
+            }
+        }
+    ]
+})
+
+const logger = pino({ level: 'trace' }, transport)
 
 const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
     fatal: BoltLogLevel.ERROR,
@@ -33,7 +39,7 @@ export const createBoltLogger = (): BoltLogger => ({
         return
     },
     debug(...msgs) {
-        logSlack(logger.debug.bind(logger), msgs)
+        logSlack(logger.trace.bind(logger), msgs)
     },
     info(...msgs) {
         logSlack(logger.info.bind(logger), msgs)
