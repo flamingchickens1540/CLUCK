@@ -41,6 +41,9 @@ router
                     slack_photo_small: true,
                     fallback_photo: true,
                     MeetingAttendances: true
+                },
+                where: {
+                    active: true
                 }
             })
         ).map((member) => {
@@ -147,7 +150,7 @@ router
             meeting_id = safeParseInt(meeting_id_str)
         }
         if (meeting_id) {
-            const members = await prisma.member.findMany({ select: { email: true } })
+            const members = await prisma.member.findMany({ select: { email: true }, where: { active: true } })
             await prisma.$transaction([
                 prisma.meetingAttendanceEntry.deleteMany({
                     where: {

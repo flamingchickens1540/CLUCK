@@ -23,6 +23,9 @@ router.get('/members', requireReadAPI, async (c) => {
             slack_photo_small: true,
             fallback_photo: true
         },
+        where: {
+            active: true
+        },
         orderBy: { full_name: 'asc' }
     })
     const resp: APIMember[] = members.map((member) => ({

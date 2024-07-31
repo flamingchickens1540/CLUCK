@@ -10,7 +10,8 @@ router
     .get('/admin/members', async (c) => {
         return c.json(
             await prisma.member.findMany({
-                orderBy: { full_name: 'asc' }
+                orderBy: { full_name: 'asc' },
+                where: { active: true }
             })
         )
     })

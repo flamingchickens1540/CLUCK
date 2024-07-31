@@ -17,7 +17,7 @@ router
     .get('/', async (c) => {
         const certs = await prisma.cert.findMany({ orderBy: [{ department: 'asc' }, { id: 'asc' }], select: { id: true, label: true, department: true, isManager: true } })
         const colcount = certs.length + 1
-        const rows = (await prisma.member.findMany({ orderBy: { full_name: 'asc' }, select: { email: true, full_name: true, MemberCerts: { select: { cert_id: true } } } })).map((member, rowI) => {
+        const rows = (await prisma.member.findMany({ where: { active: true }, orderBy: { full_name: 'asc' }, select: { email: true, full_name: true, MemberCerts: { select: { cert_id: true } } } })).map((member, rowI) => {
             let colorI = -1
             const certSet = new Set(member.MemberCerts.map((cert) => cert.cert_id))
             return (
