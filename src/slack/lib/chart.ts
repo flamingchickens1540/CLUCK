@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import QuickChart from 'quickchart-js'
 import prisma from '~lib/prisma'
+import { season_start_date } from '~config'
 
 class HourAggregator {
     private readonly group_size: number
@@ -55,13 +56,11 @@ export async function createHourChartForUsers(userIds: string[]) {
 }
 
 export async function createHourChartForTeam(team: 'primary' | 'junior' | 'all') {
-    let where: Prisma.HourLogWhereInput = {}
+    const where: Prisma.HourLogWhereInput = {
+        time_out: { gte: season_start_date }
+    }
     if (team != 'all') {
-        where = {
-            Member: {
-                team
-            }
-        }
+        where.Member = { team }
     }
     const hourLogs = await prisma.hourLog.findMany({
         where,

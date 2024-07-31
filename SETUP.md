@@ -2,6 +2,8 @@
 
 ## Config
 
+Set the `start_date` field to the date you want to start tracking current hour information from. This should be the start of the current season, and is used to calculate which hour logs count towards totals. It can be in any format accepted by the [Javascript Date constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date)
+
 Make a copy of the `./config/example.json` file as `./config/yourenvlabel.json` and adjust the fields as needed. You will need to set the environment variable `NODE_ENV='yourenvlabel'` when running to load the correct config file
 
 Create a `.env` file in the base folder, and in it set the following DATABASE_URL variable for Prisma
