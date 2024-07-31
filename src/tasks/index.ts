@@ -28,8 +28,8 @@ export function scheduleTasks() {
     const isProd = process.env.NODE_ENV === 'prod'
     scheduleTask(updateSheet, 60 * 30, isProd, 0) // Update spreadsheet every half-hour
     scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // Update slack members every hour, can also be run manually on admin dashboard
-    scheduleTask(scheduleCertAnnouncement, 60 * 60, true, 60) // Just in case the cert announcement isn't automatically run on changes
-    scheduleTask(scheduleUpdateSlackUsergroups, 60 * 60, true, 120)
+    scheduleTask(scheduleCertAnnouncement, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
+    scheduleTask(scheduleUpdateSlackUsergroups, 60 * 60, isProd, 120)
 }
 
 export function cancelTasks() {

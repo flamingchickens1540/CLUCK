@@ -6,11 +6,7 @@
     },
     "oauth_config": {
         "scopes": {
-            "user": [
-                "usergroups:write",
-                "users.profile:read",
-                "users.profile:write"
-            ]
+            "user": ["usergroups:write", "users.profile:read", "users.profile:write"]
         }
     },
     "settings": {

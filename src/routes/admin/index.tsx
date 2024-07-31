@@ -1,11 +1,10 @@
 import { Hono } from 'hono'
 import { router as membercert_route } from './membercerts'
-import { router as meeting_route } from './meetings'
+import { router as meeting_route } from './attendance'
 import { toTitleCase } from '~lib/util'
 
 export const router = new Hono()
 
-// router.use(trimTrailingSlash())
 router.route('/', membercert_route)
 router.route('/', meeting_route)
 
@@ -13,7 +12,8 @@ const pages = {
     members: ['Members', 'Add new members and sync slack accounts'],
     certs: ['Cert Setup', 'Create and edit cert names and levels'],
     membercerts: ['Cert Assignments', 'Manage certifications for team members'],
-    meetings: ['Meetings', 'Record and view meeting attendance']
+    attendance: ['Attendance', 'Record and view meeting attendance'],
+    departments: ['Departments', 'Create and edit departments']
 }
 
 router.get('/', (c) => {
