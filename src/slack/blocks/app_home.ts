@@ -15,6 +15,11 @@ export async function getAppHome(user_id: string) {
         const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
 
         homeTab.blocks(
+            Blocks.Header().text('Admin Dashboard'),
+            Blocks.Actions().elements(
+                Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
+                Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
+            ),
             Blocks.Header().text('Pending Hour Submissions'),
             pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]),
             Blocks.Divider(),
@@ -27,8 +32,7 @@ export async function getAppHome(user_id: string) {
         homeTab.blocks(
             Blocks.Actions().elements(
                 Elements.Button().text('Log Hours').actionId(ActionIDs.OPEN_LOG_MODAL),
-                Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL),
-                Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
+                Elements.Button().text('Show Info').actionId(ActionIDs.OPEN_USERINFO_MODAL)
             ),
             await getUserHourSummaryBlocks({ slack_id: user_id }),
             Blocks.Divider(),

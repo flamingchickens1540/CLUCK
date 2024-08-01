@@ -13,7 +13,8 @@ import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/
 import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
 import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
 import { handleSendPendingRequests } from '~slack/handlers/button/pending_requests'
-import { handleDepartmentsCommand, handleDepartmentsModalSubmit } from '~slack/handlers/cmd/departments'
+import { handleDepartmentsCommand, handleSubmitDepartmentsModal } from '~slack/handlers/cmd/departments'
+import { handleOpenOnboardingModal, handleSubmitOnboardingModal } from '~slack/handlers/view/onboarding'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -25,6 +26,7 @@ export enum ActionIDs {
     OPEN_USERINFO_MODAL = 'open_settings_modal',
     OPEN_LOG_MODAL = 'open_log_modal',
     SHOW_OWN_PENDING_REQUESTS = 'show_own_pending_requests',
+    OPEN_ONBOARDING_MODAL = 'open_onboarding_modal',
     SEND_PENDING_REQUESTS = 'send_pending_requests',
     CERT_APPROVE = 'cert_approve',
     CERT_REJECT = 'cert_reject'
@@ -35,7 +37,8 @@ export enum ViewIDs {
     MODAL_ACCEPT = 'accept_modal',
     MODAL_LOG = 'time_submission',
     MODAL_CERTIFY = 'certify_modal',
-    MODAL_DEPARTMENTS = 'departments_modal'
+    MODAL_DEPARTMENTS = 'departments_modal',
+    MODAL_ONBOARDING = 'onboarding_modal'
 }
 
 export function registerSlackHandlers(app: App) {
@@ -67,6 +70,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.CERT_APPROVE, handleCertApprove)
     app.action(ActionIDs.SHOW_OWN_PENDING_REQUESTS, handleShowPendingHours)
     app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequests)
+    app.action(ActionIDs.OPEN_ONBOARDING_MODAL, handleOpenOnboardingModal)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
@@ -76,7 +80,8 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_ACCEPT, handleSubmitAcceptModal)
     app.view(ViewIDs.MODAL_LOG, handleSubmitLogModal)
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
-    app.view(ViewIDs.MODAL_DEPARTMENTS, handleDepartmentsModalSubmit)
+    app.view(ViewIDs.MODAL_DEPARTMENTS, handleSubmitDepartmentsModal)
+    app.view(ViewIDs.MODAL_ONBOARDING, handleSubmitOnboardingModal)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
     app.action(/./, async ({ body, logger, action }) => {

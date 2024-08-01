@@ -22,7 +22,7 @@ export const handleDepartmentsCommand: CommandMiddleware = async ({ ack, body, c
     })
 }
 
-export const handleDepartmentsModalSubmit: ViewMiddleware = async ({ ack, body, client }) => {
+export const handleSubmitDepartmentsModal: ViewMiddleware = async ({ ack, body, client }) => {
     // Save the user's departments
     await ack()
     const options = body.view.state.values.department.department.selected_options!
