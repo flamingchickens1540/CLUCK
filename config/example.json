@@ -17,6 +17,9 @@
             "approval": "DXXX",
             "certification_approval": "DXXX"
         },
+        "groups": {
+            "students": "SXXX"
+        },
         "users": {
             "admins": ["UXXX"]
         }

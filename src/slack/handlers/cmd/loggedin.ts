@@ -10,7 +10,7 @@ export const handleGetLoggedInCommand: CommandMiddleware = async ({ logger, ack,
         })
         const names = users.map((u) => u.Member.full_name)
 
-        await respond({ response_type: 'ephemeral', text: users.length > 0 ? `*Currently Logged In:*\n${names.join('\n')}` : 'Nobody is logged in', mrkdwn: true })
+        await respond({ response_type: 'ephemeral', text: users.length > 0 ? `*Currently Logged In:*\n${names.join('\n')}` : 'Nobody is logged in' })
     } catch (e) {
         logger.error(e)
         await respond({ response_type: 'ephemeral', text: `Could not get logged in users: ${e}` })

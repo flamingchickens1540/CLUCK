@@ -4,6 +4,7 @@ import AsyncLock from 'async-lock'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import { Member as SlackMember } from '@slack/web-api/dist/types/response/UsersListResponse'
+import config from '~config'
 
 const lock = new AsyncLock({ maxExecutionTime: 3000, maxPending: 0 })
 
@@ -23,6 +24,8 @@ export async function syncSlackMembers() {
                 }
             })
             let updated = 0
+            const students_group = await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students })
+            const students_set = new Set<string>(students_group.users ?? [])
             for (const member of db_members) {
                 const slack_member = slack_members_lookup[member.email]
                 if (slack_member != null) {
@@ -34,7 +37,7 @@ export async function syncSlackMembers() {
                             slack_photo: slack_member.profile?.image_original,
                             slack_photo_small: slack_member.profile?.image_192,
                             first_name: display_name.split(' ')[0].trim(),
-                            active: !slack_member?.deleted
+                            active: students_set.has(slack_member.id!) && !slack_member?.deleted
                         }
                     })
                     updated++

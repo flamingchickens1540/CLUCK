@@ -1,5 +1,13 @@
 # Maintaining
 
+## Adding Members
+
+Visit `/admin/members/` and enter data in the bottom row. Slack IDs will automatically populate by the email
+
+## Adjusting Seasons
+
+Set the `start_date` field to the date you want to start tracking current hour information from, typically around kickoff or the end of summer. Any hour submissions after this point will be counted towards totals. It can be in any format accepted by the [Javascript Date constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date)
+
 ## Refreshing Veracross photos
 
 Open [the student directory](https://portals.veracross.com/catlin/student/directory/1) and paste the following into the browser console. You may need to disable CSP to run this script.
