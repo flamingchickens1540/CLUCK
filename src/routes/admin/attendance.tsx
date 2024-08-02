@@ -32,10 +32,7 @@ router
                 select: {
                     email: true,
                     full_name: true,
-                    grade: true,
-                    years: true,
                     use_slack_photo: true,
-                    team: true,
                     slack_id: true,
                     slack_photo: true,
                     slack_photo_small: true,

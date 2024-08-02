@@ -6,18 +6,12 @@ import { CommandMiddleware } from '~slack/lib/types'
 export const handleGraphCommand: CommandMiddleware = async ({ command, ack, respond }) => {
     await ack()
     const text = command.text.trim()
-    const teamLabels = {
-        all: 'all members',
-        primary: 'Senior Team',
-        junior: 'Junior Team'
-    }
-    const team = text as keyof typeof teamLabels
 
     const resp = { text: '', url: '', title: 'Hours Graph' }
     await respond({ response_type: 'ephemeral', text: 'Generating graph...' })
-    if (teamLabels[team]) {
-        const { url, success } = await createHourChartForTeam(text as keyof typeof teamLabels)
-        resp.text = ':chart_with_upwards_trend: <@' + command.user_id + '> generated a graph for ' + teamLabels[team]
+    if (text == 'all') {
+        const { url, success } = await createHourChartForTeam()
+        resp.text = ':chart_with_upwards_trend: <@' + command.user_id + '> generated a graph for the team'
         resp.title = success ? 'Hours Graph' : 'You were hourless to stop me from making this pun'
         resp.url = url
     } else {

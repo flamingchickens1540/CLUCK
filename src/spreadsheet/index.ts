@@ -2,7 +2,7 @@ import { JWT } from 'google-auth-library'
 import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
 import prisma from '~lib/prisma'
-import { getMemberPhoto, ordinal } from '~lib/util'
+import { getMemberPhoto } from '~lib/util'
 import { calculateHours, getMeetings, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
 
@@ -43,8 +43,6 @@ export async function updateSheet() {
     const headers = [
         'Name',
         'LoggedIn',
-        'Grade',
-        'Years',
         'Meetings',
         'LabHours',
         'ExternalHours',
@@ -67,8 +65,6 @@ export async function updateSheet() {
         const row = new Array(headers.length).fill('')
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)
-        row[columns.Grade] = ordinal(m.grade)
-        row[columns.Years] = m.years
         row[columns.Meetings] = await getMeetings({ email: m.email })
         row[columns.LabHours] = max50Hours(hours.lab)
         row[columns.ExternalHours] = hours.external

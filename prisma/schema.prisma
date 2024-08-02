@@ -115,9 +115,6 @@ model Member {
   email             String            @id @db.VarChar(50)
   first_name        String            @db.VarChar(50)
   full_name         String            @db.VarChar(100)
-  team              enum_Members_team
-  grade             Int               @db.SmallInt
-  years             Int               @db.SmallInt
   use_slack_photo   Boolean
   slack_id          String?           @unique @db.VarChar(15)
   slack_photo       String?           @db.VarChar(255)
@@ -199,11 +196,6 @@ enum enum_MeetingAttendances_state {
   present
   absent
   no_credit
-}
-
-enum enum_Members_team {
-  primary
-  junior
 }
 
 enum enum_MemberCertsRequest_state {

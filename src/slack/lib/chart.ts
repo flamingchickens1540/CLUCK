@@ -55,21 +55,17 @@ export async function createHourChartForUsers(userIds: string[]) {
     return await createHourChart(hourLogs)
 }
 
-export async function createHourChartForTeam(team: 'primary' | 'junior' | 'all') {
-    const where: Prisma.HourLogWhereInput = {
-        time_out: { gte: season_start_date }
-    }
-    if (team != 'all') {
-        where.Member = { team }
-    }
+export async function createHourChartForTeam() {
     const hourLogs = await prisma.hourLog.findMany({
-        where,
         select: {
             time_in: true,
             duration: true
         },
         orderBy: {
             time_in: 'asc'
+        },
+        where: {
+            time_out: { gte: season_start_date }
         }
     })
     return await createHourChart(hourLogs)

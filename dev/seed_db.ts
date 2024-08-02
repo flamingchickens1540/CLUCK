@@ -1,4 +1,4 @@
-import { enum_MeetingAttendances_state, enum_Members_team, Prisma, PrismaClient } from '@prisma/client'
+import { enum_MeetingAttendances_state, Prisma, PrismaClient } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import { toTitleCase } from '~lib/util'
 import logger from '~lib/logger'
@@ -26,9 +26,6 @@ async function seedMembers(count: number) {
             email: last.toLowerCase() + first.toLowerCase().slice(0, 2) + '@domain.edu',
             first_name: first,
             full_name: first + ' ' + last,
-            team: Math.random() > 0.5 ? enum_Members_team.primary : enum_Members_team.junior,
-            grade: faker.number.int({ min: 8, max: 12 }),
-            years: faker.number.int({ min: 1, max: 4 }),
             use_slack_photo: false,
             fallback_photo: faker.image.urlPicsumPhotos({ width: 100, height: 100 })
         })
