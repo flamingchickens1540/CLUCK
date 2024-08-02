@@ -66,46 +66,57 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
     out.qualifying = out.lab + out.external
     return out
 }
-
-export async function getWeeklyHours(user: Prisma.MemberWhereUniqueInput) {
-    if (user.email == null) {
-        const member = await prisma.member.findUnique({ where: user })
-        if (member == null) {
-            return
-        }
-        user.email = member.email
-    }
-    const logs = await prisma.hourLog.aggregate({
+export async function calculateAllHours() {
+    const out: Record<string, Record<enum_HourLogs_type | 'total' | 'qualifying', number>> = {}
+    const totals = await prisma.hourLog.groupBy({
+        by: ['member_id', 'type'],
+        _sum: { duration: true },
+        where: { state: 'complete', time_in: { gte: season_start_date } }
+    })
+    totals.forEach((total) => {
+        out[total.member_id] ??= { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
+        out[total.member_id][total.type] = total._sum.duration!.toNumber()
+        out[total.member_id].total += out[total.member_id][total.type]
+        out[total.member_id].qualifying = out[total.member_id].lab + out[total.member_id].external
+    })
+    return out
+}
+export async function getWeeklyHours(): Promise<Record<string, number>> {
+    const logs = await prisma.hourLog.groupBy({
+        by: ['member_id'],
         where: {
-            member_id: user.email,
             time_in: {
                 gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
             }
         },
-        _sum: { duration: true }
+        _sum: {
+            duration: true
+        }
     })
-    return logs._sum.duration?.toNumber() ?? 0
+    return Object.fromEntries(logs.map((l) => [l.member_id, l._sum.duration?.toNumber() ?? 0]))
 }
 
-export async function getMeetings(user: Prisma.MemberWhereUniqueInput) {
-    if (user.email == null) {
-        const member = await prisma.member.findUnique({ where: user })
-        if (member == null) {
-            return
-        }
-        user.email = member.email
-    }
-    return prisma.meetingAttendanceEntry.count({
-        where: {
-            member_id: user.email,
-            state: 'present',
-            Meeting: {
-                date: {
-                    gte: season_start_date
+export async function getMeetings(): Promise<Record<string, number>> {
+    const meetings = await prisma.member.findMany({
+        select: {
+            email: true,
+            _count: {
+                select: {
+                    MeetingAttendances: {
+                        where: {
+                            state: 'present',
+                            Meeting: {
+                                date: {
+                                    gte: season_start_date
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     })
+    return Object.fromEntries(meetings.map((m) => [m.email, m._count.MeetingAttendances]))
 }
 
 export async function getMeetingsMissed(): Promise<Record<string, number>> {

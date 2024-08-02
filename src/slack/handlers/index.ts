@@ -19,6 +19,7 @@ import {
     handleSubmitHoursAcceptModal,
     handleSubmitHoursRejectModal
 } from './actions/hours_response'
+import { handleRunTask } from '~slack/handlers/actions/run_task'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -33,7 +34,8 @@ export enum ActionIDs {
     OPEN_ONBOARDING_MODAL = 'open_onboarding_modal',
     SEND_PENDING_REQUESTS = 'send_pending_requests',
     CERT_APPROVE = 'cert_approve',
-    CERT_REJECT = 'cert_reject'
+    CERT_REJECT = 'cert_reject',
+    RUN_TASK = 'run_task'
 }
 
 export enum ViewIDs {
@@ -75,6 +77,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.SHOW_OWN_PENDING_REQUESTS, handleShowPendingHours)
     app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequestsButton)
     app.action(ActionIDs.OPEN_ONBOARDING_MODAL, handleOpenOnboardingModal)
+    app.action(ActionIDs.RUN_TASK, handleRunTask)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })

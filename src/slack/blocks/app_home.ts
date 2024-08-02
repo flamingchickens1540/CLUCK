@@ -3,10 +3,11 @@ import { getHourSubmissionBlocks } from '~slack/blocks/admin/hour_submission'
 import { ActionIDs } from '~slack/handlers'
 import { getUserHourSummaryBlocks } from '~slack/blocks/member/user_hours'
 import { getUserCertBlocks } from '~slack/blocks/member/user_certs'
-import { Blocks, Elements, HomeTab } from 'slack-block-builder'
+import { Bits, Blocks, Elements, HomeTab } from 'slack-block-builder'
 import config from '~config'
 import { getCertRequestBlocks } from '~slack/blocks/certify'
 import prisma from '~lib/prisma'
+import { getTaskKeys } from '~tasks'
 
 export async function getAppHome(user_id: string) {
     const homeTab = HomeTab()
@@ -16,6 +17,13 @@ export async function getAppHome(user_id: string) {
 
         homeTab.blocks(
             Blocks.Header().text('Admin Dashboard'),
+            Blocks.Section()
+                .text('Manual Tasks')
+                .accessory(
+                    Elements.OverflowMenu()
+                        .actionId(ActionIDs.RUN_TASK)
+                        .options(getTaskKeys().map((key) => Bits.Option().text(key).value(key)))
+                ),
             Blocks.Actions().elements(
                 Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
                 Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)

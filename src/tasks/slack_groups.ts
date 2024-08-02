@@ -12,7 +12,7 @@ export function scheduleUpdateSlackUsergroups() {
         timeout = setTimeout(updateSlackUsergroups, 1000 * 30)
     }
 }
-async function updateSlackUsergroups() {
+export async function updateSlackUsergroups() {
     if (profile_client == null) {
         return
     }

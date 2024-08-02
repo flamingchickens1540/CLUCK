@@ -3,7 +3,7 @@ import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
 import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
-import { calculateHours, getMeetings, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
+import { calculateAllHours, getMeetings, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
 
 /**
@@ -41,7 +41,9 @@ export async function updateSheet() {
     })
 
     const meetingsMissed = await getMeetingsMissed()
-
+    const meetings = await getMeetings()
+    const weeklyHours = await getWeeklyHours()
+    const allHours = await calculateAllHours()
     const headers = [
         'Name',
         'LoggedIn',
@@ -64,11 +66,11 @@ export async function updateSheet() {
 
     let hourReqMet = 0
     for (const m of members) {
-        const hours = (await calculateHours({ email: m.email }))!
+        const hours = allHours[m.email] ?? { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
         const row = new Array(headers.length).fill('')
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)
-        row[columns.Meetings] = await getMeetings({ email: m.email })
+        row[columns.Meetings] = meetings[m.email] ?? 0
         row[columns.MeetingsMissed] = meetingsMissed[m.email] ?? 0
         row[columns.LabHours] = max50Hours(hours.lab)
         row[columns.ExternalHours] = hours.external
@@ -76,7 +78,7 @@ export async function updateSheet() {
         row[columns.SummerHours] = hours.summer
         row[columns.QualifyingHours] = max50Hours(hours.qualifying)
         row[columns.TotalHours] = max50Hours(hours.total)
-        row[columns.WeeklyHours] = await getWeeklyHours({ email: m.email })
+        row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email]?.join(', ')
         rows.push(row)
