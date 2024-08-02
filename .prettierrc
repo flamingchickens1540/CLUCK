@@ -1,0 +1,17 @@
+{
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "quoteProps": "consistent",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 1000,
+    "overrides": [
+        {
+            "files": ["**/*.ts"],
+            "options": {
+                "printWidth": 180
+            }
+        }
+    ]
+}

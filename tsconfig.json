@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "module": "nodenext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+
+        "types": ["node", "vite/client"],
+        "jsx": "react-jsx",
+        "jsxImportSource": "hono/jsx",
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "~config": ["./lib/config.ts"],
+            "~types": ["./types/index.ts"],
+            "~*": ["./*"]
+        },
+        "baseUrl": "./src"
+    }
+}

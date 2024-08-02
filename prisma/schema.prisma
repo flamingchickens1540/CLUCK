@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id           String   @id @db.VarChar(255)
+  password     String   @db.Char(64)
+  api_key      String   @db.Char(36)
+  write_access Boolean
+  admin_access Boolean
+  slack_id     Boolean? @unique
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([api_key], map: "accounts_api_key")
+  @@map("Accounts")
+}
+
+model Department {
+  id          String   @id @db.VarChar(50)
+  name        String   @db.VarChar(100)
+  slack_group String?  @db.VarChar(50)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+  Certs       Cert[]
+
+  Members DepartmentAssociation[]
+
+  @@map("Departments")
+}
+
+model DepartmentAssociation {
+  department_id String
+  member_id     String
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  Department Department @relation(fields: [department_id], references: [id], onDelete: Cascade)
+  Member     Member     @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@id([department_id, member_id])
+  @@map("DepartmentAssociations")
+}
+
+model Cert {
+  id             String              @id @db.VarChar(15)
+  label          String              @db.VarChar(100)
+  isManager      Boolean             @default(false)
+  department     String?             @db.VarChar()
+  replaces       String?             @unique @db.VarChar(50)
+  createdAt      DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime            @updatedAt @db.Timestamptz(6)
+  ReplacedByCert Cert?               @relation("CertProgression")
+  ReplacesCert   Cert?               @relation("CertProgression", fields: [replaces], references: [id], onDelete: SetNull)
+  Department     Department?         @relation(fields: [department], references: [id], onDelete: SetNull)
+  Instances      MemberCert[]
+  Requests       MemberCertRequest[]
+
+  @@map("Certs")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model HourLog {
+  id        Int                 @id @default(autoincrement())
+  member_id String              @db.VarChar(50)
+  time_in   DateTime            @db.Timestamptz(6)
+  time_out  DateTime?           @db.Timestamptz(6)
+  duration  Decimal?            @db.Decimal(6, 3)
+  type      enum_HourLogs_type
+  state     enum_HourLogs_state
+  message   String?             @db.VarChar(2000)
+  response  String?             @db.VarChar(2000)
+  slack_ts  String?             @db.VarChar()
+  createdAt DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime            @updatedAt @db.Timestamptz(6)
+  Member    Member              @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@index([member_id], map: "hour_logs_member_id")
+  @@index([state], map: "hour_logs_state")
+  @@index([type], map: "hour_logs_type")
+  @@map("HourLogs")
+}
+
+model MeetingAttendanceEntry {
+  state      enum_MeetingAttendances_state
+  meeting_id Int                           @db.SmallInt
+  member_id  String                        @db.VarChar(50)
+  createdAt  DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                      @updatedAt @db.Timestamptz(6)
+  Meeting    Meetings                      @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Member     Member                        @relation(fields: [member_id], references: [email], onDelete: Cascade)
+
+  @@id([meeting_id, member_id])
+  @@index([meeting_id], map: "meeting_attendances_meeting_id")
+  @@index([member_id], map: "meeting_attendances_member_id")
+  @@map("MeetingAttendances")
+}
+
+model Meetings {
+  id          Int                      @id @default(autoincrement()) @db.SmallInt
+  date        DateTime                 @db.Date
+  mandatory   Boolean
+  createdAt   DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime                 @updatedAt @db.Timestamptz(6)
+  Attendances MeetingAttendanceEntry[]
+
+  @@map("Meetings")
+}
+
+model Member {
+  email             String            @id @db.VarChar(50)
+  first_name        String            @db.VarChar(50)
+  full_name         String            @db.VarChar(100)
+  use_slack_photo   Boolean
+  slack_id          String?           @unique @db.VarChar(15)
+  slack_photo       String?           @db.VarChar(255)
+  slack_photo_small String?           @db.VarChar(255)
+  fallback_photo    String?           @db.VarChar(255)
+  active            Boolean           @default(true)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  HourLogs             HourLog[]
+  MeetingAttendances   MeetingAttendanceEntry[]
+  MemberCerts          MemberCert[]
+  MemberCertRequests   MemberCertRequest[]      @relation("MemberCertRecipient")
+  MemberCertsRequested MemberCertRequest[]      @relation("MemberCertRequester")
+  Departments          DepartmentAssociation[]
+
+  @@index([slack_id], map: "members_slack_id")
+  @@index([full_name], map: "members_full_name")
+  @@map("Members")
+}
+
+model MemberCert {
+  cert_id   String
+  member_id String
+  announced Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  Member Member @relation(fields: [member_id], references: [email], onDelete: Cascade)
+  Cert   Cert   @relation(fields: [cert_id], references: [id], onDelete: Cascade)
+
+  @@id([cert_id, member_id])
+  @@index([member_id], map: "membercerts_memberid")
+  @@index([cert_id], map: "membercerts_certid")
+  @@map("MemberCerts")
+}
+
+model MemberCertRequest {
+  id           Int                           @id @default(autoincrement())
+  cert_id      String
+  member_id    String
+  requester_id String
+  slack_ts     String?
+  state        enum_MemberCertsRequest_state
+  createdAt    DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime                      @updatedAt @db.Timestamptz(6)
+
+  Requester Member @relation("MemberCertRequester", fields: [requester_id], references: [email], onDelete: Cascade)
+  Member    Member @relation("MemberCertRecipient", fields: [member_id], references: [email], onDelete: Cascade)
+  Cert      Cert   @relation(fields: [cert_id], references: [id], onDelete: Cascade)
+
+  @@index([member_id], map: "membercertrequests_memberid")
+  @@index([cert_id], map: "membercertrequests_certid")
+  @@map("MemberCertRequests")
+}
+
+model FallbackPhoto {
+  email String @id
+  url   String
+
+  @@map("FallbackPhotos")
+}
+
+enum enum_HourLogs_state {
+  complete
+  pending
+  cancelled
+}
+
+enum enum_HourLogs_type {
+  lab
+  external
+  summer
+  event
+}
+
+enum enum_MeetingAttendances_state {
+  present
+  absent
+  no_credit
+}
+
+enum enum_MemberCertsRequest_state {
+  pending
+  approved
+  rejected
+}
