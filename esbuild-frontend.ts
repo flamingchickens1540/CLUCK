@@ -13,7 +13,8 @@ const views: Record<string, string> = {
     grid: '/grid/',
     admin_members: '/admin/members/',
     admin_certs: '/admin/certs/',
-    admin_departments: '/admin/departments/'
+    admin_departments: '/admin/departments/',
+    admin_meetings: '/admin/meetings/'
 }
 
 const contexts: esbuild.BuildContext[] = []

@@ -1,7 +1,9 @@
-import { Cert, Member, Prisma } from '@prisma/client'
+import { Cert, Meetings, Member, Prisma } from '@prisma/client'
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import logger from '~lib/logger'
+import { safeParseInt } from '~lib/util'
+import { season_start_date } from '~config'
 
 export const router = new Hono()
 
@@ -97,6 +99,29 @@ router
             })
         } catch (err) {
             logger.warn({ msg: 'Error on POST /admin/certs', err, data })
+            return c.json({ error: err }, 400)
+        }
+    })
+
+router
+    .get('/admin/meetings', async (c) => {
+        return c.json(await prisma.meetings.findMany({ orderBy: { date: 'asc' }, where: { date: { gte: season_start_date } } }))
+    })
+    .put(async (c) => {
+        const data = (await c.req.json()) as Partial<Meetings>
+        try {
+            return c.json(await prisma.meetings.update({ data, where: { id: data.id } }))
+        } catch (err) {
+            logger.warn({ msg: 'Error on PUT /admin/meetings', err, data })
+            return c.json({ error: err }, 400)
+        }
+    })
+    .delete(async (c) => {
+        const data = (await c.req.json()) as { id: unknown }
+        try {
+            return c.json(await prisma.meetings.delete({ where: { id: safeParseInt(data.id) } }))
+        } catch (err) {
+            logger.warn({ msg: 'Error on DELETE /admin/meetings', err, data })
             return c.json({ error: err }, 400)
         }
     })

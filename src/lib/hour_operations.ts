@@ -98,7 +98,39 @@ export async function getMeetings(user: Prisma.MemberWhereUniqueInput) {
     return prisma.meetingAttendanceEntry.count({
         where: {
             member_id: user.email,
-            state: 'present'
+            state: 'present',
+            Meeting: {
+                date: {
+                    gte: season_start_date
+                }
+            }
         }
     })
+}
+
+export async function getMeetingsMissed(): Promise<Record<string, number>> {
+    const meetings = await prisma.member.findMany({
+        select: {
+            email: true,
+            _count: {
+                select: {
+                    MeetingAttendances: {
+                        where: {
+                            state: {
+                                not: 'present'
+                            },
+                            Meeting: {
+                                mandatory: true,
+                                date: {
+                                    gte: season_start_date
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    return Object.fromEntries(meetings.map((m) => [m.email, m._count.MeetingAttendances]))
 }

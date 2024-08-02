@@ -3,7 +3,7 @@ import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
 import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
-import { calculateHours, getMeetings, getWeeklyHours } from '~lib/hour_operations'
+import { calculateHours, getMeetings, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
 
 /**
@@ -40,10 +40,13 @@ export async function updateSheet() {
         loggedInMap.add(l.member_id)
     })
 
+    const meetingsMissed = await getMeetingsMissed()
+
     const headers = [
         'Name',
         'LoggedIn',
         'Meetings',
+        'MeetingsMissed',
         'LabHours',
         'ExternalHours',
         'EventHours',
@@ -66,6 +69,7 @@ export async function updateSheet() {
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)
         row[columns.Meetings] = await getMeetings({ email: m.email })
+        row[columns.MeetingsMissed] = meetingsMissed[m.email] ?? 0
         row[columns.LabHours] = max50Hours(hours.lab)
         row[columns.ExternalHours] = hours.external
         row[columns.EventHours] = hours.event

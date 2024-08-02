@@ -13,6 +13,7 @@ const pages = {
     certs: ['Cert Setup', 'Create and edit cert names and levels'],
     membercerts: ['Cert Assignments', 'Manage certifications for team members'],
     attendance: ['Attendance', 'Record and view meeting attendance'],
+    meetings: ['Meetings', 'Adjust meeting dates and information'],
     departments: ['Departments', 'Create and edit departments']
 }
 
