@@ -2,6 +2,7 @@ import { Blocks, Message } from 'slack-block-builder'
 import { createHourChartForTeam, createHourChartForUsers } from '~slack/lib/chart'
 import { formatList } from '~slack/lib/messages'
 import { CommandMiddleware } from '~slack/lib/types'
+import prisma from '~lib/prisma'
 
 export const handleGraphCommand: CommandMiddleware = async ({ command, ack, respond }) => {
     await ack()
@@ -17,8 +18,20 @@ export const handleGraphCommand: CommandMiddleware = async ({ command, ack, resp
     } else {
         const users: Set<string> = new Set()
         const user_matches = text.matchAll(/<@(\w+)\|\w.+?>/g)
+        const group_matches = text.matchAll(/<!subteam\^(\w+)(?:\|.+?)?>/g)
         for (const user of user_matches) {
             users.add(user[1])
+        }
+        for (const group of group_matches) {
+            const associations = await prisma.departmentAssociation.findMany({
+                where: { Department: { slack_group: group[1] } },
+                select: { Member: { select: { slack_id: true } } }
+            })
+            associations.forEach((a) => {
+                if (a.Member.slack_id) {
+                    users.add(a.Member.slack_id)
+                }
+            })
         }
 
         if (users.size == 0) {

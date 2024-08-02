@@ -65,7 +65,7 @@ export async function createHourChartForTeam() {
             time_in: 'asc'
         },
         where: {
-            time_out: { gte: season_start_date }
+            time_in: { gte: season_start_date }
         }
     })
     return await createHourChart(hourLogs)

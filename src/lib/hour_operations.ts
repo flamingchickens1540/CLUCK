@@ -35,7 +35,7 @@ export async function getValidHours(user: Prisma.MemberWhereUniqueInput) {
             HourLogs: {
                 where: {
                     state: 'complete',
-                    time_out: {
+                    time_in: {
                         gte: season_start_date
                     }
                 },
@@ -78,7 +78,7 @@ export async function getWeeklyHours(user: Prisma.MemberWhereUniqueInput) {
     const logs = await prisma.hourLog.aggregate({
         where: {
             member_id: user.email,
-            time_out: {
+            time_in: {
                 gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
             }
         },
