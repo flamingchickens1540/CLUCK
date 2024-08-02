@@ -1,20 +1,24 @@
 import type { App } from '@slack/bolt'
-import { getAcceptButtonHandler, handleAcceptWithMessageButton, handleSubmitAcceptModal } from './button/accept'
-import { handleAppHomeOpened } from './view/app_home'
-import { handleLogCommand, handleLogShortcut } from './cmd/log'
-import { handleLogoutCommand } from './cmd/logout'
-import { handleRejectButton, handleSubmitRejectModal } from './button/reject'
-import { handleOpenUserInfoModal } from './view/userinfo'
-import { handleVoidCommand } from './cmd/void'
-import { handleGetLoggedInCommand } from './cmd/loggedin'
+import { handleAppHomeOpened } from './views/app_home'
+import { handleLogCommand, handleLogShortcut, handleOpenLogModal, handleSubmitLogModal } from './actions/log'
+import { handleLogoutCommand } from './actions/logout'
+import { handleOpenUserInfoModal } from './views/userinfo'
+import { handleVoidCommand } from './actions/void'
+import { handleGetLoggedInCommand } from './actions/loggedin'
 import config from '~config'
-import { handleGraphCommand } from '~slack/handlers/cmd/graph'
-import { handleShowHoursCommand, handleShowPendingHours } from '~slack/handlers/cmd/hours'
-import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from '~slack/handlers/cmd/certify'
-import { handleOpenLogModal, handleSubmitLogModal } from '~slack/handlers/view/log_modal'
-import { handleSendPendingRequests } from '~slack/handlers/button/pending_requests'
-import { handleDepartmentsCommand, handleSubmitDepartmentsModal } from '~slack/handlers/cmd/departments'
-import { handleOpenOnboardingModal, handleSubmitOnboardingModal } from '~slack/handlers/view/onboarding'
+import { handleGraphCommand } from './actions/graph'
+import { handleShowHoursCommand, handleShowPendingHours } from './actions/hours'
+import { handleCertApprove, handleCertifyCommand, handleCertReject, handleSubmitCertifyModal } from './actions/certify'
+import { handleDepartmentsCommand, handleSubmitDepartmentsModal } from './actions/departments'
+import { handleOpenOnboardingModal, handleSubmitOnboardingModal } from './views/onboarding'
+import {
+    createHoursAcceptButtonHandler,
+    handleHoursAcceptWithMessageButton,
+    handleHoursRejectButton,
+    handleSendPendingRequestsButton,
+    handleSubmitHoursAcceptModal,
+    handleSubmitHoursRejectModal
+} from './actions/hours_response'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -58,26 +62,26 @@ export function registerSlackHandlers(app: App) {
     app.shortcut('log_hours', handleLogShortcut)
 
     // Buttons
-    app.action(ActionIDs.ACCEPT, getAcceptButtonHandler('external'))
-    app.action(ActionIDs.ACCEPT_SUMMER, getAcceptButtonHandler('summer'))
-    app.action(ActionIDs.ACCEPT_EVENT, getAcceptButtonHandler('event'))
-    app.action(ActionIDs.ACCEPT_LAB, getAcceptButtonHandler('lab'))
-    app.action(ActionIDs.ACCEPT_WITH_MSG, handleAcceptWithMessageButton)
-    app.action(ActionIDs.REJECT, handleRejectButton)
+    app.action(ActionIDs.ACCEPT, createHoursAcceptButtonHandler('external'))
+    app.action(ActionIDs.ACCEPT_SUMMER, createHoursAcceptButtonHandler('summer'))
+    app.action(ActionIDs.ACCEPT_EVENT, createHoursAcceptButtonHandler('event'))
+    app.action(ActionIDs.ACCEPT_LAB, createHoursAcceptButtonHandler('lab'))
+    app.action(ActionIDs.ACCEPT_WITH_MSG, handleHoursAcceptWithMessageButton)
+    app.action(ActionIDs.REJECT, handleHoursRejectButton)
     app.action(ActionIDs.OPEN_USERINFO_MODAL, handleOpenUserInfoModal)
     app.action(ActionIDs.OPEN_LOG_MODAL, handleOpenLogModal)
     app.action(ActionIDs.CERT_REJECT, handleCertReject)
     app.action(ActionIDs.CERT_APPROVE, handleCertApprove)
     app.action(ActionIDs.SHOW_OWN_PENDING_REQUESTS, handleShowPendingHours)
-    app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequests)
+    app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequestsButton)
     app.action(ActionIDs.OPEN_ONBOARDING_MODAL, handleOpenOnboardingModal)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
 
     // Modal Submission
-    app.view(ViewIDs.MODAL_REJECT, handleSubmitRejectModal)
-    app.view(ViewIDs.MODAL_ACCEPT, handleSubmitAcceptModal)
+    app.view(ViewIDs.MODAL_REJECT, handleSubmitHoursRejectModal)
+    app.view(ViewIDs.MODAL_ACCEPT, handleSubmitHoursAcceptModal)
     app.view(ViewIDs.MODAL_LOG, handleSubmitLogModal)
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
     app.view(ViewIDs.MODAL_DEPARTMENTS, handleSubmitDepartmentsModal)

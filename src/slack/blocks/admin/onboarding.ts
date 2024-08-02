@@ -11,7 +11,7 @@ export async function getOnboardingModal() {
     const slackMembers = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students })).users!
     const newMembers = slackMembers.filter((member) => !dbMemberSet.has(member))
 
-    const modal = Modal().title('Onboarding').callbackId(ViewIDs.MODAL_ONBOARDING).submit('Submit')
+    const modal = Modal().title('Onboarding').callbackId(ViewIDs.MODAL_ONBOARDING).submit('Add')
     modal.blocks(
         Blocks.Section().text('The following members will be added to the database from <!subteam^' + config.slack.groups.students + '>'),
         Blocks.Divider(),

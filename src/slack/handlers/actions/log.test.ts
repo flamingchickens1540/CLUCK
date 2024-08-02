@@ -1,6 +1,7 @@
 import { expect, test, vi } from 'vitest'
 
-import { parseArgs } from '~slack/handlers/cmd/log'
+import { parseArgs } from '~slack/handlers/actions/log'
+
 vi.mock(import('~slack'))
 
 test('parses /log arguments', () => {

@@ -30,6 +30,14 @@ export default {
             )
             .buildToObject()
     },
+    submissionRespondedDM(action: 'approve' | 'reject', v: { slack_id: string; hours: number; activity: string; message: string; request_id: number; type?: enum_HourLogs_type }) {
+        if (action === 'approve') {
+            return this.submissionAcceptedDM(v)
+        } else {
+            return this.submissionRejectedDM(v)
+        }
+    },
+
     submissionAcceptedDM(v: { slack_id: string; hours: number; activity: string; message?: string | null; request_id: number; type?: enum_HourLogs_type }) {
         let msg = `:white_check_mark: *<@${v.slack_id}>* accepted *${formatDuration(v.hours)}* :white_check_mark:\n>>>:person_climbing: *Activity:*\n\`\`\`${sanitizeCodeblock(v.activity)}\`\`\``
         if (v.message) {

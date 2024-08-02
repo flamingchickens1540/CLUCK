@@ -19,15 +19,23 @@ export async function getAppHome(user_id: string) {
             Blocks.Actions().elements(
                 Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
                 Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
-            ),
-            Blocks.Header().text('Pending Hour Submissions'),
-            pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]),
-            Blocks.Divider(),
-            Blocks.Header().text('Pending Certification Requests'),
-            pending_certs.flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]),
-
-            Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString())
+            )
         )
+        homeTab.blocks(Blocks.Header().text('Pending Hour Submissions'))
+        if (pending_requests.length > 0) {
+            homeTab.blocks(pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))
+        } else {
+            homeTab.blocks(Blocks.Section().text('None'))
+            homeTab.blocks(Blocks.Divider())
+        }
+        homeTab.blocks(Blocks.Header().text('Pending Certifications'))
+        if (pending_certs.length > 0) {
+            homeTab.blocks(pending_certs.flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]))
+        } else {
+            homeTab.blocks(Blocks.Section().text('None'))
+            homeTab.blocks(Blocks.Divider())
+        }
+        homeTab.blocks(Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString()))
     } else {
         homeTab.blocks(
             Blocks.Actions().elements(
