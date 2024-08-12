@@ -138,41 +138,15 @@ export class ClockCircle extends Circle{
             }
             (async () => {
                 let arrivals = await getArrivals()
-                let timeElemsWest = document.querySelectorAll('.bustime.west')
-                let timeElemsEast = document.querySelectorAll('.bustime.east')
-                
-                let minutesTillEastFirst = Math.max(0,Math.round((arrivals[busSigns[0]][0] - Date.now())/1000/60));
-                timeElemsEast[0].innerHTML = minutesTillEastFirst + '&nbsp;min'
-                if(minutesTillEastFirst <= 5) {
-                    timeElemsEast[0].classList.add('soonish')
-                } else {
-                    timeElemsEast[0].classList.remove('soonish')
-                }
+                const timeElems = [];
+                document.querySelectorAll('.bustime.east').forEach(timeElems.push);
+                document.querySelectorAll('.bustime.west').forEach(timeElems.push);
 
-                let minutesTillEastSecond = Math.max(0,Math.round((arrivals[busSigns[0]][1] - Date.now())/1000/60));
-                timeElemsEast[1].innerHTML = minutesTillEastSecond + '&nbsp;min'
-                if(minutesTillEastSecond <= 5) {
-                    timeElemsEast[1].classList.add('soonish')
-                } else {
-                    timeElemsEast[1].classList.remove('soonish')
+                for(let busSignIndex = 0; busSignIndex < timeElems.length; busSignIndex++) {
+                    let minutesTill = Math.max(0,Math.round((arrivals[busSigns[busSignIndex >> 1]][busSignIndex & 1] - Date.now())/1000/60));
+                    timeElems[0].innerHTML = minutesTill + '&nbsp;min'
+                    timeElems[0].classList[minutesTill <= 5 ? "add" : "remove"]("soonish")
                 }
-
-                let minutesTillWestFirst = Math.max(0,Math.round((arrivals[busSigns[1]][0] - Date.now())/1000/60));
-                timeElemsWest[0].innerHTML = minutesTillWestFirst + '&nbsp;min'
-                if(minutesTillEastFirst <= 5) {
-                    timeElemsWest[0].classList.add('soonish')
-                } else {
-                    timeElemsWest[0].classList.remove('soonish')
-                }
-
-                let minutesTillWestSecond = Math.max(0,Math.round((arrivals[busSigns[1]][1] - Date.now())/1000/60));
-                timeElemsWest[1].innerHTML = minutesTillWestSecond + '&nbsp;min'
-                if(minutesTillWestSecond <= 5) {
-                    timeElemsWest[1].classList.add('soonish')
-                } else {
-                    timeElemsWest[1].classList.remove('soonish')
-                }
-
             })();
         },
         15000);
