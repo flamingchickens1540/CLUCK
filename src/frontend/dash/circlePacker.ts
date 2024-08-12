@@ -143,9 +143,19 @@ export class ClockCircle extends Circle{
                 document.querySelectorAll('.bustime.west').forEach(timeElems.push);
 
                 for(let busSignIndex = 0; busSignIndex < timeElems.length; busSignIndex++) {
-                    let minutesTill = Math.max(0,Math.round((arrivals[busSigns[busSignIndex >> 1]][busSignIndex & 1] - Date.now())/1000/60));
+                    let arrivalsCardinal;
+                    if(busSignIndex < 2)
+                        arrivalsCardinal = arrivals[busSigns[0]];
+                    else
+                        arrivalsCardinal = arrivals[busSigns[1]];
+
+                    let minutesTill = Math.max(0,Math.round((arrivalsCardinal[busSignIndex % 2] - Date.now())/1000/60));
+
                     timeElems[0].innerHTML = minutesTill + '&nbsp;min'
-                    timeElems[0].classList[minutesTill <= 5 ? "add" : "remove"]("soonish")
+                    if(minutesTill <= 5)
+                        timeElems[0].classList.add("soonish");
+                    else
+                        timeElems[0].classList.remove("soonish");
                 }
             })();
         },
