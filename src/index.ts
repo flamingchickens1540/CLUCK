@@ -38,6 +38,7 @@ app.use(async (c, next) => {
 app.use('/admin/*', requireAdminLogin)
 app.use('/grid/', requireReadLogin)
 app.get('/grid', (c) => c.redirect('/grid/', 301))
+app.get('/dash', (c) => c.redirect('/dash/', 301))
 
 app.route('/admin/', admin_router)
 app.route('/api', api_router)

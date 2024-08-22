@@ -27,7 +27,7 @@ export type APIClockExternalRespondRequest = {
 export type APIClockResponse = { success: false; error: string; log_id?: number } | { success: true; log_id: number }
 
 type APIMembersResponse = APIMember[]
-export type APILoggedIn = { id: string; email: string; time_in: string }
+export type APILoggedIn = { id: string; email: string; time_in: number }
 
 interface APIMethod {
     req: unknown
@@ -49,6 +49,9 @@ export interface APIRoutes extends Record<string, APIRoute> {
     }
     '/members/refresh': {
         GET: { req: null; resp: APIMembersResponse }
+    }
+    '/chiefdelphi': {
+        GET: { req: null; resp: { body: string } }
     }
 }
 

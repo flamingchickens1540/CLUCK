@@ -1,6 +1,6 @@
 import { Context, Hono } from 'hono'
 import { syncSlackMembers } from '~tasks/slack'
-import { APIClockExternalRespondRequest, APIClockExternalSubmitRequest, APIClockLabRequest, APIClockResponse, APIMember } from '~types'
+import { APIClockLabRequest, APIClockResponse, APIMember } from '~types'
 import logger from '~lib/logger'
 import { requireReadAPI, requireWriteAPI } from '~lib/auth'
 import { emitCluckChange } from '~lib/sockets'
@@ -111,76 +111,4 @@ router
         return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
     })
 
-router.get('/clock/external', requireReadAPI, async (c) => {
-    const records = await prisma.hourLog.findMany({
-        where: { state: 'pending', type: 'external' },
-        select: { id: true, member_id: true, time_in: true, duration: true, slack_ts: true, message: true }
-    })
-    return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
-})
-
-router.post('/clock/external/submit', requireWriteAPI, async (c) => {
-    const { email, message, hours }: APIClockExternalSubmitRequest = await c.req.json()
-    const member = await prisma.member.findUnique({ where: { email }, select: { email: true } })
-    if (member == null) {
-        logger.warn('ignoring external submission for unknown user ' + email)
-        c.status(400)
-        return c.json({ success: false, error: 'member unknown' })
-    }
-    try {
-        const newLog = await prisma.hourLog.create({
-            data: {
-                member_id: email,
-                time_in: new Date(),
-                duration: hours,
-                message,
-                type: 'external',
-                state: 'pending'
-            }
-        })
-        return clockJson(c, { success: true, log_id: newLog.id })
-    } catch (e) {
-        logger.error(e)
-        c.status(500)
-        return clockJson(c, { success: false, error: 'unknown' })
-    }
-})
-
-router.post('/clock/external/respond', requireWriteAPI, async (c) => {
-    const { id, action, category }: APIClockExternalRespondRequest = await c.req.json()
-    const log = await prisma.hourLog.findUnique({ where: { id } })
-    if (log == null) {
-        logger.warn('Ignoring confirmation for unknown hour request ' + id)
-        c.status(400)
-        return clockJson(c, { success: false, error: 'request unknown' })
-    }
-    if (log.state != 'pending') {
-        logger.warn('Received confirmation for completed hour request ' + id + '. Updating anyway...')
-    }
-    try {
-        if (action == 'approve') {
-            await prisma.hourLog.update({
-                where: { id: log.id },
-                data: {
-                    time_out: new Date(),
-                    state: 'complete',
-                    type: category
-                }
-            })
-        } else {
-            await prisma.hourLog.update({
-                where: { id: log.id },
-                data: {
-                    time_out: new Date(),
-                    state: 'cancelled'
-                }
-            })
-        }
-        return clockJson(c, { success: true, log_id: log.id })
-    } catch (e) {
-        logger.error(e)
-        c.status(500)
-        return clockJson(c, { success: false, error: 'unknown' })
-    }
-})
 export default router
