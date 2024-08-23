@@ -1,49 +1,51 @@
 import { ClockCircle, MemberCircle, placeCircles, placedCircles, sizeCircles, updateCircleList, updateCircles } from './circlepacker'
-import { cyclePanel } from './chiefdelphi'
+// import { cyclePanel } from './chiefdelphi'
 import { openFullscreen } from '../util'
 import { getLoggedIn, getMemberList } from '~views/grid/clockapi'
-import { APILoggedIn, APIMember } from '~types'
+import { APIMember, WSCluckChange } from '~types'
+import socket_io from 'socket.io-client'
 
 let members: Record<string, APIMember>
-let loggedInCache: APILoggedIn[] = []
+let loggedInCache: Record<string, Date> = {}
 
 window['openFullscreen'] = openFullscreen
 
-cyclePanel()
-setInterval(cyclePanel, 1000 * 60) // chnage panel every 1 minutes
-setInterval(regenCircles, 10) // refresh circles every 10ms
+// cyclePanel()  // TODO: Wait for chiefdelphi api to work again
+// setInterval(cyclePanel, 1000 * 60) // chnage panel every 1 minutes
+setInterval(populateCircles, 50) // refresh circles at 20Hz
 
 let prevTime = Date.now()
 
-function regenCircles() {
-    const now = Date.now()
+function populateCircles() {
+    const membersToAdd = updateCircleList(loggedInCache)
+    const circlesToAdd = membersToAdd.map((entry) => {
+        const member = members[entry]
 
-    const membersToAdd = updateCircleList(new Map(loggedInCache.map((e) => [e.email, e.time_in])))
-    const circlesToAdd = []
-    for (const entry of membersToAdd) {
-        const member = members[entry[0]]
-
-        circlesToAdd.push(
-            new MemberCircle(
-                entry[1], // 1000 / 60 / 60
-                member.email,
-                member.first_name,
-                member.photo
-            )
+        return new MemberCircle(
+            loggedInCache[entry].getTime(), // 1000 / 60 / 60
+            member.email,
+            member.first_name,
+            member.photo
         )
-    }
-
+    })
     placeCircles(circlesToAdd)
 
+    const now = Date.now()
     updateCircles(now - prevTime)
-
     sizeCircles()
-
     prevTime = now
 }
 
 async function update() {
-    loggedInCache = await getLoggedIn()
+    try {
+        const loggedIn = await getLoggedIn()
+        loggedInCache = Object.fromEntries(loggedIn.map((entry) => [entry.email, new Date(entry.time_in)]))
+        document.getElementById('logo')!.style.display = 'block'
+        document.body.style.backgroundColor = 'black'
+    } catch (e) {
+        document.getElementById('logo')!.style.display = 'none'
+        document.body.style.backgroundColor = 'red'
+    }
 }
 
 async function start() {
@@ -52,15 +54,32 @@ async function start() {
     memberlist.forEach((member) => {
         members[member.email] = member
     })
-    loggedInCache = await getLoggedIn()
     placedCircles.push(new ClockCircle())
-
+    update()
     setInterval(() => {
         update()
-    }, 1000 * 3)
+    }, 1000 * 30)
     window.addEventListener('resize', () => {
-        regenCircles()
+        populateCircles()
     })
 }
+
+const socket = socket_io({ path: '/ws' })
+socket.on('cluck_change', (data: WSCluckChange) => {
+    if (data.logging_in) {
+        loggedInCache[data.email] = new Date()
+    } else {
+        delete loggedInCache[data.email]
+    }
+})
+
+socket.on('disconnect', () => {
+    document.getElementById('logo')!.style.display = 'none'
+    document.body.style.backgroundColor = 'red'
+})
+socket.on('connect', () => {
+    document.getElementById('logo')!.style.display = 'block'
+    document.body.style.backgroundColor = 'black'
+})
 
 start()

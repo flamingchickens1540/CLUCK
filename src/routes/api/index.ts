@@ -1,4 +1,5 @@
 import { Context, Hono } from 'hono'
+import sanitizeHtml from 'sanitize-html'
 import { syncSlackMembers } from '~tasks/slack'
 import { APIClockLabRequest, APIClockResponse, APIMember } from '~types'
 import logger from '~lib/logger'
@@ -110,5 +111,47 @@ router
         })
         return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
     })
+
+let delphiPost = 0
+router.get('/chiefdelphi', async (c) => {
+    delphiPost++
+    delphiPost %= 20 // switch to next post
+
+    try {
+        const resp = await fetch('https://www.chiefdelphi.com/posts.json?no_definitions=true&page=0')
+        const json = (await resp.text()) as any
+        console.log(json)
+        const id = json.topic_list.topics[delphiPost].id
+        const link = 'https://www.chiefdelphi.com/t/' + id
+        const html = (await (await fetch(link)).text()) + `<myurl>${link}</myurl>`
+        return c.text(
+            sanitizeHtml(html, {
+                allowedClasses: {
+                    '*': ['*']
+                },
+                allowedAttributes: {
+                    '*': ['id', 'class', 'style'],
+                    ...sanitizeHtml.defaults.allowedAttributes
+                },
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'myurl']),
+                transformTags: {
+                    a: 'span',
+                    img: function (tagName, attribs) {
+                        return {
+                            tagName: tagName,
+                            attribs: {
+                                ...attribs,
+                                src: attribs.src.replace(/^\//, 'https://www.chiefdelphi.com/')
+                            }
+                        }
+                    }
+                }
+            })
+        )
+    } catch (e) {
+        logger.warn(e)
+        return c.text('Error loading delphi post', 500)
+    }
+})
 
 export default router

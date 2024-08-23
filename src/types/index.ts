@@ -27,7 +27,7 @@ export type APIClockExternalRespondRequest = {
 export type APIClockResponse = { success: false; error: string; log_id?: number } | { success: true; log_id: number }
 
 type APIMembersResponse = APIMember[]
-export type APILoggedIn = { id: string; email: string; time_in: number }
+export type APILoggedIn = { id: string; email: string; time_in: string }
 
 interface APIMethod {
     req: unknown

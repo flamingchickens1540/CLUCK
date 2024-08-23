@@ -74,7 +74,7 @@ export class MemberCircle extends Circle {
 
         this.loginTime = loginTime
         this.email = email
-
+        this.element.id = email
         this.element.style.backgroundImage = `url(${imgurl})`
         this.element.className = 'memberCircle'
 
@@ -125,8 +125,20 @@ export class ClockCircle extends Circle {
         </div>
         </div>
         </div>`
-
-        setTimeout(async () => {
+        const updateBusElements = async (elements: Element[], busSign: string) => {
+            const arrivals = await getArrivals()
+            elements.forEach((element, index) => {
+                const elemArrivals = arrivals[busSign]
+                const minutesTill = Math.max(0, Math.round((elemArrivals[index].getTime() - Date.now()) / 1000 / 60))
+                element.innerHTML = minutesTill + '&nbsp;min'
+                if (minutesTill <= 5) {
+                    element.classList.add('soonish')
+                } else {
+                    element.classList.remove('soonish')
+                }
+            })
+        }
+        const updateBusTimes = async () => {
             const now = new Date()
             const timetext = document.querySelector('#hoursCircleText')!
             timetext.innerHTML = '' + (((now.getHours() + 12 - 1) % 12) + 1) + ':' + (now.getMinutes().toString().length == 1 ? '0' : '') + now.getMinutes()
@@ -136,21 +148,11 @@ export class ClockCircle extends Circle {
                 timetext.classList.remove('timeSmallerText')
             }
 
-            const arrivals = await getArrivals()
-            const timeElems = [...document.querySelectorAll('.bustime.east'), ...document.querySelectorAll('.bustime.west')]
-
-            for (let busSignIndex = 0; busSignIndex < timeElems.length; busSignIndex++) {
-                let arrivalsCardinal
-                if (busSignIndex < 2) arrivalsCardinal = arrivals[busSigns[0]]
-                else arrivalsCardinal = arrivals[busSigns[1]]
-
-                const minutesTill = Math.max(0, Math.round((arrivalsCardinal[busSignIndex % 2] - Date.now()) / 1000 / 60))
-
-                timeElems[0].innerHTML = minutesTill + '&nbsp;min'
-                if (minutesTill <= 5) timeElems[0].classList.add('soonish')
-                else timeElems[0].classList.remove('soonish')
-            }
-        }, 15000)
+            await updateBusElements([...document.querySelectorAll('.bustime.east')], busSigns.east)
+            await updateBusElements([...document.querySelectorAll('.bustime.west')], busSigns.west)
+        }
+        setTimeout(updateBusTimes)
+        setInterval(updateBusTimes, 15000)
     }
 
     updateSize() {
@@ -210,19 +212,20 @@ export function applyBoundaryForce(circle: Circle) {
     // .scaled(1/Math.sqrt(acceleration.getDistanceFrom(new Vector2D())));
 }
 
-export function updateCircleList(loggedIn: Map<string, number>) {
+export function updateCircleList(loggedIn: Record<string, Date>): string[] {
+    const filled: Record<string, boolean> = {}
     placedCircles = placedCircles.filter((circle) => {
         if (circle instanceof MemberCircle) {
-            if (!loggedIn.has(circle.email)) {
+            if (loggedIn[circle.email] == undefined) {
                 circle.destroy()
                 return false
             }
-            loggedIn.delete(circle.email)
+            filled[circle.email] = true
         }
         return true
     })
 
-    return loggedIn.entries()
+    return Object.keys(loggedIn).filter((email) => !filled[email])
 }
 
 export function placeCircles(circles: Circle[]) {
