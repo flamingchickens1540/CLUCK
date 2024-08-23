@@ -10,7 +10,7 @@ let loggedInCache: Record<string, Date> = {}
 
 window['openFullscreen'] = openFullscreen
 
-cyclePanel()
+setTimeout(cyclePanel)
 setInterval(cyclePanel, 1000 * 60) // chnage panel every 1 minutes
 setInterval(populateCircles, 50) // refresh circles at 20Hz
 
@@ -43,6 +43,7 @@ async function update() {
         document.getElementById('logo')!.style.display = 'block'
         document.body.style.backgroundColor = 'black'
     } catch (e) {
+        console.warn(e)
         document.getElementById('logo')!.style.display = 'none'
         document.body.style.backgroundColor = 'red'
     }
@@ -55,7 +56,7 @@ async function start() {
         members[member.email] = member
     })
     placedCircles.push(new ClockCircle())
-    update()
+    setTimeout(update)
     setInterval(() => {
         update()
     }, 1000 * 30)
@@ -82,4 +83,4 @@ socket.on('connect', () => {
     document.body.style.backgroundColor = 'black'
 })
 
-start()
+setTimeout(start)

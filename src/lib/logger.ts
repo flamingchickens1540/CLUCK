@@ -29,12 +29,15 @@ const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
 }
 
 export const createBoltLogger = (): BoltLogger => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setLevel(level) {
         return
     },
     getLevel() {
         return pinoToBoltLevel[logger.level]
     },
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setName(name: string) {
         return
     },

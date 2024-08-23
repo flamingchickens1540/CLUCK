@@ -23,7 +23,7 @@ import { startSlack } from '~slack'
 const app = new Hono()
 
 // Don't interfere with socket.io
-app.use('/ws/*', async (c, next) => {})
+app.use('/ws/*', async () => {})
 
 app.use(renderer)
 

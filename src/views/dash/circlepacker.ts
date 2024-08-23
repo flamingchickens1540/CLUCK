@@ -111,7 +111,7 @@ export class ClockCircle extends Circle {
         <div class="busstack">
             <div class="busname">
             Gresham
-        <img alt="trimet" src="../static/img/trimet-logo.png" class="trimetlogo">
+        <img alt="trimet" src="/static/img/trimet-logo.png" class="trimetlogo">
             </div>
             <div class="bustime east ">--&nbsp;min</div>
             <div class="bustime smoler east">--&nbsp;min</div>
@@ -319,7 +319,4 @@ export function sizeCircles() {
 
         if (circle instanceof ClockCircle) circle.element.style.fontSize = Math.min(radius) + 'vw'
     }
-}
-function circlesTouching(circle: Circle, circles: Circle[]) {
-    return !circles.every((otherCircle) => circle.r + otherCircle.r <= circle.position.getDistanceFrom(otherCircle.position))
 }

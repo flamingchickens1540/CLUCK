@@ -12,7 +12,7 @@ export const handleOpenOnboardingModal: ActionMiddleware = async ({ body, ack, c
     })
 }
 
-export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack, body, view }) => {
+export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack, view }) => {
     await ack()
     const members = new Set(view.private_metadata.split(','))
     const user_list = await slack_client.users.list({})

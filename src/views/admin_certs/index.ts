@@ -4,8 +4,6 @@ import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 
 async function main() {
-    const departmentLookup = new Map<string, string>()
-
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Cert> {
         private eGui!: HTMLElement
         private eButton!: HTMLElement

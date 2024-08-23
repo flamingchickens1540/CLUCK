@@ -1,79 +1,79 @@
 import { apiFetch } from '~views/util'
 
-type DelphiInfo = {
-    body?: HTMLElement
-    title?: HTMLElement
-    topics: string
-    url: string
-}
+// type DelphiInfo = {
+//     body?: HTMLElement
+//     title?: HTMLElement
+//     topics: string
+//     url: string
+// }
 enum PanelType {
     Delphi,
     Img
 }
-let PANEL_TYPE: PanelType = PanelType.Delphi
+// let PANEL_TYPE: PanelType = PanelType.Delphi
 //const panelTypeOrder = [PanelType.Delphi];
 //let panelTypeI = -1;
 
-function getInfo(siteHTML: string) {
-    const ret: DelphiInfo = {
-        topics: '',
-        url: ''
-    }
-
-    const doc = document.createElement('html')
-    doc.innerHTML = siteHTML
-
-    ret.body = doc.querySelector('.cooked, .post') as HTMLElement
-    ret.title = doc.querySelector('#topic-title')!.children[0] as HTMLElement
-    ret.topics = '<div class="topics">' + doc.querySelector('.topic-category')!.innerHTML + '</div>'
-    ret.url = doc.querySelector('myurl')!.innerHTML
-
-    const commentNum = 3
-    for (let n = 2; n < commentNum + 2; n++) {
-        const commentElem = doc.querySelector(`#post_${n}`) as HTMLElement
-        const comment = document.createElement(`post`)
-        if (commentElem == null) {
-            break
-        }
-
-        // comment body
-        const commentBody = commentElem.querySelector('.post')!
-        commentBody.classList.add('post_body')
-        comment.append(commentBody)
-
-        const posterName = (commentElem.querySelector(`.creator > span > span`) as HTMLElement)?.innerHTML ?? ''
-        let commentTime = commentElem.querySelector(`.post-time`)?.innerHTML.trim() ?? ''
-        commentTime = commentTime.replace(/\d\d\d\d, /, '')
-
-        ret.body.appendChild(document.createElement('br'))
-
-        const breakElem = document.createElement('hr')
-        breakElem.className = 'comment_break'
-        ret.body.appendChild(breakElem)
-
-        const postTimeElem = document.createElement('span')
-        postTimeElem.className = 'comment_time'
-        postTimeElem.innerText = commentTime
-        comment.insertBefore(postTimeElem, comment.firstElementChild)
-
-        const posterNameElem = document.createElement('span')
-        posterNameElem.className = 'commenter_name'
-        posterNameElem.innerText = posterName + ':'
-        comment.insertBefore(posterNameElem, comment.firstElementChild)
-
-        const avatar = document.createElement('img')
-        avatar.style.height = '3.3vh'
-        avatar.style.paddingRight = '1vh'
-        avatar.style.verticalAlign = 'middle'
-        avatar.src = `https://www.chiefdelphi.com/user_avatar/www.chiefdelphi.com/${posterName}/90/169322_2.png`
-        comment.insertBefore(avatar, comment.firstElementChild)
-
-        comment.classList.add('post_comment')
-        ret.body.appendChild(comment)
-    }
-
-    return ret
-}
+// function getInfo(siteHTML: string) {
+//     const ret: DelphiInfo = {
+//         topics: '',
+//         url: ''
+//     }
+//
+//     const doc = document.createElement('html')
+//     doc.innerHTML = siteHTML
+//
+//     ret.body = doc.querySelector('.cooked, .post') as HTMLElement
+//     ret.title = doc.querySelector('#topic-title')!.children[0] as HTMLElement
+//     ret.topics = '<div class="topics">' + doc.querySelector('.topic-category')!.innerHTML + '</div>'
+//     ret.url = doc.querySelector('myurl')!.innerHTML
+//
+//     const commentNum = 3
+//     for (let n = 2; n < commentNum + 2; n++) {
+//         const commentElem = doc.querySelector(`#post_${n}`) as HTMLElement
+//         const comment = document.createElement(`post`)
+//         if (commentElem == null) {
+//             break
+//         }
+//
+//         // comment body
+//         const commentBody = commentElem.querySelector('.post')!
+//         commentBody.classList.add('post_body')
+//         comment.append(commentBody)
+//
+//         const posterName = (commentElem.querySelector(`.creator > span > span`) as HTMLElement)?.innerHTML ?? ''
+//         let commentTime = commentElem.querySelector(`.post-time`)?.innerHTML.trim() ?? ''
+//         commentTime = commentTime.replace(/\d\d\d\d, /, '')
+//
+//         ret.body.appendChild(document.createElement('br'))
+//
+//         const breakElem = document.createElement('hr')
+//         breakElem.className = 'comment_break'
+//         ret.body.appendChild(breakElem)
+//
+//         const postTimeElem = document.createElement('span')
+//         postTimeElem.className = 'comment_time'
+//         postTimeElem.innerText = commentTime
+//         comment.insertBefore(postTimeElem, comment.firstElementChild)
+//
+//         const posterNameElem = document.createElement('span')
+//         posterNameElem.className = 'commenter_name'
+//         posterNameElem.innerText = posterName + ':'
+//         comment.insertBefore(posterNameElem, comment.firstElementChild)
+//
+//         const avatar = document.createElement('img')
+//         avatar.style.height = '3.3vh'
+//         avatar.style.paddingRight = '1vh'
+//         avatar.style.verticalAlign = 'middle'
+//         avatar.src = `https://www.chiefdelphi.com/user_avatar/www.chiefdelphi.com/${posterName}/90/169322_2.png`
+//         comment.insertBefore(avatar, comment.firstElementChild)
+//
+//         comment.classList.add('post_comment')
+//         ret.body.appendChild(comment)
+//     }
+//
+//     return ret
+// }
 
 export async function cyclePanel() {
     //panelTypeI++;
@@ -100,7 +100,7 @@ async function refreshDelphi() {
 // }
 
 export function setPanelType(type: PanelType) {
-    PANEL_TYPE = type
+    // PANEL_TYPE = type
     const children = Array.from(document.querySelector('#delphicontent')!.children)
     if (type == PanelType.Delphi) {
         ;(document.querySelector('#delphicontent') as HTMLElement).style.display = 'block'
