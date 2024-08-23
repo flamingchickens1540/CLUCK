@@ -1,5 +1,5 @@
 import { ClockCircle, MemberCircle, placeCircles, placedCircles, sizeCircles, updateCircleList, updateCircles } from './circlepacker'
-// import { cyclePanel } from './chiefdelphi'
+import { cyclePanel } from './chiefdelphi'
 import { openFullscreen } from '../util'
 import { getLoggedIn, getMemberList } from '~views/grid/clockapi'
 import { APIMember, WSCluckChange } from '~types'
@@ -10,8 +10,8 @@ let loggedInCache: Record<string, Date> = {}
 
 window['openFullscreen'] = openFullscreen
 
-// cyclePanel()  // TODO: Wait for chiefdelphi api to work again
-// setInterval(cyclePanel, 1000 * 60) // chnage panel every 1 minutes
+cyclePanel()
+setInterval(cyclePanel, 1000 * 60) // chnage panel every 1 minutes
 setInterval(populateCircles, 50) // refresh circles at 20Hz
 
 let prevTime = Date.now()

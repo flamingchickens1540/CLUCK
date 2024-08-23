@@ -85,13 +85,12 @@ export async function cyclePanel() {
 }
 
 async function refreshDelphi() {
-    const html = (await apiFetch('/chiefdelphi', 'GET', null))!.body
-    const info = getInfo(html)
-    document.getElementById('delphiTitle')!.innerHTML = info.title!.innerHTML + info.topics
+    const info = (await apiFetch('/dash/chiefdelphi', 'GET', null))!
+    document.getElementById('delphiTitle')!.innerHTML = info.title
     ;(document.getElementById('delphiTitle')!.parentElement as HTMLLinkElement).onclick = () => {
-        window.open(info.url, '_blank')
+        window.open(info.link, '_blank')
     }
-    document.getElementById('delphiBody')!.innerHTML = info.body!.innerHTML
+    document.getElementById('delphiBody')!.innerHTML = info.content.replace('Read full topic', '')
 
     resetScroll()
 }
@@ -104,7 +103,7 @@ export function setPanelType(type: PanelType) {
     PANEL_TYPE = type
     const children = Array.from(document.querySelector('#delphicontent')!.children)
     if (type == PanelType.Delphi) {
-        // (document.querySelector('#delphicontent') as HTMLElement).style.display = 'block'
+        ;(document.querySelector('#delphicontent') as HTMLElement).style.display = 'block'
         children
             .filter((ch) => !ch.classList.contains('theimage'))
             .forEach((child) => {
@@ -132,8 +131,8 @@ export function setPanelType(type: PanelType) {
             })
     }
 }
-setPanelType(PanelType.Img)
-
+setPanelType(PanelType.Delphi)
+setPanelVisibility(true)
 export function setPanelVisibility(visible: boolean) {
     document.getElementById('delphi')!.style.display = visible ? '' : 'none'
 }

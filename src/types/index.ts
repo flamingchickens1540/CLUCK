@@ -1,3 +1,5 @@
+import { PostItem } from '~routes/api/dash'
+
 export type HourCategory = 'lab' | 'external' | 'summer' | 'event' // must also change enum constraint when modifying
 
 export type APIMember = {
@@ -50,8 +52,8 @@ export interface APIRoutes extends Record<string, APIRoute> {
     '/members/refresh': {
         GET: { req: null; resp: APIMembersResponse }
     }
-    '/chiefdelphi': {
-        GET: { req: null; resp: { body: string } }
+    '/dash/chiefdelphi': {
+        GET: { req: null; resp: PostItem }
     }
 }
 
