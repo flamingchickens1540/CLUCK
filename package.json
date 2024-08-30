@@ -15,7 +15,8 @@
         "lint:style": "prettier --check .",
         "lint:code": "eslint . -c eslint.config.js",
         "lint": "npm-run-all -l -c --parallel lint:**",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "createaccount": "tsx dev/create_account.ts $1 $2 $3"
     },
     "dependencies": {
         "@googleapis/sheets": "^9.0.0",

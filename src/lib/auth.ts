@@ -19,7 +19,7 @@ export async function createUser(id: string, password: string, write_access: boo
             password: hashedPassword,
             write_access,
             admin_access,
-            api_key: crypto.randomBytes(20).toString('hex')
+            api_key: crypto.randomBytes(18).toString('hex')
         }
     })
 }
