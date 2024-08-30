@@ -21,7 +21,8 @@
             "students": "SXXX"
         },
         "users": {
-            "admins": ["UXXX"]
+            "admins": ["UXXX"],
+            "devs": ["UXXX"]
         }
     },
     "google": {

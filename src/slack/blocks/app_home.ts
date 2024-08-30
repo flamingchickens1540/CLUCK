@@ -11,12 +11,9 @@ import { getTaskKeys } from '~tasks'
 
 export async function getAppHome(user_id: string) {
     const homeTab = HomeTab()
-    if (config.slack.users.admins.includes(user_id)) {
-        const pending_requests = await getPendingHourSubmissionData()
-        const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
-
+    if (config.slack.users.devs.includes(user_id)) {
         homeTab.blocks(
-            Blocks.Header().text('Admin Dashboard'),
+            Blocks.Header().text('Dev Dashboard'),
             Blocks.Section()
                 .text('Manual Tasks')
                 .accessory(
@@ -29,6 +26,11 @@ export async function getAppHome(user_id: string) {
                 Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
             )
         )
+    }
+    if (config.slack.users.admins.includes(user_id)) {
+        const pending_requests = await getPendingHourSubmissionData()
+        const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
+        
         homeTab.blocks(Blocks.Header().text('Pending Hour Submissions'))
         if (pending_requests.length > 0) {
             homeTab.blocks(pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))

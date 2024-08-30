@@ -59,3 +59,26 @@ export async function announceNewCerts() {
     }
     await prisma.memberCert.updateMany({ where: { announced: false }, data: { announced: true } })
 }
+
+export async function updateProfileCerts() {
+    const members = await prisma.member.findMany({
+        where: { slack_id: {not: null} },
+        select: {
+            slack_id: true,
+            MemberCerts: {
+                select: {  Cert: { select: { label: true } } }
+            }
+        }
+    })
+    for (const member of members) {
+        if (member.slack_id) {
+            await setProfileAttribute(
+                member.slack_id,
+                'certs',
+                member.MemberCerts.map((cert) => cert.Cert.label)
+                    .sort(sortCertLabels)
+                    .join(', ')
+            )
+        }
+    }
+}
