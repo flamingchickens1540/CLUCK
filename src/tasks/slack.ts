@@ -29,7 +29,7 @@ export async function syncSlackMembers() {
             for (const member of db_members) {
                 const slack_member = slack_members_lookup[member.email]
                 if (slack_member != null) {
-                    const display_name = ((slack_member.profile?.display_name?.length ?? 0) > 0 ? slack_member.profile?.display_name : slack_member.name) ?? member.full_name
+                    const display_name = ((slack_member.profile?.display_name?.length ?? 0) > 0 ? slack_member.profile?.display_name : slack_member.real_name) ?? member.full_name
                     await prisma.member.update({
                         where: { email: member.email },
                         data: {
