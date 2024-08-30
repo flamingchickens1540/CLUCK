@@ -21,7 +21,7 @@ export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack, view })
     const fallback_photo_map = new Map<string, string>(fallback_photos.map((fp) => [fp.email, fp.url]))
     await prisma.member.createMany({
         data: members_to_add.map((m) => ({
-            email: m.profile!.email!,
+            email: m.profile!.email!.trim().toLowerCase(),
             slack_id: m.id,
             slack_photo: m.profile?.image_original,
             slack_photo_small: m.profile?.image_192,

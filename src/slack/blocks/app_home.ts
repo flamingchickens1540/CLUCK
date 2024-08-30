@@ -30,7 +30,7 @@ export async function getAppHome(user_id: string) {
     if (config.slack.users.admins.includes(user_id)) {
         const pending_requests = await getPendingHourSubmissionData()
         const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
-        
+
         homeTab.blocks(Blocks.Header().text('Pending Hour Submissions'))
         if (pending_requests.length > 0) {
             homeTab.blocks(pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))

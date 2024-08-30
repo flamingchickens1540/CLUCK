@@ -41,8 +41,8 @@ export function scheduleTasks() {
     tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 30, isProd, 0) // Update spreadsheet every half-hour
     tasks['Sync Members'] = scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // Update slack members every hour, can also be run manually on admin dashboard
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
-    tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2*60)
-    tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60*60*24, isProd, 5*60)
+    tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
+    tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
 }
 
 export async function runTask(key: string) {

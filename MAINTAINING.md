@@ -26,7 +26,7 @@ function loadNext() {
             const email = person.querySelector('a')?.innerHTML?.trim()
             const photo = person.querySelector('.directory-Entry_PersonPhoto--full')?.src
             if (email && photo) {
-                data[email] = photo.replace("c_limit", "c_fill,g_north")
+                data[email] = photo.replace('c_limit', 'c_fill,g_north')
             } else {
                 console.log('missing data for', person)
             }

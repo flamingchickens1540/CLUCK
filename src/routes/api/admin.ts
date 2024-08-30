@@ -18,7 +18,7 @@ router
     })
     .post(async (c) => {
         const data = (await c.req.json()) as Partial<Member>
-        const email = data.email?.trim()
+        const email = data.email?.trim()?.toLowerCase()
         const full_name = data.full_name?.trim()
         if (email == null || full_name == null) {
             return c.json({ success: false })

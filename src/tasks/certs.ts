@@ -62,11 +62,11 @@ export async function announceNewCerts() {
 
 export async function updateProfileCerts() {
     const members = await prisma.member.findMany({
-        where: { slack_id: {not: null} },
+        where: { slack_id: { not: null } },
         select: {
             slack_id: true,
             MemberCerts: {
-                select: {  Cert: { select: { label: true } } }
+                select: { Cert: { select: { label: true } } }
             }
         }
     })
