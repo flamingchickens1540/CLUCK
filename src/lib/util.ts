@@ -7,7 +7,7 @@ export function getMemberPhoto(member: Pick<Member, 'slack_photo' | 'slack_photo
         schoolPhoto = schoolPhoto?.replace('w_300,h_300', 'w_40,h_40') ?? null
         slackPhoto = member.slack_photo_small ?? slackPhoto
     }
-    if (slackPhoto) {
+    if (member.use_slack_photo) {
         return slackPhoto ?? schoolPhoto
     }
     return schoolPhoto
