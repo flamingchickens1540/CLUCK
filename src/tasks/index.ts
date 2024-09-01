@@ -42,12 +42,14 @@ export function scheduleTasks() {
     // Offset is to combat Slack's rate limits
     const isProd = process.env.NODE_ENV === 'prod'
 
-    tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 30, isProd, 0) // Update spreadsheet every half-hour
-    tasks['Sync Members'] = scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // Update slack members every hour, can also be run manually on admin dashboard
+    tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0) 
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
     tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
     tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
+
+    // Slack is silly and can only handle 5 items in the overflow menu
+    scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
 }
 
 export async function runTask(key: string) {
