@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 
-export const router = new Hono().basePath('/membercerts')
+export const router = new Hono().basePath('/membercerts/')
 
 export const cert_colors = [
     'bg-red-200 border-red-500 accent-red-400', //

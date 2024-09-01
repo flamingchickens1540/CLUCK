@@ -120,6 +120,7 @@ model Member {
   slack_photo       String?           @db.VarChar(255)
   slack_photo_small String?           @db.VarChar(255)
   fallback_photo    String?           @db.VarChar(255)
+  is_primary_team   Boolean           @default(true)
   active            Boolean           @default(true)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)

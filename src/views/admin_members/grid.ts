@@ -20,12 +20,18 @@ export function getColumns(params: { photo_column_formatter?: unknown }) {
             editable: true,
             headerName: 'Slack Photo Approved',
             initialWidth: 100
+        },
+        {
+            field: 'is_primary_team',
+            editable: true,
+            headerName: 'Primary Team?',
+            initialWidth: 100
         }
     ]
     if (params.photo_column_formatter) {
         out.unshift({
             headerName: '',
-            valueGetter: (params) => getMemberPhoto(params.data as never) ?? '',
+            valueGetter: (params) => getMemberPhoto(params.data as never, true) ?? '',
             editable: false,
             cellRenderer: params.photo_column_formatter,
             initialWidth: 100

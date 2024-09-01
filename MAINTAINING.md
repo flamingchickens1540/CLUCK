@@ -7,8 +7,9 @@ Alternatively use the onboarding button on the app home
 
 ## Creating Accounts
 
-To create an account, 
+To create an account,
 Role should be "read" "write" or "admin"
+
 ```
 npm run createaccount youruser yourpassword role
 ```

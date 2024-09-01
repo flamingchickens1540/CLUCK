@@ -6,7 +6,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { toTitleCase } from '~lib/util'
 import { getColumns } from '~views/admin_members/grid'
 
-const getDefaultRow = () => ({ use_slack_photo: false }) as never
+const getDefaultRow = () => ({ use_slack_photo: false, is_primary_team: false }) as never
 export async function initNewMemberTable(mainTable: GridApi) {
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Member> {
         private eGui!: HTMLElement

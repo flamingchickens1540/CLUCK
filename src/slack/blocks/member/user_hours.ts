@@ -19,6 +19,8 @@ export async function getUserHourSummaryBlocks(user: Prisma.MemberWhereUniqueInp
         Blocks.Divider(),
         Blocks.Section().fields('External', hours.external.toFixed(1)),
         Blocks.Divider(),
+        Blocks.Section().fields('Meeting', hours.meeting.toFixed(1)),
+        Blocks.Divider(),
         Blocks.Section().fields('Event', hours.event.toFixed(1)),
         Blocks.Divider(),
         Blocks.Section().fields('Summer', hours.summer.toFixed(1)),

@@ -1,11 +1,16 @@
 import type { Member } from '@prisma/client'
 
 export function getMemberPhoto(member: Pick<Member, 'slack_photo' | 'slack_photo_small' | 'fallback_photo' | 'use_slack_photo'>, small: boolean = false): string | null {
-    if (member.use_slack_photo) {
-        return (small ? member.slack_photo_small : member.slack_photo) ?? member.fallback_photo
-    } else {
-        return member.fallback_photo
+    let slackPhoto = member.slack_photo
+    let schoolPhoto = member.fallback_photo
+    if (small) {
+        schoolPhoto = schoolPhoto?.replace('w_300,h_300', 'w_40,h_40') ?? null
+        slackPhoto = member.slack_photo_small ?? slackPhoto
     }
+    if (slackPhoto) {
+        return slackPhoto ?? schoolPhoto
+    }
+    return schoolPhoto
 }
 
 export function safeParseInt(value: unknown): number | undefined {

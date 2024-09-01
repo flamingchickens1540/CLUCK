@@ -56,9 +56,9 @@ export async function updateSheet() {
         'QualifyingHours',
         'TotalHours',
         'WeeklyHours',
+        'IsPrimaryTeam',
         'Photo',
-        'Certifications',
-        'FirstRegistered'
+        'Certifications'
     ] as const
     const columns = Object.fromEntries(headers.map((h, i) => [h, i])) as Record<(typeof headers)[number], number>
     const rows: (string | number)[][] = []
@@ -81,6 +81,7 @@ export async function updateSheet() {
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email]?.join(', ')
+        row[columns.IsPrimaryTeam] = m.is_primary_team
         rows.push(row)
 
         if (hours.qualifying >= 50) {
