@@ -2,7 +2,7 @@ import prisma from '~lib/prisma'
 import logger from '~lib/logger'
 
 export async function syncFallbackPhotos() {
-    const members = await prisma.member.findMany({ select: { email: true } })
+    const members = await prisma.member.findMany({ select: { email: true }, where: { active: true } })
 
     for (const member of members) {
         const fallbackPhoto = await prisma.fallbackPhoto.findUnique({ where: { email: member.email } })

@@ -42,7 +42,7 @@ export function scheduleTasks() {
     // Offset is to combat Slack's rate limits
     const isProd = process.env.NODE_ENV === 'prod'
 
-    tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0) 
+    tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
     tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
     tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
