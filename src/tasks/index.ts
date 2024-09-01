@@ -3,15 +3,16 @@ import { updateSlackUsergroups } from '~tasks/slack_groups'
 import { syncSlackMembers } from '~tasks/slack'
 import { announceNewCerts, updateProfileCerts } from '~tasks/certs'
 import { updateSheet } from '~spreadsheet'
+import { syncFallbackPhotos } from './photos'
 
 type TaskFunc = (reason: string) => Promise<void>
 type Func = (() => void) | (() => Promise<void>)
 
 const tasks: Record<string, TaskFunc> = {}
 
-function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, offset_seconds: number): TaskFunc {
+function createTaskFunc(task: Func): TaskFunc {
     const label = 'task/' + task.name
-    const cb = async (reason: string) => {
+    return async (reason: string) => {
         try {
             await task()
         } catch (e) {
@@ -21,6 +22,9 @@ function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, 
         logger.info({ name: label }, 'Task ran successfully')
         return
     }
+}
+function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, offset_seconds: number): TaskFunc {
+    const cb = createTaskFunc(task)
     if (runOnInit) {
         setTimeout(() => {
             cb('initial run')
@@ -43,6 +47,7 @@ export function scheduleTasks() {
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
     tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
     tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
+    tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
 }
 
 export async function runTask(key: string) {

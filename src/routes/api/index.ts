@@ -52,10 +52,11 @@ router.post('/members/fallback_photos', requireWriteAPI, async (c) => {
     const { count } = await prisma.fallbackPhoto.createMany({ data: Object.entries(body).map(([k, v]) => ({ email: k.toLowerCase(), url: v })) })
     const members = await prisma.member.findMany({ select: { email: true } })
     for (const member of members) {
-        await prisma.member.update({ where: { email: member.email }, data: { fallback_photo: body[member.email] } })
+        await prisma.member.update({ where: { email: member.email }, data: { fallback_photo: body[member.email.toLowerCase()] } })
     }
     return c.text(`Updated ${count} fallback photos`)
 })
+
 function clockJson(c: Context, payload: APIClockResponse) {
     return c.json(payload)
 }
