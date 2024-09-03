@@ -4,6 +4,7 @@ import { syncSlackMembers } from '~tasks/slack'
 import { announceNewCerts, updateProfileCerts } from '~tasks/certs'
 import { updateSheet } from '~spreadsheet'
 import { syncFallbackPhotos } from './photos'
+import { setupAutoLogout } from './midnight'
 
 type TaskFunc = (reason: string) => Promise<void>
 type Func = (() => void) | (() => Promise<void>)
@@ -47,7 +48,7 @@ export function scheduleTasks() {
     tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
     tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
-
+    setupAutoLogout()
     // Slack is silly and can only handle 5 items in the overflow menu
     scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
 }
