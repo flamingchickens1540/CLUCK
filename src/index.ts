@@ -1,49 +1,56 @@
+import type { Server as HttpServer } from 'http'
 
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
+import { Hono } from 'hono'
+import { appendTrailingSlash } from 'hono/trailing-slash'
+import { compress } from 'hono/compress'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { CronJob } from 'cron';
-import express from 'express';
-import { existsSync, mkdirSync } from 'fs';
-import { basepath, server_port } from '../secrets/consts.js';
-import { router as apiRouter } from './api/index.js';
-import { dataDirectory, getResourceURL } from './consts';
-import { collect } from './member-collector/collector';
-import { router as memberRouter} from './member-collector/router';
-import { router as frontendRouter } from './router';
-import path from 'path'
-// Refresh profile images every day
-new CronJob({
-    cronTime: '*/15 * * * *',
-    start: true,
-    timeZone: 'America/Los_Angeles',
-    runOnInit: true,
-    onTick: () => collect()
+import { renderer } from '~lib/renderer'
+
+import admin_router from '~routes/admin'
+import api_router from '~routes/api'
+import account_router from '~routes/auth'
+
+import { requireAdminLogin, requireReadLogin } from '~lib/auth'
+import logger from '~lib/logger'
+import { startWS } from '~lib/sockets'
+import { scheduleTasks } from '~tasks'
+import config from '~config'
+import { startSlack } from '~slack'
+
+const app = new Hono()
+
+// Don't interfere with socket.io
+app.use('/ws/*', async () => {})
+
+app.use(renderer)
+
+app.use(compress())
+app.use(appendTrailingSlash())
+app.use(secureHeaders())
+app.use(async (c, next) => {
+    logger.debug(`${c.req.method} ${c.req.url}`)
+    await next()
 })
 
+app.use('/admin/*', requireAdminLogin)
+app.use('/grid/', requireReadLogin)
+app.get('/grid', (c) => c.redirect('/grid/', 301))
+app.get('/dash', (c) => c.redirect('/dash/', 301))
 
-if (!existsSync(dataDirectory)) {
-    mkdirSync(dataDirectory);
-}
+app.route('/admin/', admin_router)
+app.route('/api', api_router)
+app.route('/auth', account_router)
 
-// Init Express App
-const app = express()
+app.use('/static/*', serveStatic({ root: './' }))
+app.use('/*', serveStatic({ root: './public' }))
 
-app.use("/api", apiRouter)
-app.use("/api", memberRouter)
-app.use("/", frontendRouter)
+const server = serve({ fetch: app.fetch, port: config.port }, async (info) => {
+    logger.info(`Server is running: http://${info.address}:${info.port}`)
 
-// Init data directory
-
-
-
-// Redirect unknown routes to dashboard
-app.use(function(req, res) {
-    if (!req.url.endsWith("/")) {
-        const destination = path.join("/", basepath, path.normalize(req.url), "/");
-        console.log("302", req.url, "->", destination)
-        res.redirect(destination)
-    } else {
-        res.status(404).send("Could not find resource").end()
-    }
+    await startSlack()
+    scheduleTasks()
+    startWS(server as HttpServer)
 })
-
-app.listen(server_port, () => { console.log(`listening: ${getResourceURL("", true)}`) });
