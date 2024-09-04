@@ -1,6 +1,7 @@
 import {getArrivals, busSigns} from "./trimet"
 
 const membersDiv = document.getElementById('members');
+const DELTA_AVG = 0.25;
 
 export class Vector2D {
     x : number;
@@ -81,7 +82,7 @@ export class MemberCircle extends Circle {
         nameBubble.className = 'bubblename'
         nameBubble.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
         // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
-        nameBubble.style.fontSize = '25px';
+        nameBubble.style.fontSize = '50px';
     }
 
     updateSize() {
@@ -164,7 +165,7 @@ export class ClockCircle extends Circle{
 
     updateSize() {
         this.r = 20;
-        this.r = Math.max(...placedCircles.map(circle => circle.r * 1.2));
+        this.r = Math.max(...placedCircles.map(circle => circle.r * 1.5));
     }
 }
 
@@ -174,7 +175,8 @@ const BUBBLE_COLORS = ['rgba(35,132,198,.5)', 'rgba(255,214,0,.5)', 'rgba(241,93
 const FORCE_MULTIPLIER = 0.1;
 const FRICTION = 0.8;
 const TIME_SCALE = 1;
-const MARGIN = 1;
+const MARGIN = 0.5;
+const SNAP_DISTANCE = 1000;
 
 
 export function getBounds() {
@@ -264,9 +266,16 @@ export function placeCircles(circles : Circle[]) {
 }
 
 export function updateCircles(time : number) {
-    if(time > 100) return;
+    if(time > 1000) return;
 
     placedCircles.forEach(circle => circle.updateSize());
+
+    const sortedCircles = placedCircles.sort((a, b) => a.r - b.r);
+
+    let sizeSum = 0;
+
+    for(const circle of sortedCircles)
+        circle.r -= (circle.r - (sizeSum += circle.r)/(sortedCircles.length+1)) * DELTA_AVG;
 
     time *= TIME_SCALE;
     
@@ -317,8 +326,34 @@ export function updateCircles(time : number) {
     }
 }
 
-export function sizeCircles() {
-    const { maxX, maxY, minX, minY } = getBounds()
+let renderedCircles = [];
+
+export async function sizeCircles() {
+    const sizedCircles = [];
+    for(const circle of placedCircles) {
+        let minScale = Infinity;
+
+        placedCircles.forEach(otherCircle => {
+            if(otherCircle == circle)
+                return Infinity;
+            minScale = Math.min(circle.position.getDistanceFrom(otherCircle.position) / (circle.r + otherCircle.r), minScale);
+        });
+        
+        sizedCircles.push({
+            circle,
+            radius : circle.r * (minScale == Infinity ? 1 : minScale)
+        });
+    }
+
+    let maxX = 0, maxY = 0, minX = 0, minY = 0;
+
+    sizedCircles.forEach(circle => {
+        maxX = Math.max(circle.circle.position.x + circle.radius, maxX);
+        minX = Math.min(circle.circle.position.x - circle.radius, minX);
+        maxY = Math.max(circle.circle.position.y + circle.radius, maxY);
+        minY = Math.min(circle.circle.position.y - circle.radius, minY);
+    });
+
     const widthMult = membersDiv.clientWidth/membersDiv.clientHeight;
 
     const lengthYX = (maxY - minY) * widthMult;
@@ -331,18 +366,52 @@ export function sizeCircles() {
     const offsetX = (vwWidth - lengthX * multiplier)/2;
     const offsetY = (vwWidth - lengthYX * multiplier)/2;
 
-    for(const circle of placedCircles) {
-        const elem = circle.element;
-        const radius = circle.r * 2 * multiplier - MARGIN;
+    let snapCircles = false;
+    for(const circle of sizedCircles) {
+        const elem = circle.circle.element;
 
-        elem.style.width = elem.style.height = `${radius}vw`;
-        elem.style.left = `${(circle.position.x - minX) * multiplier + offsetX - radius/2}vw`;
-        elem.style.top = `${(circle.position.y - minY) * multiplier + offsetY - radius/2}vw`;
+        let diameter = circle.radius * multiplier * 2 - MARGIN;
 
-        if(circle instanceof ClockCircle)
-            circle.element.style.fontSize = Math.min(radius) + "vw"
+        elem.style.width = elem.style.height = `${diameter}vw`;
+
+        elem.style.left = `${(circle.circle.position.x - minX) * multiplier + offsetX - diameter/2}vw`;
+        elem.style.top = `${(circle.circle.position.y - minY) * multiplier + offsetY - diameter/2}vw`;
+
+        if(circle.circle instanceof ClockCircle) {
+            elem.style.fontSize = diameter + "vw";
+        }
+
+        let rendered = renderedCircles.find(renderedCircle => circle.circle == renderedCircle.circle);
+        const computedStyle = elem.computedStyleMap();
+        if(rendered == undefined) {
+            renderedCircles.push({
+                circle : circle.circle,
+                top : computedStyle.get("top").value,
+                left : computedStyle.get("left").value,
+                dia : computedStyle.get("width").value
+            })
+        } else {
+            if(!(Math.abs(computedStyle.get("top").value - rendered.top) < SNAP_DISTANCE && Math.abs(computedStyle.get("left").value - rendered.left) < SNAP_DISTANCE)) {
+                snapCircles = true;
+            }
+        }
     }
-}
-function circlesTouching(circle : Circle, circles : Circle[]) {
-    return !circles.every(otherCircle => circle.r + otherCircle.r <= circle.position.getDistanceFrom(otherCircle.position));
+    
+    if(snapCircles) {
+        renderedCircles.forEach(rendered => {
+            const computedStyle = rendered.circle.element.computedStyleMap();
+            
+            rendered.top = computedStyle.computedStyleMap().get("top").value;
+            rendered.left = computedStyle.computedStyleMap().get("left").value;
+            rendered.dia = computedStyle.computedStyleMap().get("width").value;
+        });
+    } else {
+        renderedCircles.forEach(rendered => {
+            const style = rendered.circle.element.style;
+            
+            style.top = `${rendered.top}px`;
+            style.left = `${rendered.left}px`;
+            style.width = style.height = `${rendered.dia}px`;
+        });
+    }
 }

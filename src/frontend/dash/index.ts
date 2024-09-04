@@ -11,7 +11,7 @@ window["openFullscreen"] = openFullscreen
 
 cyclePanel()
 setInterval(cyclePanel, 1000 * 60 * 1) // chnage panel every 1 minutes
-setInterval(regenCircles, 10) // chnage panel every 1 minutes
+setInterval(regenCircles, 50) // chnage panel every 1 minutes
 
 let prevTime = Date.now();
 
@@ -43,6 +43,21 @@ function regenCircles() {
     sizeCircles();
 
     prevTime = now;
+}
+
+const densityMultiplier = 0.006;
+// Estimates name density
+function getNameDensity(circles : MemberCircle[]) {
+    let nameSize = 0;
+    let circleSizeSum = 0;
+    let circleSizeSumSqr = 0;
+    for(const circle of circles) {
+        nameSize += circle.name.length * densityMultiplier + 2;
+        circleSizeSumSqr += Math.pow(circle.r, 2);
+        circleSizeSum += circle.r;
+    }
+
+    return densityMultiplier * nameSize / Math.sqrt(circleSizeSumSqr / circleSizeSum / circles.length);
 }
 
 function update() {
