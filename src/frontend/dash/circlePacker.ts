@@ -82,7 +82,7 @@ export class MemberCircle extends Circle {
         nameBubble.className = 'bubblename'
         nameBubble.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
         // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
-        nameBubble.style.fontSize = '50px';
+        nameBubble.style.fontSize = '1px';
     }
 
     updateSize() {
@@ -176,7 +176,7 @@ const FORCE_MULTIPLIER = 0.1;
 const FRICTION = 0.8;
 const TIME_SCALE = 1;
 const MARGIN = 0.5;
-const SNAP_DISTANCE = 1000;
+const SNAP_DISTANCE = 3;
 
 
 export function getBounds() {
@@ -396,14 +396,19 @@ export async function sizeCircles() {
             }
         }
     }
+
+    renderedCircles.filter(rendered => rendered.circle.element);
     
     if(snapCircles) {
-        renderedCircles.forEach(rendered => {
+        renderedCircles.forEach((rendered, index) => {
             const computedStyle = rendered.circle.element.computedStyleMap();
-            
-            rendered.top = computedStyle.computedStyleMap().get("top").value;
-            rendered.left = computedStyle.computedStyleMap().get("left").value;
-            rendered.dia = computedStyle.computedStyleMap().get("width").value;
+            if(computedStyle.get("top") == undefined) {
+                renderedCircles.splice(index, 1);
+                return;
+            }
+            rendered.top = computedStyle.get("top").value;
+            rendered.left = computedStyle.get("left").value;
+            rendered.dia = computedStyle.get("width").value;
         });
     } else {
         renderedCircles.forEach(rendered => {
