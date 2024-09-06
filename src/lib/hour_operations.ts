@@ -20,7 +20,7 @@ export async function completeHourLog(email: string, isVoid: boolean): Promise<{
         where: { id: log.id },
         data: {
             time_out: new Date(),
-            state: 'complete',
+            state: isVoid ? 'cancelled' : 'complete',
             duration: new Prisma.Decimal(isVoid ? 0 : duration)
         }
     })
