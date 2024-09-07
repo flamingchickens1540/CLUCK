@@ -82,7 +82,7 @@ export class MemberCircle extends Circle {
         nameBubble.className = 'bubblename'
         nameBubble.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
         // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
-        nameBubble.style.fontSize = '1px';
+        nameBubble.style.fontSize = '0.2in';
     }
 
     updateSize() {
