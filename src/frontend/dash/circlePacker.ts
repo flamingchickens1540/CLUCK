@@ -82,7 +82,7 @@ export class MemberCircle extends Circle {
         nameBubble.className = 'bubblename'
         nameBubble.style.backgroundColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
         // name.style.fontSize = `${Math.min(30*multiplier, 20)}px`;
-        nameBubble.style.fontSize = '5rem';
+        nameBubble.style.fontSize = '2.5vh';
     }
 
     updateSize() {
@@ -176,7 +176,7 @@ const FORCE_MULTIPLIER = 0.1;
 const FRICTION = 0.8;
 const TIME_SCALE = 1;
 const MARGIN = 0.5;
-const SNAP_DISTANCE = 3;
+const SNAP_DISTANCE = 20;
 
 
 export function getBounds() {
