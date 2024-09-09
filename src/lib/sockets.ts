@@ -13,13 +13,6 @@ export function startWS(server: HttpServer) {
         path: '/ws'
     })
     logger.info('Websocket server started')
-
-    io.on('connection', (socket) => {
-        socket.emit('hello', 'world')
-        socket.on('hello', (data) => {
-            socket.broadcast.emit('hello', data)
-        })
-    })
 }
 
 export function emitCluckChange(data: WSCluckChange) {

@@ -20,8 +20,8 @@ export default tseslint.config(
                 {
                     argsIgnorePattern: '^_',
                     varsIgnorePattern: '^_',
-                    caughtErrorsIgnorePattern: '^_',
-                },
+                    caughtErrorsIgnorePattern: '^_'
+                }
             ],
             'prefer-const': 'warn',
             '@typescript-eslint/ban-ts-comment': ['warn', { 'ts-ignore': 'allow-with-description' }]

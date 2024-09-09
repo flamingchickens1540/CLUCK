@@ -63,7 +63,7 @@ export default {
     autoSignoutDM(v: { slack_id: string; time_in: Date }) {
         return Message()
             .text(
-                `Hey <@${v.slack_id}>! You signed into the lab today at ${v.time_in.toLocaleTimeString()} but forgot to sign out, so we didn't log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`
+                `Hey <@${v.slack_id}>! You signed into the lab today at ${v.time_in.toLocaleTimeString('en-us', { hour: 'numeric', hour12: true, minute: '2-digit' })} but forgot to sign out, so we didn't log your hours for today :( Make sure you always sign out before you leave. Hope you had fun and excited to see you in the lab again!`
             )
             .buildToObject()
     }
