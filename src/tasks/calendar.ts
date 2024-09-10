@@ -6,7 +6,6 @@ import { emitCluckChange } from '~lib/sockets'
 import { slack_client } from '~slack'
 import responses from '~slack/blocks/responses'
 
-
 export async function promptCheckinMessage() {
     await slack_client.chat.postMessage({
         channel: config.slack.channels.checkin,

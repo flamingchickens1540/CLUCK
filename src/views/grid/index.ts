@@ -25,6 +25,9 @@ export async function buildGrid() {
         // Init button
         const memberButton = document.createElement('div')
         memberButton.classList.add('memberButton')
+        if (member.isManager) {
+            memberButton.classList.add('manager')
+        }
         memberButton.id = member.email
 
         // Set click toggle

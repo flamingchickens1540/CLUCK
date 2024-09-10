@@ -24,7 +24,7 @@ if (gridstyle == 'void') {
 
 export function applyRandomStyles(e: HTMLDivElement) {
     e.classList.add(randomChoice('labelLeft', 'labelRight', 'labelCenter'))
-    e.classList.add(randomChoice('labelTop', 'labelBottom'))
+    // e.classList.add(randomChoice('labelTop', 'labelBottom'))
     e.style.fontFamily = randomChoice('gilroy', 'cocogoose', 'tcm')
 }
 

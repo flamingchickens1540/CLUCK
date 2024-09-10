@@ -8,6 +8,7 @@ export type APIMember = {
     full_name: string
     photo: string
     photo_small: string
+    isManager: boolean
 }
 
 export type APIClockLabRequest = {

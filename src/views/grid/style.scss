@@ -107,6 +107,12 @@ box-shadow: inset 0 0 0 1000px rgba(0, 255, 85, 0.2); */
     }
 }
 
+.memberButton.manager[data-loggedin='true'] {
+    box-shadow:
+        inset 0 0 0 1000px rgba(255, 255, 255, 0),
+        0 0 15px 7px rgb(251, 0, 255);
+}
+
 body[data-gridstyle='void'] {
     .memberButton {
         .buttonText {
@@ -122,6 +128,10 @@ body[data-gridstyle='void'] {
                 0 0 15px 7px rgb(255, 0, 0);
         }
     }
+}
+
+.manager .buttonText {
+    box-shadow: inset 0 0 0 1000px rgba(255, 70, 237, 0.6);
 }
 
 .buttonText {
