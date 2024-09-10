@@ -22,7 +22,17 @@ router.get('/members', requireReadAPI, async (c) => {
             use_slack_photo: true,
             slack_photo: true,
             slack_photo_small: true,
-            fallback_photo: true
+            fallback_photo: true,
+            MemberCerts: {
+                where: {
+                    Cert: {
+                        isManager: true
+                    }
+                },
+                select: {
+                    cert_id: true
+                }
+            }
         },
         where: {
             active: true
@@ -34,7 +44,8 @@ router.get('/members', requireReadAPI, async (c) => {
         first_name: member.first_name,
         full_name: member.full_name,
         photo: getMemberPhotoOrDefault(member, false),
-        photo_small: getMemberPhotoOrDefault(member, true)
+        photo_small: getMemberPhotoOrDefault(member, true),
+        isManager: member.MemberCerts.length > 0
     }))
     return c.json(resp)
 })

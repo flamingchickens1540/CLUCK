@@ -15,7 +15,7 @@ const transport = pino.transport({
     ]
 })
 
-const logger = pino({ level: 'trace' }, transport)
+const logger = pino({ level: 'debug' }, transport)
 
 const pinoToBoltLevel: Record<LevelWithSilentOrString, BoltLogLevel> = {
     fatal: BoltLogLevel.ERROR,

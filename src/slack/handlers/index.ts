@@ -20,6 +20,7 @@ import {
     handleSubmitHoursRejectModal
 } from './actions/hours_response'
 import { handleRunTask } from '~slack/handlers/actions/run_task'
+import { handleAppMentioned } from './actions/checkin'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -91,6 +92,7 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_ONBOARDING, handleSubmitOnboardingModal)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
+    app.event('app_mention', handleAppMentioned)
     app.action(/./, async ({ body, logger, action }) => {
         const details: Record<string, string> = {
             type: body?.type,
