@@ -1,9 +1,18 @@
 import { Prisma } from '@prisma/client'
+import config from '~lib/config'
 import logger from '~lib/logger'
 import prisma from '~lib/prisma'
 import { emitCluckChange } from '~lib/sockets'
 import { slack_client } from '~slack'
 import responses from '~slack/blocks/responses'
+
+
+export async function promptCheckinMessage() {
+    await slack_client.chat.postMessage({
+        channel: config.slack.channels.checkin,
+        text: "<!channel> it's that time again! Make a checkin post"
+    })
+}
 
 export async function logoutAll() {
     const loggedIn = await prisma.hourLog.findMany({

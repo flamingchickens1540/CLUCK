@@ -15,12 +15,14 @@
             "celebration": "CXXXX",
             "void": "CXXX",
             "approval": "DXXX",
-            "certification_approval": "DXXX"
+            "certification_approval": "DXXX",
+            "checkin": "CXXX"
         },
         "groups": {
             "students": "SXXX"
         },
         "users": {
+            "copres": ["UXXX"],
             "admins": ["UXXX"],
             "devs": ["UXXX"]
         }

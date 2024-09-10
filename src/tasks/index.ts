@@ -5,7 +5,7 @@ import { announceNewCerts, updateProfileCerts } from '~tasks/certs'
 import { updateSheet } from '~spreadsheet'
 import { syncFallbackPhotos } from './photos'
 import schedule from 'node-schedule'
-import { logoutAll } from './midnight'
+import { logoutAll, promptCheckinMessage } from './calendar'
 
 type TaskFunc = ((reason: string) => Promise<void>) & { label: string }
 type Func = (() => void) | (() => Promise<void>)
@@ -43,7 +43,7 @@ function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, 
 }
 
 function scheduleCronTask(task: TaskFunc, cron_exp: string) {
-    schedule.scheduleJob(task.label, cron_exp, (date) => task('scheduled run'))
+    schedule.scheduleJob(task.label, cron_exp, (_date) => task('scheduled run'))
     return task
 }
 
@@ -58,6 +58,7 @@ export function scheduleTasks() {
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 
     // Slack is silly and can only handle 5 items in the overflow menu
+    scheduleCronTask(createTaskFunc(promptCheckinMessage), "0 9 * * SAT")
     scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
     scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
 }
