@@ -89,13 +89,15 @@ router
                     return clockJson(c, { success: false, error: 'member already logged in', log_id: log.id })
                 }
                 if (action == 'out') {
+                    logger.debug('logging out ' + email)
                     await completeHourLog(email, false)
                 } else if (action == 'void') {
+                    logger.debug('voiding ' + email)
                     await completeHourLog(email, true)
                 }
-
                 return clockJson(c, { success: true, log_id: log.id })
             } else if (action == 'in') {
+                logger.debug('logging in ' + email)
                 const newLog = await prisma.hourLog.create({
                     data: {
                         member_id: email,

@@ -104,7 +104,7 @@ export function registerSlackHandlers(app: App) {
         if ('action_id' in action) {
             details.action_id = action.action_id
         }
-        logger.debug(details, 'Slack action triggered')
+        logger.info(details, 'Slack action triggered')
     })
 
     app.command(/./, async ({ body, logger, command }) => {
@@ -114,6 +114,6 @@ export function registerSlackHandlers(app: App) {
             command: command?.command,
             text: command?.text
         }
-        logger.debug(details, 'Slack command triggered')
+        logger.info(details, 'Slack command triggered')
     })
 }
