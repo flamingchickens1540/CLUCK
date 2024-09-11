@@ -80,7 +80,7 @@ export async function updateSheet() {
         row[columns.TotalHours] = max50Hours(hours.total)
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
-        row[columns.Certifications] = certMap[m.email]?.join(', ')
+        row[columns.Certifications] = certMap[m.email]?.join(', ') ?? ''
         row[columns.IsPrimaryTeam] = m.is_primary_team
         rows.push(row)
 
