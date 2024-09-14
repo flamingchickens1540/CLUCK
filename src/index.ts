@@ -31,7 +31,7 @@ app.use(compress())
 app.use(appendTrailingSlash())
 app.use(secureHeaders())
 app.use(async (c, next) => {
-    logger.debug(`${c.req.method} ${c.req.url}`)
+    logger.trace(`${c.req.method} ${c.req.url}`)
     await next()
 })
 
