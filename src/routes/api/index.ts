@@ -1,14 +1,15 @@
 import { Context, Hono } from 'hono'
 import { syncSlackMembers } from '~tasks/slack'
-import { APIClockLabRequest, APIClockResponse, APIMember } from '~types'
+import { APIClockLabRequest, APIClockResponse, APIMeetingAttendance, APIMember, APIRoutes } from '~types'
 import logger from '~lib/logger'
-import { requireReadAPI, requireWriteAPI } from '~lib/auth'
+import { requireAdminAPI, requireAdminLogin, requireReadAPI, requireWriteAPI } from '~lib/auth'
 import { emitCluckChange } from '~lib/sockets'
 import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { cors } from 'hono/cors'
 import { completeHourLog } from '~lib/hour_operations'
 import { router as admin_api_router } from './admin'
 import { router as dash_api_router } from './dash'
+import { enum_MeetingAttendances_state } from '@prisma/client'
 
 const router = new Hono()
 router.route('/', admin_api_router)
@@ -126,4 +127,60 @@ router
         return c.json(records.map(({ id, member_id, time_in }) => ({ id, time_in, email: member_id })))
     })
 
+router
+    .post('/attendance', requireWriteAPI, async (c) => {
+        const { email, state, meeting }: APIMeetingAttendance = await c.req.json()
+        try {
+            await prisma.meetingAttendanceEntry.upsert({
+                where: {
+                    meeting_id_member_id: {
+                        meeting_id: meeting,
+                        member_id: email
+                    }
+                },
+                create: {
+                    meeting_id: meeting,
+                    member_id: email,
+                    state
+                },
+                update: {
+                    state
+                }
+            })
+            return c.json({ success: true, error: null })
+        } catch (e) {
+            logger.error(e, 'POST /attendance failed')
+            c.status(500)
+            return c.json({ success: false, error: e })
+        }
+    })
+    .get(requireWriteAPI, async (c) => {
+        const meeting = await prisma.meetings.findFirst({
+            orderBy: {
+                createdAt: 'desc'
+            },
+            select: {
+                id: true,
+                date: true,
+                Attendances: {
+                    select: {
+                        state: true,
+                        member_id: true
+                    }
+                }
+            }
+        })
+        if (!meeting) {
+            c.status(400)
+            return c.text('No meetings found')
+        }
+        const map: Record<string, enum_MeetingAttendances_state> = {}
+        meeting.Attendances.forEach((a) => (map[a.member_id] = a.state))
+        const out: APIRoutes['/attendance']['GET']['resp'] = {
+            id: meeting.id,
+            label: meeting.date.toLocaleDateString(),
+            attendance: map
+        }
+        return c.json(out)
+    })
 export default router

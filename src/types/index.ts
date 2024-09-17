@@ -1,3 +1,4 @@
+import { enum_MeetingAttendances_state } from '@prisma/client'
 import { PostItem } from '~routes/api/dash'
 
 export type HourCategory = 'lab' | 'external' | 'summer' | 'event' // must also change enum constraint when modifying
@@ -29,6 +30,12 @@ export type APIClockExternalRespondRequest = {
 }
 export type APIClockResponse = { success: false; error: string; log_id?: number } | { success: true; log_id: number }
 
+export type APIMeetingAttendance = {
+    email: string
+    state: enum_MeetingAttendances_state
+    meeting: number
+}
+
 type APIMembersResponse = APIMember[]
 export type APILoggedIn = { id: string; email: string; time_in: string }
 
@@ -46,6 +53,17 @@ export interface APIRoutes extends Record<string, APIRoute> {
     '/clock/lab': {
         POST: { req: APIClockLabRequest; resp: APIClockResponse }
         GET: { req: null; resp: APILoggedIn[] }
+    }
+    '/attendance': {
+        POST: { req: APIMeetingAttendance; resp: APIClockResponse }
+        GET: {
+            req: null
+            resp: {
+                id: number
+                label: string
+                attendance: Record<string, enum_MeetingAttendances_state>
+            }
+        }
     }
     '/members': {
         GET: { req: null; resp: APIMembersResponse }

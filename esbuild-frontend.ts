@@ -11,6 +11,7 @@ fs.stat('./public').catch(async () => {
 
 const views: Record<string, string> = {
     grid: '/grid/',
+    grid_attendance: '/attendance/',
     dash: '/dash/',
     admin_members: '/admin/members/',
     admin_certs: '/admin/certs/',

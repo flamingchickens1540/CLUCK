@@ -1,0 +1,176 @@
+/* Fonts */
+@font-face {
+    font-family: basics-serif;
+    src: url(/static/font/basics_serif.ttf);
+}
+
+@font-face {
+    font-family: cocogoose;
+    src: url(/static/font/cocogoose.ttf);
+}
+
+@font-face {
+    font-family: gilroy;
+    src: url(/static/font/gilroy-bold.otf);
+}
+
+@font-face {
+    font-family: tcm;
+    src: url(/static/font/tcm.ttf);
+}
+
+html {
+    overflow: hidden;
+    touch-action: none;
+}
+
+body {
+    background-image: url('/static/img/bg-grid.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    overscroll-behavior: none;
+}
+
+.blurredBody {
+    background-image: url('/static/img/bg-grid-blurred.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.noconnect {
+    position: absolute;
+    background-color: red;
+    font-size: 400%;
+    color: white;
+    height: 60%;
+    width: 100%;
+    text-align: center;
+    z-index: 100;
+    left: 0%;
+    vertical-align: middle;
+    line-height: 800%;
+    top: 15%;
+    visibility: hidden;
+}
+
+:root {
+    --width: 10;
+    --height: 4;
+}
+
+.button-grid {
+    height: 97vh;
+    margin: 10px;
+    display: grid;
+    grid-template-columns: repeat(var(--width), 1fr);
+    grid-template-rows: repeat(var(--height), 1fr);
+}
+
+/* .button-in {
+        filter: grayscale(90%);
+        box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.2);
+} */
+
+/* filter: grayscale(0%);
+box-shadow: inset 0 0 0 1000px rgba(0, 255, 85, 0.2); */
+
+#title {
+    position: fixed;
+    pointer-events: none;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    padding: 8px;
+    background-color: #4b6e8c88;
+    border-top-left-radius: 10px;
+}
+
+.memberButton {
+    margin: 4px;
+    cursor: pointer;
+    background-size: cover;
+    background-position-y: top;
+    background-position-x: center;
+    background-repeat: no-repeat;
+
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition-duration: 75ms;
+}
+
+.memberButton {
+    &[data-state='absent'] {
+        .buttonText {
+            box-shadow: inset 0 0 0 1000px rgba(70, 255, 169, 0.6);
+        }
+        & {
+            box-shadow:
+                inset 0 0 0 1000px rgba(255, 255, 255, 0.4),
+                0 0 10px rgba(255, 0, 0, 0.5);
+            filter: grayscale(100%);
+        }
+    }
+    &[data-state='no_credit'] {
+        .buttonText {
+            box-shadow: inset 0 0 0 1000px rgba(230, 0, 0, 0.6);
+        }
+        & {
+            filter: grayscale(0%);
+            box-shadow:
+                inset 0 0 0 1000px rgba(255, 0, 0, 0.1),
+                0 0 15px 7px rgba(255, 0, 0, 1);
+        }
+    }
+    &[data-state='present'] {
+        .buttonText {
+            box-shadow: inset 0 0 0 1000px rgba(70, 255, 169, 0.6);
+        }
+        & {
+            filter: grayscale(0%);
+            box-shadow:
+                inset 0 0 0 1000px rgb(0, 255, 136, 0.1),
+                0 0 15px 7px rgb(0, 255, 136);
+        }
+    }
+}
+
+.buttonText {
+    user-select: none;
+    border-radius: 14px;
+    font-size: calc(14vw / var(--width));
+    padding: 3px;
+    font-family: 'tcm', sans-serif;
+    position: absolute;
+    color: white;
+
+    left: 0;
+    right: 0;
+    display: inline-block;
+
+    &.labelTop {
+        top: 0;
+        vertical-align: top;
+    }
+    &.labelBottom {
+        bottom: 0;
+        vertical-align: bottom;
+    }
+
+    &.labelLeft {
+        // left
+        right: auto;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    &.labelRight {
+        // right
+        left: auto;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}

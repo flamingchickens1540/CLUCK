@@ -4,9 +4,10 @@ import prisma from '~lib/prisma'
 import logger from '~lib/logger'
 import { safeParseInt } from '~lib/util'
 import { season_start_date } from '~config'
+import { requireAdminLogin } from '~lib/auth'
 
 export const router = new Hono()
-
+router.use(requireAdminLogin)
 router
     .get('/admin/members', async (c) => {
         return c.json(
@@ -125,3 +126,13 @@ router
             return c.json({ error: err }, 400)
         }
     })
+
+router.post('/admin/meetings/create', async (c) => {
+    await prisma.meetings.create({
+        data: {
+            date: new Date(),
+            mandatory: true
+        }
+    })
+    return c.json({ success: true })
+})

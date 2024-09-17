@@ -107,3 +107,12 @@ export const requireAdminLogin: MiddlewareHandler<BlankEnv, never, object> = asy
         return c.redirect(`/auth/login?redirectTo=${c.req.path}&level=admin`, 302)
     }
 }
+export const requireAdminAPI: MiddlewareHandler<BlankEnv, never, object> = async (c, next) => {
+    await validateAuth(c)
+    if (c.get('auth_admin')) {
+        await next()
+    } else {
+        c.status(401)
+        return c.text('Invalid key')
+    }
+}

@@ -106,5 +106,13 @@ async function main() {
         const meetings: Prisma.Meetings[] = await resp.json()
         gridApi.setGridOption('rowData', meetings)
     })
+
+    document.getElementById('btn-create')?.addEventListener('click', async () => {
+        await fetch('/api/admin/meetings/create', { method: 'POST' })
+        fetch('/api/admin/meetings').then(async (resp) => {
+            const meetings: Prisma.Meetings[] = await resp.json()
+            gridApi.setGridOption('rowData', meetings)
+        })
+    })
 }
 main()
