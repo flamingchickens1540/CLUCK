@@ -91,7 +91,8 @@ export async function getWeeklyHours(): Promise<Record<string, number>> {
         where: {
             time_in: {
                 gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
-            }
+            },
+            state: 'complete'
         },
         _sum: {
             duration: true
