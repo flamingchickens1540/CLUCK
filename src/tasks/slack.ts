@@ -39,7 +39,7 @@ export async function syncSlackMembers() {
                             slack_photo: slack_member.profile?.image_original,
                             slack_photo_small: slack_member.profile?.image_192,
                             first_name: display_name.split(' ')[0].trim(),
-                            active: member.active && students_set.has(slack_member.id!) && !slack_member?.deleted
+                            active: students_set.has(slack_member.id!) && !slack_member?.deleted
                         }
                     })
                     updated++
