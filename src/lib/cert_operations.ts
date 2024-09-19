@@ -78,3 +78,32 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
     })
     return { success: true }
 }
+
+export async function getManagers() {
+    const departments = await prisma.department.findMany({
+        include: {
+            Certs: {
+                where: {
+                    isManager: true
+                },
+                select: {
+                    Instances: {
+                        select: {
+                            Member: {
+                                select: {
+                                    email: true,
+                                    slack_id: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    return departments.map((dept) => ({
+        dept,
+        managers: dept.Certs.flatMap((cert) => cert.Instances.map((instance) => instance.Member.slack_id).filter((v) => v != null))
+    }))
+}

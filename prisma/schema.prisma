@@ -22,12 +22,13 @@ model Account {
 }
 
 model Department {
-  id          String   @id @db.VarChar(50)
-  name        String   @db.VarChar(100)
-  slack_group String?  @db.VarChar(50)
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
-  Certs       Cert[]
+  id                  String   @id @db.VarChar(50)
+  name                String   @db.VarChar(100)
+  slack_group         String?  @db.VarChar(50)
+  manager_slack_group String?  @db.VarChar(50)
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @db.Timestamptz(6)
+  Certs               Cert[]
 
   Members DepartmentAssociation[]
 
@@ -112,16 +113,16 @@ model Meetings {
 }
 
 model Member {
-  email             String            @id @db.VarChar(50)
-  first_name        String            @db.VarChar(50)
-  full_name         String            @db.VarChar(100)
+  email             String  @id @db.VarChar(50)
+  first_name        String  @db.VarChar(50)
+  full_name         String  @db.VarChar(100)
   use_slack_photo   Boolean
-  slack_id          String?           @unique @db.VarChar(15)
-  slack_photo       String?           @db.VarChar(255)
-  slack_photo_small String?           @db.VarChar(255)
-  fallback_photo    String?           @db.VarChar(255)
-  is_primary_team   Boolean           @default(true)
-  active            Boolean           @default(true)
+  slack_id          String? @unique @db.VarChar(15)
+  slack_photo       String? @db.VarChar(255)
+  slack_photo_small String? @db.VarChar(255)
+  fallback_photo    String? @db.VarChar(255)
+  is_primary_team   Boolean @default(true)
+  active            Boolean @default(true)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
