@@ -5,7 +5,7 @@ import responses from '~slack/blocks/responses'
 import type { ActionMiddleware, CommandMiddleware, ShortcutMiddleware, ViewMiddleware } from '~slack/lib/types'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
-    const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)? (.+)$/
+    const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)?(?: (.+))?$/
     if (!timeRegex.test(text)) {
         return { hours: 0, activity: undefined }
     }
@@ -66,13 +66,12 @@ export const handleOpenLogModal: ActionMiddleware = async ({ body, ack, client }
 
 export const handleSubmitLogModal: ViewMiddleware = async ({ ack, body, view }) => {
     // Get the hours and task from the modal
-    let hours = safeParseFloat(view.state.values.hours.hours.value) ?? parseArgs(view.state.values.hours.hours.value ?? '').hours
+    let hours = parseArgs(view.state.values.time.time.value ?? '').hours
     const activity = view.state.values.task.task.value
-
     // Ensure the time values are valid
     hours = isNaN(hours) ? 0 : hours
     if (hours < 0.1) {
-        await ack({ response_action: 'errors', errors: { hours: 'Please enter a valid duration' } })
+        await ack({ response_action: 'errors', errors: { hours: 'Please enter a valid duration (eg. 1h30m)' } })
         return
     }
     if (activity?.trim() == '' || activity == undefined) {

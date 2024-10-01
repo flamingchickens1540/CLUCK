@@ -9,12 +9,12 @@ export const getLogModal =() => Modal()
     .close('Cancel')
     .blocks(
         Blocks.Input()
-            .blockId('hours')
+            .blockId('time')
             .element(Elements.TextInput()
-                .actionId('hours')
+                .actionId('time')
                 .placeholder('2h15m')
             )
-            .label('🕘 Hours Spent'),
+            .label('🕘 Time Spent'),
         Blocks.Input()
             .blockId('task')
             .element(Elements.TextInput()

@@ -53,7 +53,10 @@ export function scheduleTasks() {
 
     tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
-    tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
+    if (isProd) {
+        // This task affects workspace-wide groups, should not be run while testing if in the same workspace
+        tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
+    }
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 

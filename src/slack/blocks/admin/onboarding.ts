@@ -15,7 +15,7 @@ export async function getOnboardingModal() {
     modal.blocks(
         Blocks.Section().text('The following members will be added to the database from <!subteam^' + config.slack.groups.students + '>'),
         Blocks.Divider(),
-        Blocks.Section().text(newMembers.map((member) => `<@${member}>`).join('\n'))
+        Blocks.Section().text(newMembers.map((member) => `<@${member}>`).join('\n') || 'None')
     )
     modal.privateMetaData(newMembers.join(','))
 

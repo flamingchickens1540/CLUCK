@@ -1,6 +1,8 @@
+import { Blocks, Message } from 'slack-block-builder'
+import { getManagers } from '~lib/cert_operations'
 import config from '~lib/config'
 import logger from '~lib/logger'
-import prisma from '~lib/prisma'
+import { formatList } from '~slack/lib/messages'
 import { EventMiddleware } from '~slack/lib/types'
 
 export const handleAppMentioned: EventMiddleware<'app_mention'> = async ({ event, client }) => {
@@ -11,23 +13,28 @@ export const handleAppMentioned: EventMiddleware<'app_mention'> = async ({ event
             name: 'stopwatch'
         })
         const user = await client.auth.test()
-        const managers = await prisma.member.findMany({ where: { MemberCerts: { some: { Cert: { isManager: true } } } } })
-        const copres_string = config.slack.users.copres.join(',')
-        for (const manager of managers) {
-            if (!manager.slack_id) {
-                logger.warn('No slack id for manager ' + manager.email)
+
+        const dept_managers = await getManagers()
+
+        for (const manager_dept of dept_managers) {
+            if (manager_dept.managers.length == 0) {
+                logger.warn('No manager slack ids for dept ' + manager_dept.dept.name)
                 continue
             }
             const dm = await client.conversations.open({
-                users: copres_string + ',' + manager.slack_id
+                users: [...config.slack.users.copres, ...manager_dept.managers].join(',')
             })
             if (dm.channel?.id == null) {
-                logger.warn('No group dm for manager ' + manager.email)
+                logger.warn('No group dm for dept ' + manager_dept.dept.name)
                 continue
             }
+            const text = event.text.replace('<@' + user.user_id! + '>', formatList(manager_dept.managers.map((id) => '<@' + id + '>')))
             await client.chat.postMessage({
                 channel: dm.channel!.id!,
-                text: event.text.replace(user.user_id!, manager.slack_id)
+                text,
+                blocks: Message()
+                    .blocks(Blocks.Section().text(text), Blocks.Context().elements('Copresident Checkin for ' + manager_dept.dept.name))
+                    .buildToObject().blocks
             })
         }
         await client.reactions.remove({
