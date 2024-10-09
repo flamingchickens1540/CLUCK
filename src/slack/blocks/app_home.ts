@@ -31,16 +31,16 @@ export async function getAppHome(user_id: string) {
         const pending_requests = await getPendingHourSubmissionData()
         const pending_certs = await prisma.memberCertRequest.findMany({ where: { state: 'pending' }, include: { Member: true, Cert: true, Requester: true } })
 
-        homeTab.blocks(Blocks.Header().text('Pending Hour Submissions'))
+        homeTab.blocks(Blocks.Header().text('Pending Hour Submissions (' + pending_requests.length + ')'))
         if (pending_requests.length > 0) {
-            homeTab.blocks(pending_requests.flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))
+            homeTab.blocks(pending_requests.slice(0, 10).flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))
         } else {
             homeTab.blocks(Blocks.Section().text('None'))
             homeTab.blocks(Blocks.Divider())
         }
-        homeTab.blocks(Blocks.Header().text('Pending Certifications'))
+        homeTab.blocks(Blocks.Header().text('Pending Certifications (' + pending_certs.length + ')'))
         if (pending_certs.length > 0) {
-            homeTab.blocks(pending_certs.flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]))
+            homeTab.blocks(pending_certs.slice(0, 10).flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]))
         } else {
             homeTab.blocks(Blocks.Section().text('None'))
             homeTab.blocks(Blocks.Divider())
