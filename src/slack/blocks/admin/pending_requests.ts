@@ -9,15 +9,22 @@ import { HourSubmissionBlocksInput } from '~slack/blocks/admin/hour_submission'
 export async function getPendingHourSubmissionData(): Promise<HourSubmissionBlocksInput[]> {
     const pendingRequests = await prisma.hourLog.findMany({
         where: { type: 'external', state: 'pending' },
-        select: { id: true, duration: true, message: true, slack_ts: true, Member: { select: { slack_id: true } } }
+        select: { id: true, duration: true, message: true, slack_ts: true, createdAt: true, Member: { select: { slack_id: true } } }
     })
-    return pendingRequests.map((v) => ({ request_id: v.id.toString(), slack_id: v.Member.slack_id!, hours: v.duration!.toNumber(), activity: v.message!, state: 'pending' }))
+    return pendingRequests.map((v) => ({
+        request_id: v.id.toString(),
+        slack_id: v.Member.slack_id!,
+        hours: v.duration!.toNumber(),
+        activity: v.message!,
+        state: 'pending',
+        createdAt: v.createdAt
+    }))
 }
 
 export async function getPendingRequestMessage({ team_id, app_id }: { team_id: string; app_id: string }) {
     const pendingRequests = await prisma.hourLog.findMany({
         where: { type: 'external', state: 'pending' },
-        select: { id: true, duration: true, message: true, slack_ts: true, Member: { select: { slack_id: true } } }
+        select: { id: true, duration: true, message: true, slack_ts: true, Member: { select: { slack_id: true } }, createdAt: true }
     })
 
     const output = Message()
@@ -38,7 +45,7 @@ export async function getPendingRequestMessage({ team_id, app_id }: { team_id: s
         }
         output.blocks(
             Blocks.Section().text(`*<@${log.Member.slack_id}>* - ${formatDuration(log.duration!.toNumber())}`),
-            Blocks.Context().elements(`${log.id} | Submitted ${new Date().toLocaleString()}`),
+            Blocks.Context().elements(`${log.id} | Submitted ${log.createdAt.toLocaleString()}`),
             Blocks.Divider()
         )
     }

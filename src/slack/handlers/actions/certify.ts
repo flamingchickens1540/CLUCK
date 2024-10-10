@@ -53,7 +53,8 @@ export const handleCertReject: ActionMiddleware = async ({ ack, action, client, 
             Cert: true,
             Member: true,
             Requester: true,
-            state: true
+            state: true,
+            createdAt: true
         }
     })
 
@@ -80,7 +81,8 @@ export const handleCertApprove: ActionMiddleware = async ({ ack, action, client,
             Cert: true,
             Member: true,
             Requester: true,
-            state: true
+            state: true,
+            createdAt: true
         }
     })
     if (!req) {
@@ -95,7 +97,7 @@ export const handleCertApprove: ActionMiddleware = async ({ ack, action, client,
             }
         })
     } catch (e) {
-        logger.error(e, "Handling as duplicate certification")
+        logger.error(e, 'Handling as duplicate certification')
         return
     }
     if (req.Cert.replaces) {

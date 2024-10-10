@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import { getCertRequestMessage } from '~slack/blocks/certify'
+import logger from './logger'
 
 enum CertOperationsError {
     CERT_NOT_FOUND = 'This cert cannot be found',
@@ -51,6 +52,8 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
     if (recipients.length != recipient_slack_ids.length) {
         return { success: false, error: CertOperationsError.USER_NOT_FOUND }
     }
+    logger.info('Giving ' + cert.id + ' to ' + recipients.filter((r) => r.MemberCerts.length == 0).map((r) => r.email))
+    logger.info('Not giving ' + cert.id + ' to ' + recipients.filter((r) => r.MemberCerts.length > 0).map((r) => r.email))
     setTimeout(async () => {
         // Do in separate event loop to avoid blocking the request
         const resp = await prisma.memberCertRequest.createManyAndReturn({
@@ -68,7 +71,8 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
                 Cert: true,
                 Member: true,
                 Requester: true,
-                state: true
+                state: true,
+                createdAt: true
             }
         })
         for (const r of resp) {

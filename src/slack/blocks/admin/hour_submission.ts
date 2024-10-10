@@ -4,10 +4,21 @@ import { ActionIDs } from '~slack/handlers'
 import { enum_HourLogs_type } from '@prisma/client'
 import { toTitleCase } from '~lib/util'
 
-export const getSubmissionContextBlock = ({ request_id, state, type }: { request_id: string; state: 'pending' | 'approved' | 'rejected'; type?: enum_HourLogs_type }) => {
+export const getSubmissionContextBlock = ({
+    request_id,
+    state,
+    type,
+    createdAt
+}: {
+    request_id: string
+    state: 'pending' | 'approved' | 'rejected'
+    type?: enum_HourLogs_type
+    createdAt?: Date
+}) => {
+    createdAt ??= new Date()
     switch (state) {
         case 'pending':
-            return Blocks.Context().elements(`${request_id} | ⏳ Submitted ${new Date().toLocaleString()}`)
+            return Blocks.Context().elements(`${request_id} | ⏳ Submitted ${createdAt.toLocaleString()}`)
         case 'approved':
             return Blocks.Context().elements(`${request_id} | ✅ Approved ${new Date().toLocaleString()} | ${toTitleCase(type ?? 'external')}`)
         case 'rejected':
@@ -23,6 +34,7 @@ export type HourSubmissionBlocksInput = {
     response?: string | null
     state: 'pending' | 'approved' | 'rejected'
     type?: enum_HourLogs_type
+    createdAt: Date
 }
 export function getHourSubmissionBlocks(v: HourSubmissionBlocksInput) {
     const blocks: BlockBuilder[] = []

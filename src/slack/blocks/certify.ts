@@ -58,6 +58,7 @@ export function getCertRequestBlocks(r: {
     Requester: { slack_id: string | null }
     Member: { full_name: string; slack_id: string | null; slack_photo_small: string | null; fallback_photo: string | null }
     Cert: { label: string }
+    createdAt: Date
 }): { blocks: BlockBuilder[]; text: string } {
     let text: string
     let footer: string
@@ -90,7 +91,7 @@ export function getCertRequestBlocks(r: {
             Elements.Img()
                 .altText(r.Member.full_name)
                 .imageUrl(r.Member.slack_photo_small ?? r.Member.fallback_photo ?? ''),
-            `${r.id} | ${footer} ${new Date().toLocaleString()}`
+            `${r.id} | ${footer} ${r.createdAt?.toLocaleString()}`
         )
     )
     return { blocks, text }
@@ -103,6 +104,7 @@ export function getCertRequestMessage(r: {
     Requester: { slack_id: string | null }
     Member: { full_name: string; slack_id: string | null; slack_photo_small: string | null; fallback_photo: string | null }
     Cert: { label: string }
+    createdAt: Date
 }) {
     const msg = Message().channel(config.slack.channels.certification_approval).ts(r.slack_ts!)
 
