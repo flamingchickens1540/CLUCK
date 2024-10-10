@@ -72,19 +72,19 @@ export async function updateSheet() {
         row[columns.LoggedIn] = loggedInMap.has(m.email)
         row[columns.Meetings] = meetings[m.email] ?? 0
         row[columns.MeetingsMissed] = meetingsMissed[m.email] ?? 0
-        row[columns.LabHours] = max50Hours(hours.lab)
+        row[columns.LabHours] = hours.lab
         row[columns.ExternalHours] = hours.external
         row[columns.EventHours] = hours.event
         row[columns.SummerHours] = hours.summer
-        row[columns.QualifyingHours] = max50Hours(hours.qualifying)
-        row[columns.TotalHours] = max50Hours(hours.total)
+        row[columns.QualifyingHours] = hours.qualifying
+        row[columns.TotalHours] = hours.total
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email]?.join(', ') ?? ''
         row[columns.IsPrimaryTeam] = m.is_primary_team
         rows.push(row)
 
-        if (hours.qualifying >= 50) {
+        if (hours.qualifying >= (m.is_primary_team ? 50 : 30)) {
             hourReqMet++
         }
     }
