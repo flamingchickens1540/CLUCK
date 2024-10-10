@@ -6,6 +6,7 @@ import { safeParseInt } from '~lib/util'
 import { scheduleCertAnnouncement } from '~tasks/certs'
 import { slack_client } from '~slack'
 import { getAppHome } from '~slack/blocks/app_home'
+import logger from '~lib/logger'
 
 export const handleCertifyCommand: CommandMiddleware = async ({ command, ack, client }) => {
     await ack()
@@ -85,13 +86,18 @@ export const handleCertApprove: ActionMiddleware = async ({ ack, action, client,
     if (!req) {
         return
     }
-    await prisma.memberCert.create({
-        data: {
-            cert_id: req.Cert.id,
-            member_id: req.Member.email,
-            announced: false
-        }
-    })
+    try {
+        await prisma.memberCert.create({
+            data: {
+                cert_id: req.Cert.id,
+                member_id: req.Member.email,
+                announced: false
+            }
+        })
+    } catch (e) {
+        logger.error(e, "Handling as duplicate certification")
+        return
+    }
     if (req.Cert.replaces) {
         try {
             await prisma.memberCert.delete({
