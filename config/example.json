@@ -19,7 +19,8 @@
             "checkin": "CXXX"
         },
         "groups": {
-            "students": "SXXX"
+            "students": "SXXX",
+            "mentors": "SXXX"
         },
         "users": {
             "copres": ["UXXX"],

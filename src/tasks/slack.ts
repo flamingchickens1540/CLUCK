@@ -27,7 +27,9 @@ export async function syncSlackMembers() {
             })
             let updated = 0
             const students_group = await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students })
-            const students_set = new Set<string>(students_group.users ?? [])
+            const mentors_group = await slack_client.usergroups.users.list({ usergroup: config.slack.groups.mentors })
+            const active_set = new Set<string>((students_group.users ?? []).concat(mentors_group.users ?? []))
+
             for (const member of db_members) {
                 const slack_member = (member.slack_id != null ? slack_members_lookup_id[member.slack_id] : null) ?? slack_members_lookup[member.email]
                 if (slack_member != null) {
@@ -39,7 +41,7 @@ export async function syncSlackMembers() {
                             slack_photo: slack_member.profile?.image_original,
                             slack_photo_small: slack_member.profile?.image_192,
                             first_name: display_name.split(' ')[0].trim(),
-                            active: students_set.has(slack_member.id!) && !slack_member?.deleted
+                            active: active_set.has(slack_member.id!) && !slack_member?.deleted
                         }
                     })
                     updated++
