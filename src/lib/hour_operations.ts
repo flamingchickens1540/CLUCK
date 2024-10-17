@@ -71,17 +71,23 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
     return out
 }
 export async function calculateAllHours() {
-    const out: Record<string, Record<enum_HourLogs_type | 'total' | 'qualifying', number>> = {}
+    const out: Record<string, Record<HourCategory, number>> = {}
     const totals = await prisma.hourLog.groupBy({
         by: ['member_id', 'type'],
         _sum: { duration: true },
         where: { state: 'complete', time_in: { gte: season_start_date } }
     })
+    const meetings = await getMeetings()
     totals.forEach((total) => {
-        out[total.member_id] ??= { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
+        out[total.member_id] ??= { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 }
         out[total.member_id][total.type] = total._sum.duration!.toNumber()
         out[total.member_id].total += out[total.member_id][total.type]
         out[total.member_id].qualifying = out[total.member_id].lab + out[total.member_id].external
+    })
+    Object.keys(out).forEach((member) => {
+        out[member].meeting = meetings[member] * 0.5
+        out[member].total += out[member].meeting
+        out[member].qualifying = out[member].lab + out[member].external + out[member].meeting
     })
     return out
 }
