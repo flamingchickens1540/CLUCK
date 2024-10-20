@@ -61,7 +61,7 @@ export function scheduleTasks() {
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 
     // Slack is silly and can only handle 5 items in the overflow menu
-    scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 9 * * SAT')
+    scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 19 * * FRI')
     scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
     scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
 }
