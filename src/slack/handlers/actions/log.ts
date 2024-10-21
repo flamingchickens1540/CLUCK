@@ -71,7 +71,7 @@ export const handleSubmitLogModal: ViewMiddleware = async ({ ack, body, view }) 
     // Ensure the time values are valid
     hours = isNaN(hours) ? 0 : hours
     if (hours < 0.1) {
-        await ack({ response_action: 'errors', errors: { hours: 'Please enter a valid duration (eg. 1h30m)' } })
+        await ack({ response_action: 'errors', errors: { time: 'Please enter a valid duration (eg. 1h30m)' } })
         return
     }
     if (activity?.trim() == '' || activity == undefined) {
