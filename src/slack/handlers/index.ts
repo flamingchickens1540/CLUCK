@@ -21,6 +21,7 @@ import {
 } from './actions/hours_response'
 import { handleRunTask } from '~slack/handlers/actions/run_task'
 import { handleAppMentioned } from './actions/checkin'
+import { handleOpenEventlogModal, handleSubmitEventlogModal } from './views/eventlog'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -36,7 +37,8 @@ export enum ActionIDs {
     SEND_PENDING_REQUESTS = 'send_pending_requests',
     CERT_APPROVE = 'cert_approve',
     CERT_REJECT = 'cert_reject',
-    RUN_TASK = 'run_task'
+    RUN_TASK = 'run_task',
+    SETUP_EVENT_LOG = 'setup_event_log'
 }
 
 export enum ViewIDs {
@@ -45,7 +47,8 @@ export enum ViewIDs {
     MODAL_LOG = 'time_submission',
     MODAL_CERTIFY = 'certify_modal',
     MODAL_DEPARTMENTS = 'departments_modal',
-    MODAL_ONBOARDING = 'onboarding_modal'
+    MODAL_ONBOARDING = 'onboarding_modal',
+    MODAL_EVENTLOG = 'eventlog_modal'
 }
 
 export function registerSlackHandlers(app: App) {
@@ -79,6 +82,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.SEND_PENDING_REQUESTS, handleSendPendingRequestsButton)
     app.action(ActionIDs.OPEN_ONBOARDING_MODAL, handleOpenOnboardingModal)
     app.action(ActionIDs.RUN_TASK, handleRunTask)
+    app.action(ActionIDs.SETUP_EVENT_LOG, handleOpenEventlogModal)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
@@ -90,6 +94,7 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_CERTIFY, handleSubmitCertifyModal)
     app.view(ViewIDs.MODAL_DEPARTMENTS, handleSubmitDepartmentsModal)
     app.view(ViewIDs.MODAL_ONBOARDING, handleSubmitOnboardingModal)
+    app.view(ViewIDs.MODAL_EVENTLOG, handleSubmitEventlogModal)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
     app.event('app_mention', handleAppMentioned)

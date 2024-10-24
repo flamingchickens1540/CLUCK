@@ -23,7 +23,8 @@ export async function getAppHome(user_id: string) {
                 ),
             Blocks.Actions().elements(
                 Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
-                Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS)
+                Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS),
+                Elements.Button().text('Create Event Log Button').actionId(ActionIDs.SETUP_EVENT_LOG)
             )
         )
     }

@@ -3,6 +3,7 @@ import { safeParseFloat } from '~lib/util'
 import { handleHoursRequest } from '~slack/lib/hours_submission'
 import responses from '~slack/blocks/responses'
 import type { ActionMiddleware, CommandMiddleware, ShortcutMiddleware, ViewMiddleware } from '~slack/lib/types'
+import { View } from '@slack/web-api'
 
 export function parseArgs(text: string): { hours: number; activity: string | undefined } {
     const timeRegex = /^(?:([\d.]+)h)? ?(?:([\d.]+)m)?(?: (.+))?$/
@@ -58,8 +59,15 @@ export const handleLogShortcut: ShortcutMiddleware = async ({ shortcut, ack, cli
 export const handleOpenLogModal: ActionMiddleware = async ({ body, ack, client }) => {
     await ack()
 
+    const preset = body.actions[0].value
+    let view: View
+    if (preset) {
+        const params = JSON.parse(preset)
+        view = getLogModal({ time: params.time, task: params.task })
+    }
+    view ??= getLogModal()
     await client.views.open({
-        view: getLogModal(),
+        view: view,
         trigger_id: body.trigger_id
     })
 }
