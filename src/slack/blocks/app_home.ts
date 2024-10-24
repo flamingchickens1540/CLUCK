@@ -34,14 +34,24 @@ export async function getAppHome(user_id: string) {
 
         homeTab.blocks(Blocks.Header().text('Pending Hour Submissions (' + pending_requests.length + ')'))
         if (pending_requests.length > 0) {
-            homeTab.blocks(pending_requests.slice(0, 10).flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()]))
+            homeTab.blocks(
+                pending_requests
+                    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+                    .slice(0, 10)
+                    .flatMap((req) => [...getHourSubmissionBlocks(req), Blocks.Divider()])
+            )
         } else {
             homeTab.blocks(Blocks.Section().text('None'))
             homeTab.blocks(Blocks.Divider())
         }
         homeTab.blocks(Blocks.Header().text('Pending Certifications (' + pending_certs.length + ')'))
         if (pending_certs.length > 0) {
-            homeTab.blocks(pending_certs.slice(0, 10).flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()]))
+            homeTab.blocks(
+                pending_certs
+                    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+                    .slice(0, 10)
+                    .flatMap((req) => [...getCertRequestBlocks(req).blocks, Blocks.Divider()])
+            )
         } else {
             homeTab.blocks(Blocks.Section().text('None'))
             homeTab.blocks(Blocks.Divider())
