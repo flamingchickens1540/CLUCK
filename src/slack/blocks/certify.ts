@@ -6,7 +6,7 @@ import config from '~config'
 
 export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
     const manager = await prisma.member.findUnique({
-        where: user,
+        where: { ...user, active: true },
         select: {
             MemberCerts: {
                 where: { Cert: { isManager: true } },

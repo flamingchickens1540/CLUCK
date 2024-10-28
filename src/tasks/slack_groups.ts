@@ -20,7 +20,7 @@ export async function updateSlackUsergroups() {
     }
     const usergroups_list = await slack_client.usergroups.list({ include_disabled: true })
     const usergroups = new Map(usergroups_list.usergroups!.map((g) => [g.id!, g]))
-    const departments = await prisma.department.findMany({ include: { Members: { select: { Member: { select: { slack_id: true } } } } } })
+    const departments = await prisma.department.findMany({ include: { Members: { select: { Member: { select: { slack_id: true, active: true } } } } } })
     const syncUsergroup = async (data: { department_id: string; group_id: string | null; title: string; handle: string; member_ids: string[] }) => {
         const existing = usergroups.get(data.group_id ?? '')
         let returnValue: { group_id: string; isNew: boolean }
@@ -80,7 +80,7 @@ export async function updateSlackUsergroups() {
             group_id: department.slack_group,
             title: department.name,
             handle: department.name.toLowerCase().replace(' ', '-') + '-dept',
-            member_ids: department.Members.filter((m) => m.Member.slack_id != null).map((m) => m.Member.slack_id!)
+            member_ids: department.Members.filter((m) => m.Member.slack_id != null && m.Member.active).map((m) => m.Member.slack_id!)
         })
         if (res?.isNew) {
             await prisma.department.update({

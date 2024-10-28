@@ -95,6 +95,7 @@ export async function getManagers() {
                         select: {
                             Member: {
                                 select: {
+                                    active: true,
                                     email: true,
                                     slack_id: true
                                 }
@@ -108,6 +109,10 @@ export async function getManagers() {
 
     return departments.map((dept) => ({
         dept,
-        managers: dept.Certs.flatMap((cert) => cert.Instances.map((instance) => instance.Member.slack_id).filter((v) => v != null))
+        managers: dept.Certs.flatMap((cert) =>
+            cert.Instances.filter((instance) => instance.Member.active)
+                .map((instance) => instance.Member.slack_id)
+                .filter((v) => v != null)
+        )
     }))
 }
