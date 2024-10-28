@@ -1,8 +1,9 @@
 import prisma from '~lib/prisma'
 import logger from '~lib/logger'
-import { profile_client } from '~slack/lib/profile'
+import { profile_client, setProfileAttribute } from '~slack/lib/profile'
 import { slack_client } from '~slack'
 import { getManagers } from '~lib/cert_operations'
+import { formatList } from '~slack/lib/messages'
 
 let timeout: NodeJS.Timeout
 
@@ -107,6 +108,23 @@ export async function updateSlackUsergroups() {
                     manager_slack_group: res.group_id
                 }
             })
+        }
+    }
+}
+
+export async function updateProfileDepartments() {
+    const members = await prisma.member.findMany({
+        where: { slack_id: { not: null } },
+        select: {
+            slack_id: true,
+            Departments: {
+                select: { Department: { select: { name: true } } }
+            }
+        }
+    })
+    for (const member of members) {
+        if (member.slack_id) {
+            await setProfileAttribute(member.slack_id, 'department', formatList(member.Departments.map((dept) => dept.Department.name)))
         }
     }
 }

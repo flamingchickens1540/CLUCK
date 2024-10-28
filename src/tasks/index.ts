@@ -1,5 +1,5 @@
 import logger from '~lib/logger'
-import { updateSlackUsergroups } from '~tasks/slack_groups'
+import { updateProfileDepartments, updateSlackUsergroups } from '~tasks/departments'
 import { syncSlackMembers } from '~tasks/slack'
 import { announceNewCerts, updateProfileCerts } from '~tasks/certs'
 import { updateSheet } from '~spreadsheet'
@@ -47,23 +47,30 @@ function scheduleCronTask(task: TaskFunc, cron_exp: string) {
     return task
 }
 
+async function updateProfileFields() {
+    await updateProfileCerts()
+    await updateProfileDepartments()
+}
 export function scheduleTasks() {
     // Offset is to combat Slack's rate limits
     const isProd = process.env.NODE_ENV === 'prod'
 
-    tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
+    tasks['Sync Profiles'] = createTaskFunc(updateProfileFields)
+
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
     if (isProd) {
         // This task affects workspace-wide groups, should not be run while testing if in the same workspace
-        tasks['Sync Usergroups'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
+        tasks['Sync Departments'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
     }
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 
     // Slack is silly and can only handle 5 items in the overflow menu
     scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 19 * * FRI')
+    scheduleTask(updateSheet, 60 * 5, isProd, 0)
     scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
     scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
+    scheduleTask(updateProfileDepartments, 60 * 60 * 24, isProd, 10 * 60)
 }
 
 export async function runTask(key: string) {

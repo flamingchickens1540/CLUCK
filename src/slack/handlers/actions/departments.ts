@@ -6,7 +6,7 @@ import prisma from '~lib/prisma'
 import logger from '~lib/logger'
 import { setProfileAttribute } from '~slack/lib/profile'
 import { formatList } from '~slack/lib/messages'
-import { scheduleUpdateSlackUsergroups } from '~tasks/slack_groups'
+import { scheduleUpdateSlackUsergroups } from '~tasks/departments'
 
 export const handleDepartmentsCommand: CommandMiddleware = async ({ ack, body, client }) => {
     await ack()
