@@ -41,7 +41,8 @@ export function getRespondMessageModal(
                             Bits.Option().text('External').value('external'),
                             Bits.Option().text('Summer ☀️').value('summer'),
                             Bits.Option().text('Event').value('event'),
-                            Bits.Option().text('Lab').value('lab')
+                            Bits.Option().text('Lab').value('lab'),
+                            Bits.Option().text('Outreach').value('outreach')
                         )
                 )
         )

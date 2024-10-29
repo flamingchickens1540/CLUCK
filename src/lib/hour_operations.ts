@@ -59,15 +59,15 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
         }
         user.email = member.email
     }
-    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete', member_id: user.email, time_out: { gte: season_start_date } } })
+    const sums = await prisma.hourLog.groupBy({ by: 'type', _sum: { duration: true }, where: { state: 'complete', member_id: user.email, time_in: { gte: season_start_date } } })
     const meetingCount = await prisma.meetingAttendanceEntry.count({ where: { member_id: user.email, state: 'present', Meeting: { date: { gte: season_start_date } } } })
-    const out: Record<HourCategory, number> = { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0.5 * meetingCount }
+    const out: Record<HourCategory, number> = { outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0.5 * meetingCount }
     sums.forEach((sum) => {
         out[sum.type] = sum._sum.duration!.toNumber()
         out.total += out[sum.type]
     })
     out.total += out.meeting
-    out.qualifying = out.lab + out.external + out.meeting
+    out.qualifying = out.lab + out.external + out.meeting + out.outreach
     return out
 }
 export async function calculateAllHours() {
@@ -79,15 +79,14 @@ export async function calculateAllHours() {
     })
     const meetings = await getMeetings()
     totals.forEach((total) => {
-        out[total.member_id] ??= { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 }
+        out[total.member_id] ??= { outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 }
         out[total.member_id][total.type] = total._sum.duration!.toNumber()
         out[total.member_id].total += out[total.member_id][total.type]
-        out[total.member_id].qualifying = out[total.member_id].lab + out[total.member_id].external
     })
     Object.keys(out).forEach((member) => {
         out[member].meeting = meetings[member] * 0.5
         out[member].total += out[member].meeting
-        out[member].qualifying = out[member].lab + out[member].external + out[member].meeting
+        out[member].qualifying = out[member].lab + out[member].external + out[member].meeting + out[member].outreach
     })
     return out
 }

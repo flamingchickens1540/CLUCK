@@ -21,10 +21,6 @@ export async function authorize() {
 
 const client = await authorize()
 
-function max50Hours(hours: number) {
-    return hours >= 50 ? '50+' : hours
-}
-
 export async function updateSheet() {
     const members = await prisma.member.findMany({ orderBy: { full_name: 'asc' }, where: { active: true } })
     const certs = await prisma.memberCert.findMany({ orderBy: { cert_id: 'asc' }, include: { Cert: { select: { label: true } } } })
@@ -53,6 +49,7 @@ export async function updateSheet() {
         'ExternalHours',
         'EventHours',
         'SummerHours',
+        'OutreachHours',
         'QualifyingHours',
         'TotalHours',
         'WeeklyHours',
@@ -76,6 +73,7 @@ export async function updateSheet() {
         row[columns.ExternalHours] = hours.external
         row[columns.EventHours] = hours.event
         row[columns.SummerHours] = hours.summer
+        row[columns.OutreachHours] = hours.outreach
         row[columns.QualifyingHours] = hours.qualifying
         row[columns.TotalHours] = hours.total
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0

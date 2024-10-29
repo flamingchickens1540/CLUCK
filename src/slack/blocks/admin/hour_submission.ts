@@ -50,9 +50,10 @@ export function getHourSubmissionBlocks(v: HourSubmissionBlocksInput) {
             Blocks.Actions().elements(
                 Elements.Button().primary().text('Accept').actionId(ActionIDs.ACCEPT).value(v.request_id),
                 Elements.Button().danger().text('Reject').actionId(ActionIDs.REJECT).value(v.request_id),
-                Elements.Button().text('☀️').actionId(ActionIDs.ACCEPT_SUMMER).value(v.request_id),
+                // Elements.Button().text('☀️').actionId(ActionIDs.ACCEPT_SUMMER).value(v.request_id), // 7 buttons renders poorly, not used in fall
                 Elements.Button().text('📆').actionId(ActionIDs.ACCEPT_EVENT).value(v.request_id),
                 Elements.Button().text('🔨').actionId(ActionIDs.ACCEPT_LAB).value(v.request_id),
+                Elements.Button().text('⛳').actionId(ActionIDs.ACCEPT_OUTREACH).value(v.request_id),
                 Elements.Button().text('Accept w/ Message').actionId(ActionIDs.ACCEPT_WITH_MSG).value(v.request_id)
             )
         )

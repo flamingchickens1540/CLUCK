@@ -192,6 +192,7 @@ enum enum_HourLogs_type {
   external
   summer
   event
+  outreach
 }
 
 enum enum_MeetingAttendances_state {

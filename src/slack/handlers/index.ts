@@ -28,6 +28,7 @@ export enum ActionIDs {
     ACCEPT_SUMMER = 'accept_summer',
     ACCEPT_EVENT = 'accept_event',
     ACCEPT_LAB = 'accept_lab',
+    ACCEPT_OUTREACH = 'accept_outreach',
     ACCEPT_WITH_MSG = 'accept_msg',
     REJECT = 'reject',
     OPEN_USERINFO_MODAL = 'open_settings_modal',
@@ -72,6 +73,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.ACCEPT_SUMMER, createHoursAcceptButtonHandler('summer'))
     app.action(ActionIDs.ACCEPT_EVENT, createHoursAcceptButtonHandler('event'))
     app.action(ActionIDs.ACCEPT_LAB, createHoursAcceptButtonHandler('lab'))
+    app.action(ActionIDs.ACCEPT_OUTREACH, createHoursAcceptButtonHandler('outreach'))
     app.action(ActionIDs.ACCEPT_WITH_MSG, handleHoursAcceptWithMessageButton)
     app.action(ActionIDs.REJECT, handleHoursRejectButton)
     app.action(ActionIDs.OPEN_USERINFO_MODAL, handleOpenUserInfoModal)
