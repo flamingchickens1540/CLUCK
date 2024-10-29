@@ -12,15 +12,24 @@ import { getTaskKeys } from '~tasks'
 export async function getAppHome(user_id: string) {
     const homeTab = HomeTab()
     if (config.slack.users.devs.includes(user_id)) {
+        const tasks = getTaskKeys().map((key) => Bits.Option().text(key).value(key))
         homeTab.blocks(
             Blocks.Header().text('Dev Dashboard'),
-            Blocks.Section()
-                .text('Manual Tasks')
-                .accessory(
-                    Elements.OverflowMenu()
-                        .actionId(ActionIDs.RUN_TASK)
-                        .options(getTaskKeys().map((key) => Bits.Option().text(key).value(key)))
-                ),
+        )
+        for (let i = 0; i<Math.ceil(tasks.length/5); i++) {
+            console.log(tasks.slice(i*5,(i+1)*5))
+            homeTab.blocks(
+                Blocks.Section()
+                    .text('Manual Tasks ('+i+")")
+                    .accessory(
+                        Elements.OverflowMenu()
+                            .actionId(ActionIDs.RUN_TASK)
+                            .options(tasks.slice(i*5,(i+1)*5))
+                    ),
+            )
+        }
+        
+        homeTab.blocks(
             Blocks.Actions().elements(
                 Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
                 Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS),
