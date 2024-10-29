@@ -16,6 +16,7 @@
             "void": "CXXX",
             "approval": "DXXX",
             "certification_approval": "DXXX",
+            "violation": "CXXXX",
             "checkin": "CXXX"
         },
         "groups": {
@@ -25,6 +26,7 @@
         "users": {
             "copres": ["UXXX"],
             "admins": ["UXXX"],
+            "reports": ["UXXX"],
             "devs": ["UXXX"]
         }
     },

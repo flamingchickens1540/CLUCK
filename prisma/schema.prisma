@@ -133,6 +133,7 @@ model Member {
   MemberCertRequests   MemberCertRequest[]      @relation("MemberCertRecipient")
   MemberCertsRequested MemberCertRequest[]      @relation("MemberCertRequester")
   Departments          DepartmentAssociation[]
+  Violations           Violation[]
 
   @@index([slack_id], map: "members_slack_id")
   @@index([full_name], map: "members_full_name")
@@ -179,6 +180,17 @@ model FallbackPhoto {
   url   String
 
   @@map("FallbackPhotos")
+}
+
+model Violation {
+  id       Int    @id @default(autoincrement())
+  member   String
+  reporter_slack_id String
+  description String
+
+  Member Member @relation(fields: [member], references: [email], onDelete: Cascade)
+
+  @@map("Violations")
 }
 
 enum enum_HourLogs_state {
