@@ -67,6 +67,7 @@ export function scheduleTasks() {
 
     // Slack is silly and can only handle 5 items in the overflow menu
     scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 19 * * FRI')
+    scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 15 * * FRI')
     tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
     tasks['Sync Slack Members'] = scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
     tasks['Update profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
