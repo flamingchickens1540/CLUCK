@@ -14,7 +14,7 @@ export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
                     Cert: {
                         select: {
                             id: true,
-                            Department: { select: { name: true, id: true, Certs: { select: { id: true, label: true } } } }
+                            Department: { select: { name: true, id: true, Certs: { select: { id: true, label: true }, where: { isManager: false } } } }
                         }
                     }
                 }
