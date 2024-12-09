@@ -83,7 +83,7 @@ export async function createCertRequest(giver: Prisma.MemberWhereUniqueInput, re
     return { success: true }
 }
 
-export async function getManagers() {
+export async function getDepartmentManagers() {
     const departments = await prisma.department.findMany({
         include: {
             Certs: {

@@ -21,7 +21,8 @@
         },
         "groups": {
             "students": "SXXX",
-            "mentors": "SXXX"
+            "mentors": "SXXX",
+            "leadership": "SXXX"
         },
         "users": {
             "copres": ["UXXX"],

@@ -1,5 +1,5 @@
 import { Blocks, Message } from 'slack-block-builder'
-import { getManagers } from '~lib/cert_operations'
+import { getDepartmentManagers } from '~lib/cert_operations'
 import config from '~lib/config'
 import logger from '~lib/logger'
 import { formatList } from '~slack/lib/messages'
@@ -14,7 +14,7 @@ export const handleAppMentioned: EventMiddleware<'app_mention'> = async ({ event
         })
         const user = await client.auth.test()
 
-        const dept_managers = await getManagers()
+        const dept_managers = await getDepartmentManagers()
 
         for (const manager_dept of dept_managers) {
             if (manager_dept.managers.length == 0) {
