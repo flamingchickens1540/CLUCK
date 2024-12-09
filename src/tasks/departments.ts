@@ -96,7 +96,7 @@ export async function updateSlackUsergroups() {
     const managers = new Set<string>()
     for (const manager_department of await getDepartmentManagers()) {
         const department = manager_department.dept
-        manager_department.managers.forEach(managers.add)
+        manager_department.managers.forEach((u) => managers.add(u))
         const res = await syncUsergroup({
             department_id: department.id,
             group_id: department.manager_slack_group,
