@@ -61,8 +61,8 @@ export function scheduleTasks() {
     tasks['Announce Certs'] = scheduleTask(announceNewCerts, 60 * 60, isProd, 60) // Just in case the cert announcement isn't automatically run on changes
     if (isProd) {
         // This task affects workspace-wide groups, should not be run while testing if in the same workspace
-        tasks['Sync Departments'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
-        tasks['Sync Teams'] = scheduleTask(updateProfileTeam, 60 * 60 * 24, true, 15 * 60)
+        tasks['Sync Departments'] = scheduleTask(updateSlackUsergroups, 60 * 60, true, 2 * 60)
+        tasks['Sync Teams'] = scheduleTask(updateProfileTeam, 60 * 60 * 24, false, 15 * 60)
     }
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
@@ -72,8 +72,8 @@ export function scheduleTasks() {
     scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 15 * * FRI')
     tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
     tasks['Sync Slack Members'] = scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
-    tasks['Update profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, isProd, 5 * 60)
-    tasks['Update Profile Departments'] = scheduleTask(updateProfileDepartments, 60 * 60 * 24, isProd, 10 * 60)
+    tasks['Update profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, false, 5 * 60)
+    tasks['Update Profile Departments'] = scheduleTask(updateProfileDepartments, 60 * 60 * 24, false, 10 * 60)
 }
 
 export async function runTask(key: string) {
