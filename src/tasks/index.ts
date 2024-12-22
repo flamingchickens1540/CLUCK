@@ -1,6 +1,6 @@
 import logger from '~lib/logger'
 import { updateProfileDepartments, updateSlackUsergroups } from '~tasks/departments'
-import { syncSlackMembers } from '~tasks/slack'
+import { syncSlackMembers, updateProfileTeam } from '~tasks/slack'
 import { announceNewCerts, updateProfileCerts } from '~tasks/certs'
 import { updateSheet } from '~spreadsheet'
 import { syncFallbackPhotos } from './photos'
@@ -50,6 +50,7 @@ function scheduleCronTask(task: TaskFunc, cron_exp: string) {
 async function updateProfileFields() {
     await updateProfileCerts()
     await updateProfileDepartments()
+    await updateProfileTeam()
 }
 export function scheduleTasks() {
     // Offset is to combat Slack's rate limits
@@ -61,6 +62,7 @@ export function scheduleTasks() {
     if (isProd) {
         // This task affects workspace-wide groups, should not be run while testing if in the same workspace
         tasks['Sync Departments'] = scheduleTask(updateSlackUsergroups, 60 * 60, isProd, 2 * 60)
+        tasks['Sync Teams'] = scheduleTask(updateProfileTeam, 60 * 60 * 24, true, 15 * 60)
     }
     tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')

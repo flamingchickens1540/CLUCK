@@ -5,8 +5,24 @@ import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import { Member as SlackMember } from '@slack/web-api/dist/types/response/UsersListResponse'
 import config from '~config'
+import { setProfileAttribute } from '~slack/lib/profile'
 
 const lock = new AsyncLock({ maxExecutionTime: 3000, maxPending: 0 })
+
+export async function updateProfileTeam() {
+    const members = await prisma.member.findMany({
+        where: { slack_id: { not: null } },
+        select: {
+            slack_id: true,
+            is_primary_team: true
+        }
+    })
+    for (const member of members) {
+        if (member.slack_id) {
+            await setProfileAttribute(member.slack_id, 'team', member.is_primary_team ? '1540' : '1844')
+        }
+    }
+}
 
 export async function syncSlackMembers() {
     if (lock.isBusy()) {
