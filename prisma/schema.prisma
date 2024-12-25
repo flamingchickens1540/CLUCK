@@ -121,7 +121,7 @@ model Member {
   slack_photo       String? @db.VarChar(255)
   slack_photo_small String? @db.VarChar(255)
   fallback_photo    String? @db.VarChar(255)
-  is_primary_team   Boolean @default(true)
+  team              enum_Member_Team?
   active            Boolean @default(true)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -217,4 +217,11 @@ enum enum_MemberCertsRequest_state {
   pending
   approved
   rejected
+}
+
+enum enum_Member_Team {
+  primary
+  junior
+  community
+  unaffiliated
 }

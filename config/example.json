@@ -21,7 +21,11 @@
             "checkin": "CXXX"
         },
         "groups": {
-            "students": "SXXX",
+            "students": {
+                "primary": "SXXX",
+                "junior": "SXXX",
+                "community_engineering": "SXXX"
+            },
             "mentors": "SXXX",
             "leadership": "SXXX"
         },

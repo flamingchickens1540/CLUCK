@@ -5,6 +5,7 @@ import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
 import { calculateAllHours, getMeetings, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
+import { enum_Member_Team } from '@prisma/client'
 
 /**
  * Load or request or authorization to call APIs.
@@ -53,7 +54,7 @@ export async function updateSheet() {
         'QualifyingHours',
         'TotalHours',
         'WeeklyHours',
-        'IsPrimaryTeam',
+        'Team',
         'Photo',
         'Certifications'
     ] as const
@@ -79,10 +80,10 @@ export async function updateSheet() {
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
         row[columns.Certifications] = certMap[m.email]?.join(', ') ?? ''
-        row[columns.IsPrimaryTeam] = m.is_primary_team
+        row[columns.Team] = m.team
         rows.push(row)
 
-        if (hours.qualifying >= (m.is_primary_team ? 50 : 30)) {
+        if (hours.qualifying >= (m.team == enum_Member_Team.primary ? 50 : 30)) {
             hourReqMet++
         }
     }

@@ -1,7 +1,5 @@
 import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import { getOnboardingModal } from '~slack/blocks/admin/onboarding'
 import { slack_client } from '~slack'
-import prisma from '~lib/prisma'
 import { Blocks, Elements, Message, Modal } from 'slack-block-builder'
 import { ActionIDs, ViewIDs } from '..'
 import { parseArgs } from '../actions/log'

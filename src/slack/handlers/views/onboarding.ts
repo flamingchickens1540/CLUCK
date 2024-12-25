@@ -2,6 +2,8 @@ import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
 import { getOnboardingModal } from '~slack/blocks/admin/onboarding'
 import { slack_client } from '~slack'
 import prisma from '~lib/prisma'
+import config from '~config'
+import { enum_Member_Team } from '@prisma/client'
 
 export const handleOpenOnboardingModal: ActionMiddleware = async ({ body, ack, client }) => {
     await ack()
@@ -14,22 +16,38 @@ export const handleOpenOnboardingModal: ActionMiddleware = async ({ body, ack, c
 
 export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack, view }) => {
     await ack()
-    const members = new Set(view.private_metadata.split(','))
+    const dbMembers = await prisma.member.findMany({ where: { slack_id: { not: null } } })
+    const dbMemberSet = new Set<string>(dbMembers.map((member) => member.slack_id!))
+
+    const teams = new Map<string, enum_Member_Team>()
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.primary }))
+        .users!.filter((member) => !dbMemberSet.has(member))
+        .forEach((m) => teams.set(m, 'primary'))
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.junior }))
+        .users!.filter((member) => !dbMemberSet.has(member))
+        .forEach((m) => teams.set(m, 'junior'))
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.community_engineering }))
+        .users!.filter((member) => !dbMemberSet.has(member))
+        .forEach((m) => teams.set(m, 'community'))
+
     const user_list = await slack_client.users.list({})
-    const members_to_add = user_list.members?.filter((m) => members.has(m.id!)) ?? []
     const fallback_photos = await prisma.fallbackPhoto.findMany()
     const fallback_photo_map = new Map<string, string>(fallback_photos.map((fp) => [fp.email, fp.url]))
     await prisma.member.createMany({
-        data: members_to_add.map((m) => ({
-            email: m.profile!.email!.trim().toLowerCase(),
-            slack_id: m.id,
-            slack_photo: m.profile?.image_original,
-            slack_photo_small: m.profile?.image_192,
-            first_name: m.profile!.real_name_normalized!.split(' ')[0] ?? m.profile!.real_name_normalized,
-            full_name: m.profile!.real_name_normalized!,
-            fallback_photo: fallback_photo_map.get(m.profile!.email!),
-            use_slack_photo: false,
-            active: true
-        }))
+        data:
+            user_list.members
+                ?.filter((m) => teams.has(m.id!))
+                .map((m) => ({
+                    email: m.profile!.email!.trim().toLowerCase(),
+                    slack_id: m.id,
+                    slack_photo: m.profile?.image_original,
+                    slack_photo_small: m.profile?.image_192,
+                    first_name: m.profile!.real_name_normalized!.split(' ')[0] ?? m.profile!.real_name_normalized,
+                    full_name: m.profile!.real_name_normalized!,
+                    fallback_photo: fallback_photo_map.get(m.profile!.email!),
+                    use_slack_photo: false,
+                    active: true,
+                    team: teams.get(m.id!)
+                })) ?? []
     })
 }

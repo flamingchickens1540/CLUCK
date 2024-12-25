@@ -1,4 +1,4 @@
-import type { Member } from '@prisma/client'
+import type { enum_Member_Team, Member } from '@prisma/client'
 
 export function getMemberPhoto(member: Pick<Member, 'slack_photo' | 'slack_photo_small' | 'fallback_photo' | 'use_slack_photo'>, small: boolean = false): string | null {
     let slackPhoto = member.slack_photo
@@ -60,4 +60,14 @@ export function toTitleCase(str: string): string {
 
 export function sortCertLabels(a: string, b: string): number {
     return a[a.length - 1].localeCompare(b[b.length - 1])
+}
+
+const labels: Record<enum_Member_Team, string> = {
+    community: 'Community Engineering',
+    primary: '1540',
+    junior: '1844',
+    unaffiliated: ''
+}
+export function getTeamName(team?: enum_Member_Team | null) {
+    return team != null ? labels[team] : null
 }

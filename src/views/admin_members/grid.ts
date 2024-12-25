@@ -22,9 +22,9 @@ export function getColumns(params: { photo_column_formatter?: unknown }) {
             initialWidth: 100
         },
         {
-            field: 'is_primary_team',
+            field: 'team',
             editable: true,
-            headerName: 'Primary Team?',
+            headerName: 'Team',
             initialWidth: 100
         }
     ]
