@@ -7,7 +7,7 @@ import { toTitleCase } from '~lib/util'
 import { getColumns } from '~views/admin_members/grid'
 import { enum_Member_Team } from '@prisma/client'
 
-const getDefaultRow = () => ({ use_slack_photo: false, team: enum_Member_Team.junior }) as never
+const getDefaultRow = () => ({ use_slack_photo: false, team: null }) as never
 export async function initNewMemberTable(mainTable: GridApi) {
     class ButtonComponent implements ag.ICellRendererComp<Prisma.Member> {
         private eGui!: HTMLElement

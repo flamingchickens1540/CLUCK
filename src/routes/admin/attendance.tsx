@@ -43,7 +43,8 @@ router
                     }
                 },
                 where: {
-                    active: true
+                    active: true,
+                    OR: [{ team: 'primary' }, { team: 'junior' }]
                 }
             })
         ).map((member) => {
@@ -141,7 +142,7 @@ router
             meeting_id = safeParseInt(meeting_id_str)
         }
         if (meeting_id) {
-            const members = await prisma.member.findMany({ select: { email: true }, where: { active: true } })
+            const members = await prisma.member.findMany({ select: { email: true }, where: { active: true, OR: [{ team: 'primary' }, { team: 'junior' }] } })
             await prisma.$transaction([
                 prisma.meetingAttendanceEntry.deleteMany({
                     where: {

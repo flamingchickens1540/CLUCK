@@ -19,13 +19,13 @@ export function getColumns(params: { photo_column_formatter?: unknown }) {
             field: 'use_slack_photo',
             editable: true,
             headerName: 'Slack Photo Approved',
-            initialWidth: 100
+            initialWidth: 200
         },
         {
             field: 'team',
-            editable: true,
+            editable: false,
             headerName: 'Team',
-            initialWidth: 100
+            initialWidth: 200
         }
     ]
     if (params.photo_column_formatter) {

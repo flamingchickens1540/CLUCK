@@ -43,7 +43,8 @@
             "client_email": ""
         }
     },
-    "start_date": "2024-06-01",
+    "season_start_date": "2024-06-01",
+    "year_start_date": "2024-06-01",
     "port": 3000,
     "default_photo": "/static/img/default_member.webp"
 }

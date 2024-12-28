@@ -3,7 +3,7 @@ import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
 import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
-import { calculateAllHours, getMeetings, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
+import { calculateAllSeasonHours, getMeetingsAttended, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
 import { enum_Member_Team } from '@prisma/client'
 
@@ -23,7 +23,7 @@ export async function authorize() {
 const client = await authorize()
 
 export async function updateSheet() {
-    const members = await prisma.member.findMany({ orderBy: { full_name: 'asc' }, where: { active: true } })
+    const members = await prisma.member.findMany({ orderBy: { full_name: 'asc' }, where: { active: true, OR: [{ team: 'junior' }, { team: 'primary' }] } })
     const certs = await prisma.memberCert.findMany({ orderBy: { cert_id: 'asc' }, include: { Cert: { select: { label: true } } } })
     const loggedin = await prisma.hourLog.findMany({ where: { state: 'pending', type: 'lab' } })
     const certMap: Record<string, string[]> = {}
@@ -38,9 +38,9 @@ export async function updateSheet() {
     })
 
     const meetingsMissed = await getMeetingsMissed()
-    const meetings = await getMeetings()
+    const meetings = await getMeetingsAttended()
     const weeklyHours = await getWeeklyHours()
-    const allHours = await calculateAllHours()
+    const allHours = await calculateAllSeasonHours()
     const headers = [
         'Name',
         'LoggedIn',
