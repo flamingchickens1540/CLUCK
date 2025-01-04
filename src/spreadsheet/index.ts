@@ -23,7 +23,7 @@ export async function authorize() {
 const client = await authorize()
 
 export async function updateSheet() {
-    const members = await prisma.member.findMany({ orderBy: { full_name: 'asc' }, where: { active: true, OR: [{ team: 'junior' }, { team: 'primary' }] } })
+    const members = await prisma.member.findMany({ orderBy: { full_name: 'asc' }, where: { active: true } })
     const certs = await prisma.memberCert.findMany({ orderBy: { cert_id: 'asc' }, include: { Cert: { select: { label: true } } } })
     const loggedin = await prisma.hourLog.findMany({ where: { state: 'pending', type: 'lab' } })
     const certMap: Record<string, string[]> = {}

@@ -1,7 +1,7 @@
 import prisma from '~lib/prisma'
 import { emitCluckChange } from '~lib/sockets'
 import { enum_HourLogs_type, Prisma } from '@prisma/client'
-import { getStartDate, season_start_date } from '~config'
+import { getStartDate, season_start_date, year_start_date } from '~config'
 
 export enum HourError {
     NOT_SIGNED_IN
@@ -72,17 +72,25 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
 }
 export async function calculateAllSeasonHours() {
     const out: Record<string, Record<HourCategory, number>> = {}
-    const totals = await prisma.hourLog.groupBy({
+    const robotics_totals = await prisma.hourLog.groupBy({
         by: ['member_id', 'type'],
         _sum: { duration: true },
-        where: { state: 'complete', time_in: { gte: season_start_date } }
+        where: { state: 'complete', time_in: { gte: season_start_date }, Member: { OR: [{ team: 'primary' }, { team: 'junior' }] } }
+    })
+    const comm_totals = await prisma.hourLog.groupBy({
+        by: ['member_id', 'type'],
+        _sum: { duration: true },
+        where: { state: 'complete', time_in: { gte: year_start_date }, Member: { team: 'community' } }
     })
     const meetings = await getMeetingsAttended()
-    totals.forEach((total) => {
+    const buildMapFunc = (total: (typeof robotics_totals)[number]) => {
         out[total.member_id] ??= { outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 }
         out[total.member_id][total.type] = total._sum.duration!.toNumber()
         out[total.member_id].total += out[total.member_id][total.type]
-    })
+    }
+    robotics_totals.forEach(buildMapFunc)
+    comm_totals.forEach(buildMapFunc)
+
     Object.keys(out).forEach((member) => {
         out[member].meeting = meetings[member] * 0.5
         out[member].total += out[member].meeting
@@ -107,7 +115,8 @@ export async function getWeeklyHours(): Promise<Record<string, number>> {
 }
 
 export async function getMeetingsAttended(): Promise<Record<string, number>> {
-    const meetings = await prisma.member.findMany({
+    const lookup: Record<string, number> = {}
+    const robotics = await prisma.member.findMany({
         where: {
             active: true,
             OR: [{ team: 'primary' }, { team: 'junior' }]
@@ -130,7 +139,36 @@ export async function getMeetingsAttended(): Promise<Record<string, number>> {
             }
         }
     })
-    return Object.fromEntries(meetings.map((m) => [m.email, m._count.MeetingAttendances]))
+    const commEng = await prisma.member.findMany({
+        where: {
+            active: true,
+            team: 'community'
+        },
+        select: {
+            email: true,
+            _count: {
+                select: {
+                    MeetingAttendances: {
+                        where: {
+                            state: 'present',
+                            Meeting: {
+                                date: {
+                                    gte: year_start_date
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+    robotics.forEach((m) => {
+        lookup[m.email] = m._count.MeetingAttendances
+    })
+    commEng.forEach((m) => {
+        lookup[m.email] = m._count.MeetingAttendances
+    })
+    return lookup
 }
 
 export async function getMeetingsMissed(): Promise<Record<string, number>> {
