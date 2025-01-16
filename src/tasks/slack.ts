@@ -26,12 +26,13 @@ export async function updateProfileTeam() {
     }
 }
 type Team = enum_Member_Team
-const teams: Record<Team, string> = {
-    primary: config.slack.groups.students.primary,
-    junior: config.slack.groups.students.junior,
-    community: config.slack.groups.students.community_engineering,
-    unaffiliated: config.slack.groups.mentors
-}
+const teams: [Team, string] = [
+    ['primary', config.slack.groups.students.primary],
+    ['junior', config.slack.groups.students.junior],
+    ['community', config.slack.groups.students.community_engineering],
+    ['unaffiliated', config.slack.groups.mentors],
+    ['unaffiliated', config.slack.groups.other]
+]
 export async function syncSlackMembers() {
     if (lock.isBusy()) {
         return
@@ -51,7 +52,7 @@ export async function syncSlackMembers() {
             })
             let updated = 0
             const active = new Map<string, Team>()
-            for (const [team, usergroup] of Object.entries(teams)) {
+            for (const [team, usergroup] of teams) {
                 const members = await slack_client.usergroups.users.list({ usergroup: usergroup })
                 if (members.users == null) {
                     logger.error({ members }, 'Could not fetch group members for ' + team)
@@ -59,9 +60,12 @@ export async function syncSlackMembers() {
                 }
                 for (const member of members.users) {
                     if (active.has(member)) {
-                        logger.warn({ member, new: team, existing: active.get(member) }, 'Member affiliated with two teams')
+                        if (team != 'unaffiliated') {
+                            logger.warn({ member, new: team, existing: active.get(member) }, 'Member affiliated with two teams')
+                        }
+                    } else {
+                        active.set(member, team as Team)
                     }
-                    active.set(member, team as Team)
                 }
             }
             for (const member of db_members) {
