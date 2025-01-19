@@ -2,7 +2,7 @@ import { APIMember, WSCluckChange } from '~types'
 import { openFullscreen } from '../util'
 import { clock, getLoggedIn, getMemberList, refreshMemberList } from './clockapi'
 import { registerGestures } from './gestures'
-import { applyRandomStyles, isButtonLoggedIn, setButtonLoggedIn } from './style'
+import { applyRandomStyles, getStyle, isButtonLoggedIn, setButtonLoggedIn } from './style'
 import socket_io from 'socket.io-client'
 
 declare global {
@@ -25,9 +25,11 @@ export async function buildGrid() {
         // Init button
         const memberButton = document.createElement('div')
         memberButton.classList.add('memberButton')
-        if (member.isManager) {
-            memberButton.classList.add('manager')
-        }
+
+        const style = getStyle(member.isManager, member.team)
+        memberButton.style.setProperty('--text-shadow-color', style.textShadow)
+        memberButton.style.setProperty('--button-shadow-color', style.buttonShadow)
+
         memberButton.id = member.email
 
         // Set click toggle

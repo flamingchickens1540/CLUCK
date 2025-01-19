@@ -1,4 +1,5 @@
-import { PostItem } from '~routes/api/dash'
+import { type enum_Member_Team } from '@prisma/client'
+import { type PostItem } from '~routes/api/dash'
 
 export type HourCategory = 'lab' | 'external' | 'summer' | 'event' // must also change enum constraint when modifying
 
@@ -9,6 +10,7 @@ export type APIMember = {
     photo: string
     photo_small: string
     isManager: boolean
+    team: enum_Member_Team
 }
 
 export type APIClockLabRequest = {
