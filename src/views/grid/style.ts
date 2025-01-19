@@ -38,6 +38,9 @@ type Style = {
     buttonShadow: string
 }
 export function getStyle(isManager: boolean, team: enum_Member_Team): Style {
+    if (team == 'unaffiliated') {
+        return { textShadow: 'rgba(132, 132, 132, 0.6)', buttonShadow: 'rgb(122, 122, 122)' }
+    }
     if (isManager) {
         return { textShadow: 'rgba(255, 141, 70, 0.6)', buttonShadow: 'rgb(255, 145, 0)' }
     }
