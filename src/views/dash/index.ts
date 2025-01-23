@@ -55,7 +55,6 @@ async function start() {
     memberlist.forEach((member) => {
         members[member.email] = member
     })
-    placedCircles.push(new ClockCircle())
     setTimeout(update)
     setInterval(() => {
         update()
