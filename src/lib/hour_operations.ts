@@ -50,8 +50,8 @@ export async function getValidHours(user: Prisma.MemberWhereUniqueInput) {
 
 export type HourCategory = enum_HourLogs_type | 'total' | 'qualifying' | 'meeting'
 
-export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
-    const member = await prisma.member.findUnique({ where: user, select: { email: true, team: true } })
+export async function calculateHours(input: Prisma.MemberWhereUniqueInput) {
+    const member = await prisma.member.findUnique({ where: input, select: { email: true, team: true } })
     if (member == null) {
         return
     }
@@ -60,7 +60,7 @@ export async function calculateHours(user: Prisma.MemberWhereUniqueInput) {
         _sum: { duration: true },
         where: { state: 'complete', member_id: member.email, time_in: { gte: getStartDate(member.team) } }
     })
-    const meetingCount = await prisma.meetingAttendanceEntry.count({ where: { member_id: user.email, state: 'present', Meeting: { date: { gte: getStartDate(member.team) } } } })
+    const meetingCount = await prisma.meetingAttendanceEntry.count({ where: { member_id: member.email, state: 'present', Meeting: { date: { gte: getStartDate(member.team) } } } })
     const out: Record<HourCategory, number> = { outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0.5 * meetingCount }
     sums.forEach((sum) => {
         out[sum.type] = sum._sum.duration!.toNumber()
