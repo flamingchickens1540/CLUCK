@@ -2,7 +2,7 @@ import { Blocks, Elements, Modal, ModalBuilder, Option } from 'slack-block-build
 import prisma from '~lib/prisma'
 import { ViewIDs } from '~slack/handlers'
 import { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import { scheduleUpdateSlackUsergroups } from '~tasks/departments'
+import { scheduleUpdateSlackProfileDepartments, scheduleUpdateSlackUsergroups } from '~tasks/departments'
 import config from '~config'
 
 async function getDepartmentModal(manager_slack_id: string): Promise<ModalBuilder> {
@@ -110,4 +110,5 @@ export const handleSubmitManagerDepartmentUsersModal: ViewMiddleware = async ({ 
         skipDuplicates: true
     })
     scheduleUpdateSlackUsergroups()
+    scheduleUpdateSlackProfileDepartments()
 }

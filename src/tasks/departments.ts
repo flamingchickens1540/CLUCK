@@ -6,13 +6,23 @@ import { getDepartmentManagers } from '~lib/cert_operations'
 import { formatList } from '~slack/lib/messages'
 import config from '~config'
 
-let timeout: NodeJS.Timeout
+let groupsTimeout: NodeJS.Timeout
 
 export function scheduleUpdateSlackUsergroups() {
-    if (timeout) {
-        timeout.refresh()
+    if (groupsTimeout) {
+        groupsTimeout.refresh()
     } else {
-        timeout = setTimeout(updateSlackUsergroups, 1000 * 30)
+        groupsTimeout = setTimeout(updateSlackUsergroups, 1000 * 30)
+    }
+}
+
+let profilesTimeout: NodeJS.Timeout
+
+export function scheduleUpdateSlackProfileDepartments() {
+    if (profilesTimeout) {
+        profilesTimeout.refresh()
+    } else {
+        profilesTimeout = setTimeout(updateProfileDepartments, 1000 * 120)
     }
 }
 
