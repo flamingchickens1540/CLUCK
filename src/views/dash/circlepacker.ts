@@ -305,7 +305,7 @@ export function updateCircles(time: number) {
     }
 }
 
-let renderedCircles: { circle: Circle; top: any; left: any; dia: any }[] = []
+const renderedCircles: { circle: Circle; top: any; left: any; dia: any }[] = []
 
 export async function sizeCircles() {
     const sizedCircles = []
@@ -351,14 +351,14 @@ export async function sizeCircles() {
     for (const circle of sizedCircles) {
         const elem = circle.circle.element
 
-        let diameter = circle.radius * multiplier * 2 - MARGIN
+        const diameter = circle.radius * multiplier * 2 - MARGIN
 
         elem.style.width = elem.style.height = `${diameter}vw`
 
         elem.style.left = `${(circle.circle.position.x - minX) * multiplier + offsetX - diameter / 2}vw`
         elem.style.top = `${(circle.circle.position.y - minY) * multiplier + offsetY - diameter / 2}vw`
 
-        let rendered = renderedCircles.find((renderedCircle) => circle.circle == renderedCircle.circle)
+        const rendered = renderedCircles.find((renderedCircle) => circle.circle == renderedCircle.circle)
         const computedStyle = elem.computedStyleMap()
         if (rendered == undefined) {
             renderedCircles.push({

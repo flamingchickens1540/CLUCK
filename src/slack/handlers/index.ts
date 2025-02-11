@@ -23,6 +23,7 @@ import { handleRunTask } from '~slack/handlers/actions/run_task'
 import { handleAppMentioned } from './actions/checkin'
 import { handleOpenEventlogModal, handleSubmitEventlogModal } from './views/eventlog'
 import { handleReportCommand, handleReportDelete, handleSubmitReportModal } from './actions/report'
+import { handleManagerDepartmentsCommand, handleSubmitManagerDepartmentsModal, handleSubmitManagerDepartmentUsersModal } from './actions/departments_manager'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -41,7 +42,8 @@ export enum ActionIDs {
     CERT_REJECT = 'cert_reject',
     RUN_TASK = 'run_task',
     SETUP_EVENT_LOG = 'setup_event_log',
-    DELETE_REPORT = 'delete_report'
+    DELETE_REPORT = 'delete_report',
+    OPEN_MGRDEPT_MODAL = 'mgrdept'
 }
 
 export enum ViewIDs {
@@ -52,7 +54,9 @@ export enum ViewIDs {
     MODAL_REPORT = 'report_modal',
     MODAL_DEPARTMENTS = 'departments_modal',
     MODAL_ONBOARDING = 'onboarding_modal',
-    MODAL_EVENTLOG = 'eventlog_modal'
+    MODAL_EVENTLOG = 'eventlog_modal',
+    MODAL_MGRDEPT_DEPARTMENT = 'mgrdept_department',
+    MODAL_MGRDEPT_USERS = 'mgrdept_users'
 }
 
 export function registerSlackHandlers(app: App) {
@@ -90,6 +94,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.RUN_TASK, handleRunTask)
     app.action(ActionIDs.SETUP_EVENT_LOG, handleOpenEventlogModal)
     app.action(ActionIDs.DELETE_REPORT, handleReportDelete)
+    app.action(ActionIDs.OPEN_MGRDEPT_MODAL, handleManagerDepartmentsCommand)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
@@ -103,6 +108,8 @@ export function registerSlackHandlers(app: App) {
     app.view(ViewIDs.MODAL_ONBOARDING, handleSubmitOnboardingModal)
     app.view(ViewIDs.MODAL_EVENTLOG, handleSubmitEventlogModal)
     app.view(ViewIDs.MODAL_REPORT, handleSubmitReportModal)
+    app.view(ViewIDs.MODAL_MGRDEPT_DEPARTMENT, handleSubmitManagerDepartmentsModal)
+    app.view(ViewIDs.MODAL_MGRDEPT_USERS, handleSubmitManagerDepartmentUsersModal)
     // Events
     app.event('app_home_opened', handleAppHomeOpened)
     app.event('app_mention', handleAppMentioned)
