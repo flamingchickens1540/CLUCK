@@ -3,7 +3,7 @@ import { sheets, sheets_v4 } from '@googleapis/sheets'
 import config from '~config'
 import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
-import { calculateAllSeasonHours, getMeetingsAttended, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
+import { calculateAllSeasonHours, getBlankHoursRecord, getMeetingsAttended, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
 import { enum_Member_Team } from '@prisma/client'
 
@@ -64,7 +64,7 @@ export async function updateSheet() {
 
     let hourReqMet = 0
     for (const m of members) {
-        const hours = allHours[m.email] ?? { event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0 }
+        const hours = allHours[m.email] ?? getBlankHoursRecord()
         const row = new Array(headers.length).fill('')
         row[columns.Name] = m.full_name
         row[columns.LoggedIn] = loggedInMap.has(m.email)

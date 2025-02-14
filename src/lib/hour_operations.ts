@@ -70,6 +70,8 @@ export async function calculateHours(input: Prisma.MemberWhereUniqueInput) {
     out.qualifying = out.lab + out.external + out.meeting + out.outreach
     return out
 }
+export const getBlankHoursRecord: () => Record<HourCategory, number> = () => ({ outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 })
+
 export async function calculateAllSeasonHours() {
     const out: Record<string, Record<HourCategory, number>> = {}
     const robotics_totals = await prisma.hourLog.groupBy({
@@ -84,15 +86,17 @@ export async function calculateAllSeasonHours() {
     })
     const meetings = await getMeetingsAttended()
     const buildMapFunc = (total: (typeof robotics_totals)[number]) => {
-        out[total.member_id] ??= { outreach: 0, event: 0, external: 0, lab: 0, summer: 0, total: 0, qualifying: 0, meeting: 0 }
+        out[total.member_id] ??= getBlankHoursRecord()
         out[total.member_id][total.type] = total._sum.duration!.toNumber()
         out[total.member_id].total += out[total.member_id][total.type]
     }
     robotics_totals.forEach(buildMapFunc)
     comm_totals.forEach(buildMapFunc)
-
-    Object.keys(out).forEach((member) => {
+    Object.keys(meetings).forEach((member) => {
+        out[member] ??= getBlankHoursRecord()
         out[member].meeting = meetings[member] * 0.5
+    })
+    Object.keys(out).forEach((member) => {
         out[member].total += out[member].meeting
         out[member].qualifying = out[member].lab + out[member].external + out[member].meeting + out[member].outreach
     })
