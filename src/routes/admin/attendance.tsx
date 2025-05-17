@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { safeParseInt } from '~lib/util'
 import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 import { enum_MeetingAttendances_state } from '@prisma/client'
-import { season_start_date } from '~config'
+import { extra_config } from '~config'
 
 export const router = new Hono().basePath('/attendance/')
 
@@ -25,7 +25,7 @@ const attendanceSVGs = {
 }
 router
     .get('/', async (c) => {
-        const meetings = await prisma.meetings.findMany({ orderBy: [{ date: 'desc' }, { id: 'desc' }], where: { date: { gte: season_start_date } } })
+        const meetings = await prisma.meetings.findMany({ orderBy: [{ date: 'desc' }, { id: 'desc' }], where: { date: { gte: extra_config.season_start_date } } })
         const colcount = meetings.length + 4
         const rows = (
             await prisma.member.findMany({
@@ -39,7 +39,7 @@ router
                     slack_photo_small: true,
                     fallback_photo: true,
                     MeetingAttendances: {
-                        where: { Meeting: { date: { gte: season_start_date } } }
+                        where: { Meeting: { date: { gte: extra_config.season_start_date } } }
                     }
                 },
                 where: {

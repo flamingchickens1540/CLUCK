@@ -1,7 +1,7 @@
 import prisma from '~lib/prisma'
 import { emitCluckChange } from '~lib/sockets'
 import { enum_HourLogs_type, Prisma } from '@prisma/client'
-import { getStartDate, season_start_date, year_start_date } from '~config'
+import { getStartDate, extra_config } from '~config'
 
 export enum HourError {
     NOT_SIGNED_IN
@@ -77,12 +77,12 @@ export async function calculateAllSeasonHours() {
     const robotics_totals = await prisma.hourLog.groupBy({
         by: ['member_id', 'type'],
         _sum: { duration: true },
-        where: { state: 'complete', time_in: { gte: season_start_date }, Member: { OR: [{ team: 'primary' }, { team: 'junior' }] } }
+        where: { state: 'complete', time_in: { gte: extra_config.season_start_date }, Member: { OR: [{ team: 'primary' }, { team: 'junior' }] } }
     })
     const comm_totals = await prisma.hourLog.groupBy({
         by: ['member_id', 'type'],
         _sum: { duration: true },
-        where: { state: 'complete', time_in: { gte: year_start_date }, Member: { team: 'community' } }
+        where: { state: 'complete', time_in: { gte: extra_config.year_start_date }, Member: { team: 'community' } }
     })
     const meetings = await getMeetingsAttended()
     const buildMapFunc = (total: (typeof robotics_totals)[number]) => {
@@ -134,7 +134,7 @@ export async function getMeetingsAttended(): Promise<Record<string, number>> {
                             state: 'present',
                             Meeting: {
                                 date: {
-                                    gte: season_start_date
+                                    gte: extra_config.season_start_date
                                 }
                             }
                         }
@@ -157,7 +157,7 @@ export async function getMeetingsAttended(): Promise<Record<string, number>> {
                             state: 'present',
                             Meeting: {
                                 date: {
-                                    gte: year_start_date
+                                    gte: extra_config.year_start_date
                                 }
                             }
                         }
@@ -193,7 +193,7 @@ export async function getMeetingsMissed(): Promise<Record<string, number>> {
                             Meeting: {
                                 mandatory: true,
                                 date: {
-                                    gte: season_start_date
+                                    gte: extra_config.season_start_date
                                 }
                             }
                         }

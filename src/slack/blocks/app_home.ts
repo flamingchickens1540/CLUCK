@@ -3,8 +3,8 @@ import { getHourSubmissionBlocks } from '~slack/blocks/admin/hour_submission'
 import { ActionIDs } from '~slack/handlers'
 import { getUserHourSummaryBlocks } from '~slack/blocks/member/user_hours'
 import { getUserCertBlocks } from '~slack/blocks/member/user_certs'
-import { Bits, Blocks, Elements, HomeTab } from 'slack-block-builder'
-import config from '~config'
+import { Bits, Blocks, ConfirmationDialog, Elements, HomeTab } from 'slack-block-builder'
+import config, { extra_config } from '~config'
 import { getCertRequestBlocks } from '~slack/blocks/certify'
 import prisma from '~lib/prisma'
 import { getTaskKeys } from '~tasks'
@@ -26,12 +26,22 @@ export async function getAppHome(user_id: string) {
                     )
             )
         }
-
+        const enableSheetCertsButton = Bits.Option().text('Update Spreadsheet Certs').description('Disable at EOY to avoid updating spreadsheet').value('update_spreadsheet_certs')
         homeTab.blocks(
             Blocks.Actions().elements(
                 Elements.Button().text('Open Onboarding').actionId(ActionIDs.OPEN_ONBOARDING_MODAL),
                 Elements.Button().text('Send Pending Requests').actionId(ActionIDs.SEND_PENDING_REQUESTS),
-                Elements.Button().text('Create Event Log Button').actionId(ActionIDs.SETUP_EVENT_LOG)
+                Elements.Button().text('Create Event Log Button').actionId(ActionIDs.SETUP_EVENT_LOG),
+                Elements.Checkboxes()
+                    .options(enableSheetCertsButton)
+                    .confirm(
+                        ConfirmationDialog()
+                            .title('Are you sure?')
+                            .text("If turning on, will replace spreadsheet's certs with database's certs")
+                            .danger(extra_config.update_spreadsheet_certs)
+                    )
+                    .initialOptions(extra_config.update_spreadsheet_certs ? enableSheetCertsButton : undefined)
+                    .actionId(ActionIDs.SETTING_UPDATE_CERTS)
             )
         )
     }

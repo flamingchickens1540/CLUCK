@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import logger from '~lib/logger'
 import { safeParseInt } from '~lib/util'
-import { season_start_date } from '~config'
+import { extra_config } from '~config'
 
 export const router = new Hono()
 
@@ -105,7 +105,7 @@ router
 
 router
     .get('/admin/meetings', async (c) => {
-        return c.json(await prisma.meetings.findMany({ orderBy: { date: 'asc' }, where: { date: { gte: season_start_date } } }))
+        return c.json(await prisma.meetings.findMany({ orderBy: { date: 'asc' }, where: { date: { gte: extra_config.season_start_date } } }))
     })
     .put(async (c) => {
         const data = (await c.req.json()) as Partial<Meetings>

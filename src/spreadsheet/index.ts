@@ -1,6 +1,6 @@
 import { JWT } from 'google-auth-library'
 import { sheets, sheets_v4 } from '@googleapis/sheets'
-import config from '~config'
+import config, { extra_config } from '~config'
 import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
 import { calculateAllSeasonHours, getBlankHoursRecord, getMeetingsAttended, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
@@ -79,7 +79,7 @@ export async function updateSheet() {
         row[columns.TotalHours] = hours.total
         row[columns.WeeklyHours] = weeklyHours[m.email] ?? 0
         row[columns.Photo] = getMemberPhoto(m, true) ?? ''
-        row[columns.Certifications] = certMap[m.email]?.join(', ') ?? ''
+        row[columns.Certifications] = extra_config.update_spreadsheet_certs ? (certMap[m.email]?.join(', ') ?? '') : null
         row[columns.Team] = m.team
         rows.push(row)
 

@@ -6,7 +6,12 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+model State {
+  key String @id @db.VarChar(128)
+  valBool Boolean?
+  valString String?
+  valDate DateTime?
+}
 model Account {
   id           String   @id @db.VarChar(255)
   password     String   @db.Char(64)

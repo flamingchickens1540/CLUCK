@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import QuickChart from 'quickchart-js'
 import prisma from '~lib/prisma'
-import { season_start_date } from '~config'
+import { extra_config } from '~config'
 
 class HourAggregator {
     private readonly group_size: number
@@ -65,7 +65,7 @@ export async function createHourChartForTeam() {
             time_in: 'asc'
         },
         where: {
-            time_in: { gte: season_start_date }
+            time_in: { gte: extra_config.season_start_date }
         }
     })
     return await createHourChart(hourLogs)

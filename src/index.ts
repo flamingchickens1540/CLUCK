@@ -17,7 +17,7 @@ import { requireAdminLogin, requireReadLogin } from '~lib/auth'
 import logger from '~lib/logger'
 import { startWS } from '~lib/sockets'
 import { scheduleTasks } from '~tasks'
-import config from '~config'
+import config, { refreshState } from '~config'
 import { startSlack } from '~slack'
 
 const app = new Hono()
@@ -49,7 +49,7 @@ app.use('/*', serveStatic({ root: './public' }))
 
 const server = serve({ fetch: app.fetch, port: config.port }, async (info) => {
     logger.info(`Server is running: http://${info.address}:${info.port}`)
-
+    await refreshState()
     await startSlack()
     scheduleTasks()
     startWS(server as HttpServer)

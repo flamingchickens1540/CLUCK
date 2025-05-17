@@ -24,6 +24,7 @@ import { handleAppMentioned } from './actions/checkin'
 import { handleOpenEventlogModal, handleSubmitEventlogModal } from './views/eventlog'
 import { handleReportCommand, handleReportDelete, handleSubmitReportModal } from './actions/report'
 import { handleManagerDepartmentsCommand, handleSubmitManagerDepartmentsModal, handleSubmitManagerDepartmentUsersModal } from './actions/departments_manager'
+import { handleBooleanSettings } from './actions/settings'
 
 export enum ActionIDs {
     ACCEPT = 'accept',
@@ -43,7 +44,8 @@ export enum ActionIDs {
     RUN_TASK = 'run_task',
     SETUP_EVENT_LOG = 'setup_event_log',
     DELETE_REPORT = 'delete_report',
-    OPEN_MGRDEPT_MODAL = 'mgrdept'
+    OPEN_MGRDEPT_MODAL = 'mgrdept',
+    SETTING_UPDATE_CERTS = 'update_spreadsheet_certs'
 }
 
 export enum ViewIDs {
@@ -95,6 +97,7 @@ export function registerSlackHandlers(app: App) {
     app.action(ActionIDs.SETUP_EVENT_LOG, handleOpenEventlogModal)
     app.action(ActionIDs.DELETE_REPORT, handleReportDelete)
     app.action(ActionIDs.OPEN_MGRDEPT_MODAL, handleManagerDepartmentsCommand)
+    app.action(ActionIDs.SETTING_UPDATE_CERTS, handleBooleanSettings)
     app.action('jump_url', async ({ ack }) => {
         await ack()
     })
