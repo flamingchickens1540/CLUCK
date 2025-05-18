@@ -35,10 +35,10 @@ tsx dev/generate_manifest.ts
 If your instance is the only one, you can use `dev/manifest.json` directly
 You'll need to [create a Slack application](https://api.slack.com/apps), which you should do from the app manifest you're using.
 
--   After you complete the setup flow, click "Install to Workspace"
--   `slack.app.signing_secret` can be found in Basic Information > App Credentials > Signing Secret
--   `slack.app.app_token` should be generated in Basic Information > App-Level Tokens with scope `connections:write`
--   `slack.app.bot_token` can be found in OAuth & Permissions > Bot User OAuth Token
+- After you complete the setup flow, click "Install to Workspace"
+- `slack.app.signing_secret` can be found in Basic Information > App Credentials > Signing Secret
+- `slack.app.app_token` should be generated in Basic Information > App-Level Tokens with scope `connections:write`
+- `slack.app.bot_token` can be found in OAuth & Permissions > Bot User OAuth Token
 
 The slack user token needs to be authorized by an administrator, and requires the scopes shown in `dev/user_manifest.json`. You can either add these to the main app's manifest (if the main app will be authorized by a slack administrator) or create a separate app for the user token. The user token is used to set profile fields and usergroups by selected departments.
 `slack.app.user_token` can be left as an empty string if desired to disable the profile field and department usergroup functionality, otherwise it will appear next to where the bot token was after reauthorization.
