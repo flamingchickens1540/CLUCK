@@ -16,43 +16,11 @@ npm run createaccount youruser yourpassword role
 
 ## Adjusting Seasons
 
-Set the `start_date` field to the date you want to start tracking current hour information from, typically around kickoff or the end of summer. Any hour submissions after this point will be counted towards totals. It can be in any format accepted by the [Javascript Date constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date)
+Set the `valDate` column of the `start_date` records in the `State` table of the database to the date you want to start tracking current hour information from, typically around kickoff or the end of summer.
 
-## Refreshing Veracross photos
+## Fallback photos
 
-Open [the student directory](https://portals.veracross.com/catlin/student/directory/1) and paste the following into the browser console. You may need to disable CSP to run this script.
-
-```js
-function loadNext() {
-    console.log('loading more pages...')
-    const elem = document.querySelector('.DirectoryEntries_LoadMoreEntriesButton')
-    if (elem) {
-        elem.click()
-        setTimeout(loadNext, 1000)
-    } else {
-        const people = document.querySelectorAll('.directory-Entry_Header')
-        const data = {}
-        people.forEach((person) => {
-            const email = person.querySelector('a')?.innerHTML?.trim()
-            const photo = person.querySelector('.directory-Entry_PersonPhoto--full')?.src
-            if (email && photo) {
-                data[email] = photo.replace('c_limit', 'c_fill,g_north')
-            } else {
-                console.log('missing data for', person)
-            }
-        })
-        fetch('https://cluck.team1540.org/api/members/fallback_photos', {
-            method: 'POST',
-            headers: { 'X-Api-Key': 'YOUR-API-KEY' },
-            body: JSON.stringify(data)
-        })
-            .then((resp) => resp.text())
-            .then(console.log)
-    }
-}
-
-loadNext()
-```
+These photos are used when Slack photos are not set or are not marked as acceptable. This is now handled by the [CG Photo Access API](https://docs.google.com/document/d/1nhMTYlZLCCqJBqti7kGpqYtWIABRlldEO7k7EdXJGY0/edit)
 
 ## Adding Member Fields
 

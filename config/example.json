@@ -43,8 +43,10 @@
             "client_email": ""
         }
     },
-    "season_start_date": "2024-06-01",
-    "year_start_date": "2024-06-01",
+    "photos": {
+        "url": "",
+        "apikey": ""
+    },
     "port": 3000,
     "default_photo": "/static/img/default_member.webp"
 }

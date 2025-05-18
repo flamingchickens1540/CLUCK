@@ -27,12 +27,12 @@ function createTaskFunc(task: Func): TaskFunc {
     func.label = label
     return func
 }
-function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, offset_seconds: number): TaskFunc {
+function scheduleTask(task: Func, interval_seconds: number, runOnInit: boolean, offset_seconds: number = 0, initial_offset_seconds: number = 0): TaskFunc {
     const cb = createTaskFunc(task)
     if (runOnInit) {
         setTimeout(() => {
             cb('initial run')
-        })
+        }, initial_offset_seconds * 1000)
     }
     setTimeout(() => {
         setInterval(() => {
@@ -64,7 +64,7 @@ export function scheduleTasks() {
         tasks['Sync Departments'] = scheduleTask(updateSlackUsergroups, 60 * 60, true, 2 * 60)
         tasks['Sync Teams'] = scheduleTask(updateProfileTeam, 60 * 60 * 24, false, 15 * 60)
     }
-    tasks['Link Fallback Photos'] = createTaskFunc(syncFallbackPhotos)
+    tasks['Link Fallback Photos'] = scheduleTask(syncFallbackPhotos, 60 * 60 * 24 * 5, true, 0, 5 * 60)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 
     // Slack is silly and can only handle 5 items in the overflow menu

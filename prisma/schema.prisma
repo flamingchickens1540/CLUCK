@@ -125,7 +125,7 @@ model Member {
   slack_id          String? @unique @db.VarChar(15)
   slack_photo       String? @db.VarChar(255)
   slack_photo_small String? @db.VarChar(255)
-  fallback_photo    String? @db.VarChar(255)
+  fallback_photo    String? @db.VarChar(512)
   team              enum_Member_Team?
   active            Boolean @default(true)
 
