@@ -53,8 +53,8 @@ export async function syncSlackMembers() {
             let updated = 0
             const active = new Map<string, Team>()
             for (const [team, usergroup] of teams) {
-                const members = await slack_client.usergroups.users.list({ usergroup: usergroup })
-                if (members.users == null) {
+                const members = await slack_client.usergroups.users.list({ usergroup: usergroup }).catch(() => null)
+                if (members?.users == null || !members.ok) {
                     logger.error({ members }, 'Could not fetch group members for ' + team)
                     continue
                 }
@@ -90,5 +90,4 @@ export async function syncSlackMembers() {
             }
             logger.info(`Found ${updated} members on slack`)
         })
-        .catch((err: Error) => logger.warn(err.message))
 }
