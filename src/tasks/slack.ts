@@ -80,7 +80,7 @@ export async function syncSlackMembers() {
                             slack_photo: slack_member.profile?.image_original,
                             slack_photo_small: slack_member.profile?.image_192,
                             first_name: display_name.split(' ')[0].trim(),
-                            full_name: slack_member.profile!.real_name_normalized!,
+                            full_name: slack_member.profile!.real_name!,
                             team: team,
                             active: team != null && !slack_member?.deleted
                         }
