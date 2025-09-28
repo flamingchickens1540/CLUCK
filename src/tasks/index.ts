@@ -67,12 +67,11 @@ export function scheduleTasks() {
     tasks['Link Fallback Photos'] = scheduleTask(syncFallbackPhotos, 60 * 60 * 24 * 5, true, 0, 5 * 60)
     tasks['Logout All'] = scheduleCronTask(createTaskFunc(logoutAll), '0 0 * * *')
 
-    // Slack is silly and can only handle 5 items in the overflow menu
-    scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 19 * * FRI')
-    scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 15 * * FRI')
+    //scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 19 * * FRI')
+    //scheduleCronTask(createTaskFunc(promptCheckinMessage), '0 15 * * FRI')
     tasks['Sync Sheet'] = scheduleTask(updateSheet, 60 * 5, isProd, 0)
     tasks['Sync Slack Members'] = scheduleTask(syncSlackMembers, 60 * 60, isProd, 0) // can be run from the admin members page
-    tasks['Update profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, false, 5 * 60)
+    tasks['Update Profile Certs'] = scheduleTask(updateProfileCerts, 60 * 60 * 24, false, 5 * 60)
     tasks['Update Profile Departments'] = scheduleTask(updateProfileDepartments, 60 * 60 * 24, false, 10 * 60)
 }
 
