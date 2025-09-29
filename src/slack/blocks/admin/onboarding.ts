@@ -8,11 +8,11 @@ export async function getOnboardingModal() {
     const dbMembers = await prisma.member.findMany({ where: { slack_id: { not: null } } })
     const dbMemberSet = new Set<string>(dbMembers.map((member) => member.slack_id!))
 
-    const membersPrimary = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.primary })).users!.filter((member) => !dbMemberSet.has(member))
-    const membersSecondary = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.junior })).users!.filter((member) => !dbMemberSet.has(member))
-    const membersCommunity = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.community_engineering })).users!.filter(
+    const membersPrimary = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.primary }).catch((e) => null))?.users?.filter((member) => !dbMemberSet.has(member))?? []
+    const membersSecondary = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.junior }).catch((e) => null))?.users?.filter((member) => !dbMemberSet.has(member)) ?? []
+    const membersCommunity = (await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.community_engineering }).catch((e) => null))?.users?.filter(
         (member) => !dbMemberSet.has(member)
-    )
+    ) ?? []
 
     const modal = Modal().title('Onboarding').callbackId(ViewIDs.MODAL_ONBOARDING).submit('Add')
     modal.blocks(
