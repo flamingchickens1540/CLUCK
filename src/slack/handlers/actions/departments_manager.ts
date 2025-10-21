@@ -1,37 +1,13 @@
 import { Blocks, Elements, Modal, ModalBuilder, Option } from 'slack-block-builder'
 import prisma from '~lib/prisma'
 import { ViewIDs } from '~slack/handlers'
+import { getManagedDepartments } from '~slack/lib/department'
 import { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
 import { scheduleUpdateSlackProfileDepartments, scheduleUpdateSlackUsergroups } from '~tasks/departments'
-import config from '~config'
 
 async function getDepartmentModal(manager_slack_id: string): Promise<ModalBuilder> {
-    let managedDepartments: { id: string; name: string }[] = []
-    if (config.slack.users.copres.includes(manager_slack_id) || config.slack.users.devs.includes(manager_slack_id)) {
-        managedDepartments = await prisma.department.findMany()
-    } else {
-        const manager = await prisma.member.findUnique({
-            where: { slack_id: manager_slack_id, active: true },
-            select: {
-                MemberCerts: {
-                    where: { Cert: { isManager: true } },
-                    select: {
-                        Cert: {
-                            select: {
-                                id: true,
-                                Department: { select: { name: true, id: true, Certs: { select: { id: true, label: true }, where: { isManager: false } } } }
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        if (!manager) {
-            return Modal().title(':(').blocks(Blocks.Header().text('No member found'))
-        }
-        managedDepartments = manager.MemberCerts.map((c) => c.Cert.Department).filter((dept) => dept != null)
-    }
-    if (managedDepartments.length == 0) {
+    const managedDepartments = await getManagedDepartments({slack_id:manager_slack_id})
+    if (managedDepartments == null || managedDepartments.length == 0) {
         return Modal().title(':(').blocks(Blocks.Header().text('Must be a manager'))
     }
 
@@ -97,7 +73,7 @@ export const handleSubmitManagerDepartmentsModal: ViewMiddleware = async ({ ack,
     })
 }
 
-export const handleSubmitManagerDepartmentUsersModal: ViewMiddleware = async ({ ack, body, client }) => {
+export const handleSubmitManagerDepartmentUsersModal: ViewMiddleware = async ({ ack, body }) => {
     await ack()
     const dept = body.view.private_metadata
     const users = body.view.state.values.users.users.selected_users

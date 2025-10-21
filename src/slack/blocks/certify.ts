@@ -1,36 +1,17 @@
-import { Prisma } from '@prisma/client'
 import { Bits, BlockBuilder, Blocks, Elements, Message, Modal, OptionGroupBuilder } from 'slack-block-builder'
-import { ActionIDs, ViewIDs } from '~slack/handlers'
-import prisma from '~lib/prisma'
 import config from '~config'
+import { ActionIDs, ViewIDs } from '~slack/handlers'
+import { getManagedDepartments } from '~slack/lib/department'
 
-export async function getCertifyModal(user: Prisma.MemberWhereUniqueInput) {
-    const manager = await prisma.member.findUnique({
-        where: { ...user, active: true },
-        select: {
-            MemberCerts: {
-                where: { Cert: { isManager: true } },
-                select: {
-                    Cert: {
-                        select: {
-                            id: true,
-                            Department: { select: { name: true, id: true, Certs: { select: { id: true, label: true }, where: { isManager: false } } } }
-                        }
-                    }
-                }
-            }
-        }
-    })
-    if (!manager) {
-        return Modal().title(':(').blocks(Blocks.Header().text('No member found')).buildToObject()
-    }
-    const managedDepartments = manager.MemberCerts.map((c) => c.Cert.Department)
-    if (managedDepartments.length == 0) {
+export async function getCertifyModal(user: {slack_id:string}) {
+
+    const managedDepartments = await getManagedDepartments(user)
+    if (managedDepartments == null || managedDepartments.length == 0) {
         return Modal().title(':(').blocks(Blocks.Header().text('Must be a manager')).buildToObject()
     }
 
     const optionGroups: OptionGroupBuilder[] = managedDepartments
-        .filter((d) => d != null)
+        .filter((d) => d != null && d.Certs.length > 0)
         .map((d) => {
             return Bits.OptionGroup()
                 .label(d.name)

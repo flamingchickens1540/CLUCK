@@ -1,9 +1,9 @@
-import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
-import { getOnboardingModal } from '~slack/blocks/admin/onboarding'
-import { slack_client } from '~slack'
-import prisma from '~lib/prisma'
-import config from '~config'
 import { enum_Member_Team } from '@prisma/client'
+import config from '~config'
+import prisma from '~lib/prisma'
+import { slack_client } from '~slack'
+import { getOnboardingModal } from '~slack/blocks/admin/onboarding'
+import type { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
 
 export const handleOpenOnboardingModal: ActionMiddleware = async ({ body, ack, client }) => {
     await ack()
@@ -14,20 +14,20 @@ export const handleOpenOnboardingModal: ActionMiddleware = async ({ body, ack, c
     })
 }
 
-export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack, view }) => {
+export const handleSubmitOnboardingModal: ViewMiddleware = async ({ ack }) => {
     await ack()
     const dbMembers = await prisma.member.findMany({ where: { slack_id: { not: null } } })
     const dbMemberSet = new Set<string>(dbMembers.map((member) => member.slack_id!))
 
     const teams = new Map<string, enum_Member_Team>()
-    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.primary }).catch((e) => null))
-        ?.users?.filter((member) => !dbMemberSet.has(member))
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.primary }).catch(() => null))?.users
+        ?.filter((member) => !dbMemberSet.has(member))
         .forEach((m) => teams.set(m, 'primary'))
-    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.junior }).catch((e) => null))
-        ?.users?.filter((member) => !dbMemberSet.has(member))
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.junior }).catch(() => null))?.users
+        ?.filter((member) => !dbMemberSet.has(member))
         .forEach((m) => teams.set(m, 'junior'))
-    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.community_engineering }).catch((e) => null))
-        ?.users?.filter((member) => !dbMemberSet.has(member))
+    ;(await slack_client.usergroups.users.list({ usergroup: config.slack.groups.students.community_engineering }).catch(() => null))?.users
+        ?.filter((member) => !dbMemberSet.has(member))
         .forEach((m) => teams.set(m, 'community'))
 
     const user_list = await slack_client.users.list({})
