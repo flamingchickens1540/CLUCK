@@ -4,19 +4,19 @@
     "scripts": {
         "dev": "npm-run-all -c --parallel watch:**",
         "dev:frontend": "npm-run-all -c --parallel serve build:css watch:frontend",
-        "watch:backend": "tsx watch src/index.ts --tsconfig ./tsconfig.json",
+        "watch:backend": "bun src/index.ts --watch",
         "watch:css": "tailwindcss -i ./src/app.css -o static/app.css --watch",
-        "watch:frontend": "tsx esbuild-frontend.ts --watch",
+        "watch:frontend": "bun esbuild-frontend.ts --watch",
         "build:css": "tailwindcss -i ./src/app.css -o static/app.css --minify",
-        "build:frontend": "tsx esbuild-frontend.ts",
-        "build:backend": "tsx esbuild-backend.ts",
+        "build:frontend": "bun esbuild-frontend.ts",
+        "build:backend": "bun build src/index.ts --target=node --sourcemap=linked  --outdir=build/",
         "build": "npm-run-all -c --parallel build:**",
         "prod": "NODE_ENV=prod node --enable-source-maps build/index.js",
         "lint:style": "prettier --check .",
         "lint:code": "eslint . -c eslint.config.js",
         "lint": "npm-run-all -l -c --parallel lint:**",
         "format": "prettier --write .",
-        "createaccount": "tsx dev/create_account.ts $1 $2 $3"
+        "createaccount": "bun dev/create_account.ts $1 $2 $3"
     },
     "dependencies": {
         "@googleapis/sheets": "^9.0.0",
@@ -61,12 +61,9 @@
         "eslint": "^9.9.0",
         "eslint-formatter-markdown": "^1.0.4",
         "htmlnano": "^2.1.1",
-        "npm-run-all": "^4.1.5",
-        "pre-commit": "^1.2.2",
         "prettier": "^3.3.3",
         "prisma": "^5.17.0",
         "tailwindcss": "^3.4.10",
-        "tsx": "^4.16.2",
         "typescript": "^5.5.3",
         "typescript-eslint": "^8.2.0",
         "vite-tsconfig-paths": "^4.3.2",
@@ -77,12 +74,5 @@
     },
     "overrides": {
         "uri-js": "npm:uri-js-replace",
-        "pre-commit": {
-            "cross-spawn": "^7.0.5"
-        }
     },
-    "pre-commit": [
-        "lint:code",
-        "format"
-    ]
 }
