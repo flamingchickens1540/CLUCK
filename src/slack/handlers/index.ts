@@ -122,7 +122,7 @@ export function registerSlackHandlers(app: App) {
             user: body?.user?.id
         }
         if ('value' in action) {
-            details.value = action.value
+            details.value = action.value ?? '<none>'
         }
         if ('action_id' in action) {
             details.action_id = action.action_id

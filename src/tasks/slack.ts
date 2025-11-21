@@ -26,7 +26,7 @@ export async function updateProfileTeam() {
     }
 }
 type Team = enum_Member_Team
-const teams: [Team, string] = [
+const teams: [Team, string][] = [
     ['primary', config.slack.groups.students.primary],
     ['junior', config.slack.groups.students.junior],
     ['community', config.slack.groups.students.community_engineering],

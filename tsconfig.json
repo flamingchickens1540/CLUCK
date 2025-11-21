@@ -6,7 +6,7 @@
         "strict": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-
+        "noEmit": true,
         "types": ["node", "vite/client"],
         "jsx": "react-jsx",
         "jsxImportSource": "hono/jsx",
@@ -15,10 +15,9 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "paths": {
-            "~config": ["./lib/config.ts"],
-            "~types": ["./types/index.ts"],
-            "~*": ["./*"]
-        },
-        "baseUrl": "./src"
+            "~config": ["./src/lib/config.ts"],
+            "~types": ["./src/types/index.ts"],
+            "~*": ["./src/*"]
+        }
     }
 }

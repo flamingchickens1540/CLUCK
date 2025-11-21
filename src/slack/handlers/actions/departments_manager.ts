@@ -6,7 +6,7 @@ import { ActionMiddleware, ViewMiddleware } from '~slack/lib/types'
 import { scheduleUpdateSlackProfileDepartments, scheduleUpdateSlackUsergroups } from '~tasks/departments'
 
 async function getDepartmentModal(manager_slack_id: string): Promise<ModalBuilder> {
-    const managedDepartments = await getManagedDepartments({slack_id:manager_slack_id})
+    const managedDepartments = await getManagedDepartments({ slack_id: manager_slack_id })
     if (managedDepartments == null || managedDepartments.length == 0) {
         return Modal().title(':(').blocks(Blocks.Header().text('Must be a manager'))
     }
