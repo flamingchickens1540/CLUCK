@@ -1,9 +1,13 @@
-import { enum_MeetingAttendances_state, Prisma, PrismaClient } from '@prisma/client'
+import { enum_MeetingAttendances_state, Prisma, PrismaClient } from '~prisma'
 import { faker } from '@faker-js/faker'
 import { toTitleCase } from '~lib/util'
 import logger from '~lib/logger'
 
-const prisma = new PrismaClient()
+import { PrismaPg } from '@prisma/adapter-pg'
+
+const prisma = new PrismaClient({
+    adapter: new PrismaPg({})
+})
 
 async function main() {
     await seedDepartments()

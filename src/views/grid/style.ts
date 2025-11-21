@@ -1,4 +1,4 @@
-import type { enum_Member_Team } from '@prisma/client'
+import type { enum_Member_Team } from '~prisma'
 
 type GridStyle = 'void' | 'normal'
 const gridstyle = new URL(document.URL).searchParams.get('void') != null ? 'void' : 'normal'

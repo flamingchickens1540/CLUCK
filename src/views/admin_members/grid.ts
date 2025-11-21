@@ -1,4 +1,4 @@
-import Prisma from '@prisma/client'
+import * as Prisma from '~prisma'
 import * as ag from 'ag-grid-community'
 import { getMemberPhoto } from '~lib/util'
 

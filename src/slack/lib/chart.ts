@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '~prisma'
 import QuickChart from 'quickchart-js'
 import prisma from '~lib/prisma'
 import { extra_config } from '~config'

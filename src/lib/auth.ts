@@ -4,7 +4,7 @@ import logger from '~lib/logger'
 import { getCookie, setCookie } from 'hono/cookie'
 import prisma from '~lib/prisma'
 import crypto from 'crypto'
-import { Account } from '@prisma/client'
+import { Account } from '~prisma'
 
 type KeyAuth = { read: boolean; write: boolean; admin: boolean }
 type KeyValidation = { id: string } & KeyAuth

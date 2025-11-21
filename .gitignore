@@ -38,3 +38,4 @@ _*.ts
 
 /dev/*.manifest.json
 /build/
+/prisma/generated/

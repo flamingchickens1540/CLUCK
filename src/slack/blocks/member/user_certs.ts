@@ -1,5 +1,5 @@
 import { Blocks, ViewBlockBuilder } from 'slack-block-builder'
-import { Prisma } from '@prisma/client'
+import { Prisma } from '~prisma'
 import { UndefinableArray } from 'slack-block-builder/dist/internal'
 import prisma from '~lib/prisma'
 import { sortCertLabels } from '~lib/util'

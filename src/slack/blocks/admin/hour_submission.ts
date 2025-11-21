@@ -1,7 +1,7 @@
 import { BlockBuilder, Blocks, Elements, Message } from 'slack-block-builder'
 import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
 import { ActionIDs } from '~slack/handlers'
-import { enum_HourLogs_type } from '@prisma/client'
+import { enum_HourLogs_type } from '~prisma'
 import { toTitleCase } from '~lib/util'
 
 export const getSubmissionContextBlock = ({

@@ -1,9 +1,13 @@
-import { Member, PrismaClient } from '@prisma/client'
+import { Member, PrismaClient } from '~prisma'
 import config from '~config'
 import { getMemberPhoto } from '~lib/util'
 import logger from '~lib/logger'
+import { PrismaPg } from '@prisma/adapter-pg'
+
+const adapter = new PrismaPg({})
 
 export const prisma = new PrismaClient({
+    adapter,
     log: [
         {
             emit: 'event',

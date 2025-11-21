@@ -7,7 +7,7 @@ import { Member as SlackMember } from '@slack/web-api/dist/types/response/UsersL
 import config from '~config'
 import { setProfileAttribute } from '~slack/lib/profile'
 import { getTeamName } from '~lib/util'
-import { enum_Member_Team } from '@prisma/client'
+import { enum_Member_Team } from '~prisma'
 
 const lock = new AsyncLock({ maxExecutionTime: 3000, maxPending: 0 })
 

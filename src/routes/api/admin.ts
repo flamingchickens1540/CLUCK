@@ -1,4 +1,4 @@
-import { Cert, Meetings, Member, Prisma } from '@prisma/client'
+import { Cert, Meetings, Member, Prisma } from '~prisma'
 import { Hono } from 'hono'
 import prisma from '~lib/prisma'
 import logger from '~lib/logger'

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { safeParseInt } from '~lib/util'
 import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
-import { enum_MeetingAttendances_state } from '@prisma/client'
+import { enum_MeetingAttendances_state } from '~prisma'
 import { extra_config } from '~config'
 
 export const router = new Hono().basePath('/attendance/')

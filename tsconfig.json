@@ -15,10 +15,10 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "paths": {
-            "~config": ["./lib/config.ts"],
-            "~types": ["./types/index.ts"],
-            "~*": ["./*"]
+            "~config": ["./src/lib/config.ts"],
+            "~types": ["./src/types/index.ts"],
+            "~prisma": ["./prisma/generated/client.ts"],
+            "~*": ["./src/*"]
         },
-        "baseUrl": "./src"
     }
 }

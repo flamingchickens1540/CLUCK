@@ -1,11 +1,11 @@
-import Prisma from '@prisma/client'
+import * as Prisma from '~prisma'
 import * as ag from 'ag-grid-community'
 import { GridApi } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { toTitleCase } from '~lib/util'
 import { getColumns } from '~views/admin_members/grid'
-import { enum_Member_Team } from '@prisma/client'
+import { enum_Member_Team } from '~prisma'
 
 const getDefaultRow = () => ({ use_slack_photo: false, team: null }) as never
 export async function initNewMemberTable(mainTable: GridApi) {

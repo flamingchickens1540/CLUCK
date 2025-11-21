@@ -5,7 +5,7 @@ import prisma from '~lib/prisma'
 import { getMemberPhoto } from '~lib/util'
 import { calculateAllSeasonHours, getBlankHoursRecord, getMeetingsAttended, getMeetingsMissed, getWeeklyHours } from '~lib/hour_operations'
 import logger from '~lib/logger'
-import { enum_Member_Team } from '@prisma/client'
+import { enum_Member_Team } from '~prisma'
 
 /**
  * Load or request or authorization to call APIs.

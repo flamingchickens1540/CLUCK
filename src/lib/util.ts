@@ -1,4 +1,4 @@
-import type { enum_Member_Team, Member } from '@prisma/client'
+import type { enum_Member_Team, Member } from '~prisma'
 
 export function getMemberPhoto(member: Pick<Member, 'slack_photo' | 'slack_photo_small' | 'fallback_photo' | 'use_slack_photo'>, small: boolean = false): string | null {
     let slackPhoto = member.slack_photo

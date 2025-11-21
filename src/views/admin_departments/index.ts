@@ -1,4 +1,4 @@
-import Prisma from '@prisma/client'
+import * as Prisma from '~prisma'
 import * as ag from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.min.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'

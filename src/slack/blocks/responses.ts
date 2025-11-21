@@ -1,7 +1,7 @@
 import { Blocks, Message } from 'slack-block-builder'
 import { formatDuration, sanitizeCodeblock } from '~slack/lib/messages'
 import { getSubmissionContextBlock } from '~slack/blocks/admin/hour_submission'
-import { enum_HourLogs_type } from '@prisma/client'
+import { enum_HourLogs_type } from '~prisma'
 
 export default {
     tooFewHours() {

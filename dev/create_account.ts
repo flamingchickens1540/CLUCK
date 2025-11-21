@@ -1,8 +1,11 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '~prisma'
 import { createUser } from '~lib/auth'
 import logger from '~lib/logger'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+    adapter: new PrismaPg({})
+})
 
 async function main() {
     await createUser(process.argv[2].trim(), process.argv[3].trim(), level[0], level[1])

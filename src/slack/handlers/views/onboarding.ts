@@ -1,4 +1,4 @@
-import { enum_Member_Team } from '@prisma/client'
+import { enum_Member_Team } from '~prisma'
 import config from '~config'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'

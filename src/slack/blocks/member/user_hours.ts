@@ -1,6 +1,6 @@
 import { Blocks, Elements, ViewBlockBuilder } from 'slack-block-builder'
 import { calculateHours } from '~lib/hour_operations'
-import { Prisma } from '@prisma/client'
+import { Prisma } from '~prisma'
 import { UndefinableArray } from 'slack-block-builder/dist/internal'
 import { ActionIDs } from '~slack/handlers'
 import prisma from '~lib/prisma'

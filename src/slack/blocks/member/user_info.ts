@@ -1,4 +1,4 @@
-import { Member, Prisma } from '@prisma/client'
+import { Member, Prisma } from '~prisma'
 import { Blocks, Elements, Modal } from 'slack-block-builder'
 import prisma, { getMemberPhotoOrDefault } from '~lib/prisma'
 

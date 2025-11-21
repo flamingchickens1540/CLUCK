@@ -1,6 +1,6 @@
 import prisma from '~lib/prisma'
 import { emitCluckChange } from '~lib/sockets'
-import { enum_HourLogs_type, Prisma } from '@prisma/client'
+import { enum_HourLogs_type, Prisma } from '~prisma'
 import { getStartDate, extra_config } from '~config'
 
 export enum HourError {

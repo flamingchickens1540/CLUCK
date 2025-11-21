@@ -1,4 +1,4 @@
-import { enum_Member_Team } from '@prisma/client'
+import { enum_Member_Team } from '~prisma'
 import type template_config from '../../config/example.json'
 import config_lib from 'config'
 import prisma from './prisma'

@@ -1,5 +1,5 @@
 import prisma from '~lib/prisma'
-import { enum_HourLogs_type, Prisma } from '@prisma/client'
+import { enum_HourLogs_type, Prisma } from '~prisma'
 import config from '~config'
 import { slack_client } from '~slack'
 import { getHourSubmissionMessage } from '~slack/blocks/admin/hour_submission'

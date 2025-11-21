@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '~prisma'
 import prisma from '~lib/prisma'
 import { slack_client } from '~slack'
 import { getCertRequestMessage } from '~slack/blocks/certify'

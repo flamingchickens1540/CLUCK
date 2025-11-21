@@ -1,5 +1,5 @@
 import prisma from '~lib/prisma'
-import { Prisma, Cert } from '@prisma/client'
+import { Prisma, Cert } from '~prisma'
 import { Bits, BlockBuilder, Blocks, Elements, OptionBuilder } from 'slack-block-builder'
 import { ActionIDs } from '~slack/handlers'
 
