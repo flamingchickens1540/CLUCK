@@ -3,8 +3,7 @@ import config from '~config'
 import { ActionIDs, ViewIDs } from '~slack/handlers'
 import { getManagedDepartments } from '~slack/lib/department'
 
-export async function getCertifyModal(user: {slack_id:string}) {
-
+export async function getCertifyModal(user: { slack_id: string }) {
     const managedDepartments = await getManagedDepartments(user)
     if (managedDepartments == null || managedDepartments.length == 0) {
         return Modal().title(':(').blocks(Blocks.Header().text('Must be a manager')).buildToObject()

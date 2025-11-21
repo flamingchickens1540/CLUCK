@@ -1,4 +1,4 @@
-import bolt from '@slack/bolt'
+import * as bolt from '@slack/bolt'
 import config from '~config'
 import logger, { createBoltLogger } from '~lib/logger'
 import { registerSlackHandlers } from '~slack/handlers'

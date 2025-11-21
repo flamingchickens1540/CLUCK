@@ -11,7 +11,8 @@ import type {
     SlackViewMiddlewareArgs,
     ViewSubmitAction
 } from '@slack/bolt'
-import { StringIndexed } from '@slack/bolt/dist/types/helpers'
+
+type StringIndexed = Record<string, any>
 
 export type CommandMiddleware = Middleware<SlackCommandMiddlewareArgs, StringIndexed>
 export type ShortcutMiddleware = Middleware<SlackShortcutMiddlewareArgs<SlackShortcut>, StringIndexed>

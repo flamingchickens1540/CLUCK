@@ -6,7 +6,7 @@
         "strict": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-
+        "noEmit": true,
         "types": ["node", "vite/client"],
         "jsx": "react-jsx",
         "jsxImportSource": "hono/jsx",
@@ -19,6 +19,6 @@
             "~types": ["./src/types/index.ts"],
             "~prisma": ["./prisma/generated/client.ts"],
             "~*": ["./src/*"]
-        },
+        }
     }
 }

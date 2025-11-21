@@ -90,9 +90,9 @@ router
         return c.render(
             <>
                 {meetings.map((meeting) => (
-                    <form method="POST" action={`/admin/attendance/${meeting.id}`} id={`meeting-${meeting.id}`} name={`meeting-${meeting.id}`}></form>
+                    <form method="post" action={`/admin/attendance/${meeting.id}`} id={`meeting-${meeting.id}`} name={`meeting-${meeting.id}`}></form>
                 ))}
-                <form method="POST" action={`/admin/attendance/new`} id={`meeting--1`} name={`meeting--1`}></form>
+                <form method="post" action={`/admin/attendance/new`} id={`meeting--1`} name={`meeting--1`}></form>
                 <div class="container-xl text-center text-xl">
                     <div class="grid" style={`grid-template-columns: 300px 50px 200px repeat(${meetings.length}, 150px) auto`}>
                         <div class="grid grid-cols-subgrid border-0 bg-cyan-300" style={`grid-column: span ${colcount} / span ${colcount}`}>

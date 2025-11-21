@@ -13,7 +13,7 @@
         "build": "npm-run-all -c --parallel build:**",
         "prod": "NODE_ENV=prod node --enable-source-maps build/index.js",
         "lint:style": "prettier --check .",
-        "lint:code": "eslint . -c eslint.config.js",
+        "lint:code": "tsc --noEmit -p . && eslint . -c eslint.config.js",
         "lint": "npm-run-all -l -c --parallel lint:**",
         "format": "prettier --write .",
         "createaccount": "tsx dev/create_account.ts $1 $2 $3"
