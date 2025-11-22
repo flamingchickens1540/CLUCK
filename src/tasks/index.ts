@@ -19,7 +19,6 @@ function createTaskFunc(task: Func): TaskFunc {
             await task()
         } catch (e) {
             logger.error({ name: label, error: e?.toString() }, 'Error running task for ' + reason)
-            throw e
         }
         logger.info({ name: label }, 'Task ran successfully')
         return
