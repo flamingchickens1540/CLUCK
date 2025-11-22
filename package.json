@@ -2,21 +2,21 @@
     "name": "cluck",
     "type": "module",
     "scripts": {
-        "dev": "npm-run-all -c --parallel watch:**",
-        "dev:frontend": "npm-run-all -c --parallel serve build:css watch:frontend",
-        "watch:backend": "tsx watch src/index.ts --tsconfig ./tsconfig.json",
+        "dev": "run-p -c watch:**",
+        "dev:frontend": "run-p -c serve build:css watch:frontend",
+        "watch:backend": "bun --watch src/index.ts",
         "watch:css": "tailwindcss -i ./src/app.css -o static/app.css --watch",
-        "watch:frontend": "tsx esbuild-frontend.ts --watch",
+        "watch:frontend": "bunx esbuild-frontend.ts --watch",
         "build:css": "tailwindcss -i ./src/app.css -o static/app.css --minify",
-        "build:frontend": "tsx esbuild-frontend.ts",
-        "build:backend": "tsx esbuild-backend.ts",
-        "build": "npm-run-all -c --parallel build:**",
+        "build:frontend": "bun esbuild-frontend.ts",
+        "build:backend": "bun build --minify --target=bun src/index.ts --outfile=build/index.js",
+        "build": "run-p -c  build:**",
         "prod": "NODE_ENV=prod node --enable-source-maps build/index.js",
         "lint:style": "prettier --check .",
         "lint:code": "tsc --noEmit -p . && eslint . -c eslint.config.js",
-        "lint": "npm-run-all -l -c --parallel lint:**",
+        "lint": "bun run lint:code && bun run lint:style",
         "format": "prettier --write .",
-        "createaccount": "tsx dev/create_account.ts $1 $2 $3"
+        "createaccount": "bun dev/create_account.ts $1 $2 $3"
     },
     "dependencies": {
         "@googleapis/sheets": "^9.0.0",
@@ -27,6 +27,7 @@
         "@slack/web-api": "^7",
         "ag-grid-community": "^32.0.2",
         "async-lock": "^1.4.1",
+        "caniuse-lite": "^1.0.30001756",
         "config": "^3.3.12",
         "core-js-pure": "^3.37.1",
         "dotenv": "^17.2.3",
@@ -45,6 +46,7 @@
         "ws": "^8.18.0"
     },
     "devDependencies": {
+        "@3c1u/bun-run-all": "^0.1.2",
         "@chialab/esbuild-plugin-html": "^0.18.2",
         "@eslint/js": "^9.6.0",
         "@faker-js/faker": "^8.4.1",
@@ -63,7 +65,6 @@
         "eslint": "^9.9.0",
         "eslint-formatter-markdown": "^1.0.4",
         "htmlnano": "^2.1.1",
-        "npm-run-all": "^4.1.5",
         "pre-commit": "^1.2.2",
         "prettier": "^3.3.3",
         "prisma": "^7.0.0",
@@ -74,17 +75,8 @@
         "vite-tsconfig-paths": "^4.3.2",
         "vitest": "^3.1.3"
     },
-    "engines": {
-        "node": ">=21.0.0"
-    },
     "overrides": {
-        "uri-js": "npm:uri-js-replace",
-        "pre-commit": {
-            "cross-spawn": "^7.0.5"
-        },
-        "@prisma/dev": {
-            "hono": "^4.10.6"
-        }
+        "uri-js": "npm:uri-js-replace"
     },
     "pre-commit": [
         "lint:code",

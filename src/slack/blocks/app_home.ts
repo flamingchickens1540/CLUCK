@@ -84,7 +84,7 @@ export async function getAppHome(user_id: string) {
             Blocks.Divider(),
             await getUserCertBlocks({ slack_id: user_id }),
             Blocks.Divider(),
-            Blocks.Context().elements('Last updated ' + new Date().toLocaleTimeString())
+            Blocks.Context().elements('Last updated ' + new Date().toLocaleString())
         )
     }
     return homeTab.buildToObject()
