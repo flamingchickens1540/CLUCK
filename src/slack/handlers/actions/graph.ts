@@ -3,6 +3,7 @@ import { createHourChartForTeam, createHourChartForUsers } from '~slack/lib/char
 import { formatList } from '~slack/lib/messages'
 import { CommandMiddleware } from '~slack/lib/types'
 import prisma from '~lib/prisma'
+import { SLACK_GROUP_REGEX, SLACK_USER_REGEX } from '~lib/util'
 
 export const handleGraphCommand: CommandMiddleware = async ({ command, ack, respond }) => {
     await ack()
@@ -17,8 +18,8 @@ export const handleGraphCommand: CommandMiddleware = async ({ command, ack, resp
         resp.url = url
     } else {
         const users: Set<string> = new Set()
-        const user_matches = text.matchAll(/<@(\w+)\|\w.+?>/g)
-        const group_matches = text.matchAll(/<!subteam\^(\w+)(?:\|.+?)?>/g)
+        const user_matches = text.matchAll(SLACK_USER_REGEX)
+        const group_matches = text.matchAll(SLACK_GROUP_REGEX)
         for (const user of user_matches) {
             users.add(user[1])
         }

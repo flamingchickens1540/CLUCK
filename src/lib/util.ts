@@ -71,3 +71,6 @@ const labels: Record<enum_Member_Team, string> = {
 export function getTeamName(team?: enum_Member_Team | null) {
     return team != null ? labels[team] : null
 }
+
+export const SLACK_USER_REGEX = /<@(\w+)\|\w.+?>/g
+export const SLACK_GROUP_REGEX = /<!subteam\^(\w+)(?:\|.+?)?>/g
