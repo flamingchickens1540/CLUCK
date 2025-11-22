@@ -12,7 +12,14 @@ jobs:
               uses: oven-sh/setup-bun@v2
             - name: Install Node Dependencies
               run: bun install
+            - name: Generate Prisma Client
+              run: bun x prisma generate
+              env:
+                  DATABASE_URL: '_'
             - name: Lint
-              run: bun run lint
+              run: bun run lint:code
+            - name: Check Format
+              run: bun run lint:style
+              continue-on-error: true
             - name: Build
               run: bun run build
